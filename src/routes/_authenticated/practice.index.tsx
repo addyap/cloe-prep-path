@@ -20,9 +20,13 @@ function PracticePage() {
         <p className="text-sm text-muted-foreground mt-1">Choose a skill to drill.</p>
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
           {SKILLS.map((s) => {
-            const isReady = s.slug === "listening";
-            const linkProps = isReady
-              ? ({ to: "/practice/listening" } as const)
+            const readyTo: Record<string, "/practice/listening" | "/practice/reading"> = {
+              listening: "/practice/listening",
+              reading: "/practice/reading",
+            };
+            const ready = readyTo[s.slug];
+            const linkProps = ready
+              ? ({ to: ready } as const)
               : ({ to: "/coming-soon/$skill", params: { skill: s.slug } } as const);
             return (
               <Link key={s.slug} {...linkProps}
@@ -31,7 +35,7 @@ function PracticePage() {
                   <s.icon className="h-5 w-5" />
                 </div>
                 <div className="mt-4 font-semibold text-foreground">{s.title}</div>
-                {!isReady && <div className="text-xs text-muted-foreground mt-1">Coming soon</div>}
+                {!ready && <div className="text-xs text-muted-foreground mt-1">Coming soon</div>}
               </Link>
             );
           })}
