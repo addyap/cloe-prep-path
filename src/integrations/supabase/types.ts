@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attempts: {
+        Row: {
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          created_at: string
+          id: string
+          is_correct: boolean | null
+          question_id: string
+          score: number | null
+          skill: Database["public"]["Enums"]["skill_type"]
+          user_answer: string | null
+          user_id: string
+        }
+        Insert: {
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          question_id: string
+          score?: number | null
+          skill: Database["public"]["Enums"]["skill_type"]
+          user_answer?: string | null
+          user_id: string
+        }
+        Update: {
+          cefr_level?: Database["public"]["Enums"]["cefr_level"]
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          question_id?: string
+          score?: number | null
+          skill?: Database["public"]["Enums"]["skill_type"]
+          user_answer?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practice_sessions: {
+        Row: {
+          completed_at: string | null
+          id: string
+          mode: Database["public"]["Enums"]["session_mode"]
+          skill: Database["public"]["Enums"]["skill_type"] | null
+          started_at: string
+          summary: Json | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          mode: Database["public"]["Enums"]["session_mode"]
+          skill?: Database["public"]["Enums"]["skill_type"] | null
+          started_at?: string
+          summary?: Json | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          mode?: Database["public"]["Enums"]["session_mode"]
+          skill?: Database["public"]["Enums"]["skill_type"] | null
+          started_at?: string
+          summary?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          current_estimated_level:
+            | Database["public"]["Enums"]["cefr_level"]
+            | null
+          full_name: string | null
+          id: string
+          target_cefr_level: Database["public"]["Enums"]["cefr_level"] | null
+        }
+        Insert: {
+          created_at?: string
+          current_estimated_level?:
+            | Database["public"]["Enums"]["cefr_level"]
+            | null
+          full_name?: string | null
+          id: string
+          target_cefr_level?: Database["public"]["Enums"]["cefr_level"] | null
+        }
+        Update: {
+          created_at?: string
+          current_estimated_level?:
+            | Database["public"]["Enums"]["cefr_level"]
+            | null
+          full_name?: string | null
+          id?: string
+          target_cefr_level?: Database["public"]["Enums"]["cefr_level"] | null
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          audio_url: string | null
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          context_tag: Database["public"]["Enums"]["context_tag"]
+          correct_answer: string | null
+          created_at: string
+          explanation: string | null
+          id: string
+          options: Json | null
+          prompt_text: string
+          skill: Database["public"]["Enums"]["skill_type"]
+          type: Database["public"]["Enums"]["question_type"]
+        }
+        Insert: {
+          audio_url?: string | null
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          context_tag?: Database["public"]["Enums"]["context_tag"]
+          correct_answer?: string | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt_text: string
+          skill: Database["public"]["Enums"]["skill_type"]
+          type: Database["public"]["Enums"]["question_type"]
+        }
+        Update: {
+          audio_url?: string | null
+          cefr_level?: Database["public"]["Enums"]["cefr_level"]
+          context_tag?: Database["public"]["Enums"]["context_tag"]
+          correct_answer?: string | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt_text?: string
+          skill?: Database["public"]["Enums"]["skill_type"]
+          type?: Database["public"]["Enums"]["question_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +168,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      cefr_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
+      context_tag:
+        | "email"
+        | "meeting"
+        | "call"
+        | "negotiation"
+        | "customer_service"
+        | "general"
+      question_type: "mcq" | "gap_fill" | "open_text" | "prompt"
+      session_mode: "practice" | "mock" | "skill_drill"
+      skill_type:
+        | "listening"
+        | "reading"
+        | "grammar_vocab"
+        | "writing"
+        | "speaking"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +310,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      cefr_level: ["A1", "A2", "B1", "B2", "C1", "C2"],
+      context_tag: [
+        "email",
+        "meeting",
+        "call",
+        "negotiation",
+        "customer_service",
+        "general",
+      ],
+      question_type: ["mcq", "gap_fill", "open_text", "prompt"],
+      session_mode: ["practice", "mock", "skill_drill"],
+      skill_type: [
+        "listening",
+        "reading",
+        "grammar_vocab",
+        "writing",
+        "speaking",
+      ],
+    },
   },
 } as const
