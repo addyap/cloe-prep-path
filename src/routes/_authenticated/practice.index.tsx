@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Headphones, BookOpen, PenLine, Mic } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/practice")({ component: PracticePage });
+export const Route = createFileRoute("/_authenticated/practice/")({ component: PracticePage });
 
 const SKILLS = [
   { slug: "listening", title: "Listening", icon: Headphones },
