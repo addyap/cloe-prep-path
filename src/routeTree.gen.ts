@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
+import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
 import { Route as AuthenticatedComingSoonSkillRouteImport } from './routes/_authenticated/coming-soon.$skill'
 
@@ -72,6 +73,12 @@ const AuthenticatedPracticeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const AuthenticatedPracticeReadingRoute =
+  AuthenticatedPracticeReadingRouteImport.update({
+    id: '/reading',
+    path: '/reading',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
 const AuthenticatedPracticeListeningRoute =
   AuthenticatedPracticeListeningRouteImport.update({
     id: '/listening',
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
+  '/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -108,6 +116,7 @@ export interface FileRoutesByTo {
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
+  '/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesById {
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
+  '/_authenticated/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRouteTypes {
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/progress'
     | '/coming-soon/$skill'
     | '/practice/listening'
+    | '/practice/reading'
     | '/practice/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/progress'
     | '/coming-soon/$skill'
     | '/practice/listening'
+    | '/practice/reading'
     | '/practice'
   id:
     | '__root__'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/progress'
     | '/_authenticated/coming-soon/$skill'
     | '/_authenticated/practice/listening'
+    | '/_authenticated/practice/reading'
     | '/_authenticated/practice/'
   fileRoutesById: FileRoutesById
 }
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeIndexRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
+    '/_authenticated/practice/reading': {
+      id: '/_authenticated/practice/reading'
+      path: '/reading'
+      fullPath: '/practice/reading'
+      preLoaderRoute: typeof AuthenticatedPracticeReadingRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
     '/_authenticated/practice/listening': {
       id: '/_authenticated/practice/listening'
       path: '/listening'
@@ -264,11 +284,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPracticeRouteChildren {
   AuthenticatedPracticeListeningRoute: typeof AuthenticatedPracticeListeningRoute
+  AuthenticatedPracticeReadingRoute: typeof AuthenticatedPracticeReadingRoute
   AuthenticatedPracticeIndexRoute: typeof AuthenticatedPracticeIndexRoute
 }
 
 const AuthenticatedPracticeRouteChildren: AuthenticatedPracticeRouteChildren = {
   AuthenticatedPracticeListeningRoute: AuthenticatedPracticeListeningRoute,
+  AuthenticatedPracticeReadingRoute: AuthenticatedPracticeReadingRoute,
   AuthenticatedPracticeIndexRoute: AuthenticatedPracticeIndexRoute,
 }
 

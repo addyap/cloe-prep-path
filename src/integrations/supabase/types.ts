@@ -58,6 +58,36 @@ export type Database = {
           },
         ]
       }
+      passages: {
+        Row: {
+          body: string
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          context_tag: Database["public"]["Enums"]["context_tag"]
+          created_at: string
+          id: string
+          skill: Database["public"]["Enums"]["skill_type"]
+          title: string
+        }
+        Insert: {
+          body: string
+          cefr_level: Database["public"]["Enums"]["cefr_level"]
+          context_tag?: Database["public"]["Enums"]["context_tag"]
+          created_at?: string
+          id?: string
+          skill?: Database["public"]["Enums"]["skill_type"]
+          title: string
+        }
+        Update: {
+          body?: string
+          cefr_level?: Database["public"]["Enums"]["cefr_level"]
+          context_tag?: Database["public"]["Enums"]["context_tag"]
+          created_at?: string
+          id?: string
+          skill?: Database["public"]["Enums"]["skill_type"]
+          title?: string
+        }
+        Relationships: []
+      }
       practice_sessions: {
         Row: {
           completed_at: string | null
@@ -128,6 +158,7 @@ export type Database = {
           explanation: string | null
           id: string
           options: Json | null
+          passage_id: string | null
           prompt_text: string
           skill: Database["public"]["Enums"]["skill_type"]
           type: Database["public"]["Enums"]["question_type"]
@@ -141,6 +172,7 @@ export type Database = {
           explanation?: string | null
           id?: string
           options?: Json | null
+          passage_id?: string | null
           prompt_text: string
           skill: Database["public"]["Enums"]["skill_type"]
           type: Database["public"]["Enums"]["question_type"]
@@ -154,11 +186,20 @@ export type Database = {
           explanation?: string | null
           id?: string
           options?: Json | null
+          passage_id?: string | null
           prompt_text?: string
           skill?: Database["public"]["Enums"]["skill_type"]
           type?: Database["public"]["Enums"]["question_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "questions_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
