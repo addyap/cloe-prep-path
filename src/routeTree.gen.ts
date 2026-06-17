@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
+import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
 import { Route as AuthenticatedComingSoonSkillRouteImport } from './routes/_authenticated/coming-soon.$skill'
 
 const AuthRoute = AuthRouteImport.update({
@@ -71,6 +72,12 @@ const AuthenticatedPracticeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const AuthenticatedPracticeListeningRoute =
+  AuthenticatedPracticeListeningRouteImport.update({
+    id: '/listening',
+    path: '/listening',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
 const AuthenticatedComingSoonSkillRoute =
   AuthenticatedComingSoonSkillRouteImport.update({
     id: '/coming-soon/$skill',
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesById {
@@ -113,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/coming-soon/$skill'
+    | '/practice/listening'
     | '/practice/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/coming-soon/$skill'
+    | '/practice/listening'
     | '/practice'
   id:
     | '__root__'
@@ -151,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/coming-soon/$skill'
+    | '/_authenticated/practice/listening'
     | '/_authenticated/practice/'
   fileRoutesById: FileRoutesById
 }
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeIndexRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
+    '/_authenticated/practice/listening': {
+      id: '/_authenticated/practice/listening'
+      path: '/listening'
+      fullPath: '/practice/listening'
+      preLoaderRoute: typeof AuthenticatedPracticeListeningRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
     '/_authenticated/coming-soon/$skill': {
       id: '/_authenticated/coming-soon/$skill'
       path: '/coming-soon/$skill'
@@ -243,10 +263,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedPracticeRouteChildren {
+  AuthenticatedPracticeListeningRoute: typeof AuthenticatedPracticeListeningRoute
   AuthenticatedPracticeIndexRoute: typeof AuthenticatedPracticeIndexRoute
 }
 
 const AuthenticatedPracticeRouteChildren: AuthenticatedPracticeRouteChildren = {
+  AuthenticatedPracticeListeningRoute: AuthenticatedPracticeListeningRoute,
   AuthenticatedPracticeIndexRoute: AuthenticatedPracticeIndexRoute,
 }
 
