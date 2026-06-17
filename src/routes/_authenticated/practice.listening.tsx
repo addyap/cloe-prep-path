@@ -464,9 +464,12 @@ function Summary({ history, estimatedLevel }: { history: HistoryItem[]; estimate
           )}
 
           <div className="mt-8 flex gap-3 justify-center">
-            <Link to="/practice/listening" reloadDocument>
-              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">Practice again</Button>
-            </Link>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              Practice again
+            </Button>
             <Link to="/dashboard">
               <Button variant="outline">Back to dashboard</Button>
             </Link>
