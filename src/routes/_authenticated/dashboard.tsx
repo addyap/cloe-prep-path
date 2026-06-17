@@ -67,23 +67,28 @@ function Dashboard() {
 
         <h2 className="mt-10 text-lg font-bold text-foreground">Practice by skill</h2>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {SKILLS.map((s) => (
-            <Link
-              key={s.slug}
-              to="/coming-soon/$skill"
-              params={{ skill: s.slug }}
-              className="group rounded-2xl bg-card border border-border p-5 shadow-card hover:shadow-elevated hover:border-accent/50 transition"
-            >
-              <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <s.icon className="h-5 w-5" />
-              </div>
-              <div className="mt-4 font-semibold text-foreground">{s.title}</div>
-              <div className="text-sm text-muted-foreground mt-1">{s.desc}</div>
-              <div className="mt-4 text-sm font-medium text-accent flex items-center gap-1">
-                Start <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </div>
-            </Link>
-          ))}
+          {SKILLS.map((s) => {
+            const isReady = s.slug === "listening";
+            const linkProps = isReady
+              ? ({ to: "/practice/listening" } as const)
+              : ({ to: "/coming-soon/$skill", params: { skill: s.slug } } as const);
+            return (
+              <Link
+                key={s.slug}
+                {...linkProps}
+                className="group rounded-2xl bg-card border border-border p-5 shadow-card hover:shadow-elevated hover:border-accent/50 transition"
+              >
+                <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <s.icon className="h-5 w-5" />
+                </div>
+                <div className="mt-4 font-semibold text-foreground">{s.title}</div>
+                <div className="text-sm text-muted-foreground mt-1">{s.desc}</div>
+                <div className="mt-4 text-sm font-medium text-accent flex items-center gap-1">
+                  {isReady ? "Start" : "Coming soon"} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </div>
+              </Link>
+            );
+          })}
 
           <Link
             to="/coming-soon/$skill"
