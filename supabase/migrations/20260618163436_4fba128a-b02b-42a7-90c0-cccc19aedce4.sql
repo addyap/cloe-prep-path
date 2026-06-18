@@ -1,0 +1,1 @@
+ALTER TABLE public.attempts ADD COLUMN IF NOT EXISTS feedback jsonb;

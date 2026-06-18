@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
+import { Route as AuthenticatedPracticeWritingRouteImport } from './routes/_authenticated/practice.writing'
 import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
 import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
@@ -74,6 +75,12 @@ const AuthenticatedPracticeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const AuthenticatedPracticeWritingRoute =
+  AuthenticatedPracticeWritingRouteImport.update({
+    id: '/writing',
+    path: '/writing',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
 const AuthenticatedPracticeReadingRoute =
   AuthenticatedPracticeReadingRouteImport.update({
     id: '/reading',
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
+  '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -126,6 +134,7 @@ export interface FileRoutesByTo {
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
+  '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesById {
@@ -143,6 +152,7 @@ export interface FileRoutesById {
   '/_authenticated/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/_authenticated/practice/reading': typeof AuthenticatedPracticeReadingRoute
+  '/_authenticated/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRouteTypes {
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
+    | '/practice/writing'
     | '/practice/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
+    | '/practice/writing'
     | '/practice'
   id:
     | '__root__'
@@ -190,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/practice/grammar-vocab'
     | '/_authenticated/practice/listening'
     | '/_authenticated/practice/reading'
+    | '/_authenticated/practice/writing'
     | '/_authenticated/practice/'
   fileRoutesById: FileRoutesById
 }
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeIndexRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
+    '/_authenticated/practice/writing': {
+      id: '/_authenticated/practice/writing'
+      path: '/writing'
+      fullPath: '/practice/writing'
+      preLoaderRoute: typeof AuthenticatedPracticeWritingRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
     '/_authenticated/practice/reading': {
       id: '/_authenticated/practice/reading'
       path: '/reading'
@@ -306,6 +326,7 @@ interface AuthenticatedPracticeRouteChildren {
   AuthenticatedPracticeGrammarVocabRoute: typeof AuthenticatedPracticeGrammarVocabRoute
   AuthenticatedPracticeListeningRoute: typeof AuthenticatedPracticeListeningRoute
   AuthenticatedPracticeReadingRoute: typeof AuthenticatedPracticeReadingRoute
+  AuthenticatedPracticeWritingRoute: typeof AuthenticatedPracticeWritingRoute
   AuthenticatedPracticeIndexRoute: typeof AuthenticatedPracticeIndexRoute
 }
 
@@ -314,6 +335,7 @@ const AuthenticatedPracticeRouteChildren: AuthenticatedPracticeRouteChildren = {
     AuthenticatedPracticeGrammarVocabRoute,
   AuthenticatedPracticeListeningRoute: AuthenticatedPracticeListeningRoute,
   AuthenticatedPracticeReadingRoute: AuthenticatedPracticeReadingRoute,
+  AuthenticatedPracticeWritingRoute: AuthenticatedPracticeWritingRoute,
   AuthenticatedPracticeIndexRoute: AuthenticatedPracticeIndexRoute,
 }
 
