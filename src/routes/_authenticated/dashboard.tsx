@@ -68,10 +68,11 @@ function Dashboard() {
         <h2 className="mt-10 text-lg font-bold text-foreground">Practice by skill</h2>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {SKILLS.map((s) => {
-            const readyTo: Record<string, "/practice/listening" | "/practice/reading" | "/practice/grammar-vocab"> = {
+            const readyTo: Record<string, "/practice/listening" | "/practice/reading" | "/practice/grammar-vocab" | "/practice/writing"> = {
               listening: "/practice/listening",
               reading: "/practice/reading",
               grammar_vocab: "/practice/grammar-vocab",
+              writing: "/practice/writing",
             };
             const ready = readyTo[s.slug];
             const linkProps = ready
