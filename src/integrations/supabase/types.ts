@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           cefr_level: Database["public"]["Enums"]["cefr_level"]
           created_at: string
+          feedback: Json | null
           id: string
           is_correct: boolean | null
           question_id: string
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           cefr_level: Database["public"]["Enums"]["cefr_level"]
           created_at?: string
+          feedback?: Json | null
           id?: string
           is_correct?: boolean | null
           question_id: string
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           cefr_level?: Database["public"]["Enums"]["cefr_level"]
           created_at?: string
+          feedback?: Json | null
           id?: string
           is_correct?: boolean | null
           question_id?: string
