@@ -217,6 +217,12 @@ export type Database = {
         | "negotiation"
         | "customer_service"
         | "general"
+        | "tenses"
+        | "prepositions"
+        | "business_vocab"
+        | "phrasal_verbs"
+        | "formal_register"
+        | "collocations"
       question_type: "mcq" | "gap_fill" | "open_text" | "prompt"
       session_mode: "practice" | "mock" | "skill_drill"
       skill_type:
@@ -360,6 +366,12 @@ export const Constants = {
         "negotiation",
         "customer_service",
         "general",
+        "tenses",
+        "prepositions",
+        "business_vocab",
+        "phrasal_verbs",
+        "formal_register",
+        "collocations",
       ],
       question_type: ["mcq", "gap_fill", "open_text", "prompt"],
       session_mode: ["practice", "mock", "skill_drill"],

@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
 import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
+import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
 import { Route as AuthenticatedComingSoonSkillRouteImport } from './routes/_authenticated/coming-soon.$skill'
 
 const AuthRoute = AuthRouteImport.update({
@@ -85,6 +86,12 @@ const AuthenticatedPracticeListeningRoute =
     path: '/listening',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const AuthenticatedPracticeGrammarVocabRoute =
+  AuthenticatedPracticeGrammarVocabRouteImport.update({
+    id: '/grammar-vocab',
+    path: '/grammar-vocab',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
 const AuthenticatedComingSoonSkillRoute =
   AuthenticatedComingSoonSkillRouteImport.update({
     id: '/coming-soon/$skill',
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
@@ -131,6 +140,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
+  '/_authenticated/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/_authenticated/practice/reading': typeof AuthenticatedPracticeReadingRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/coming-soon/$skill'
+    | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
     | '/practice/'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/coming-soon/$skill'
+    | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
     | '/practice'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/coming-soon/$skill'
+    | '/_authenticated/practice/grammar-vocab'
     | '/_authenticated/practice/listening'
     | '/_authenticated/practice/reading'
     | '/_authenticated/practice/'
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeListeningRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
+    '/_authenticated/practice/grammar-vocab': {
+      id: '/_authenticated/practice/grammar-vocab'
+      path: '/grammar-vocab'
+      fullPath: '/practice/grammar-vocab'
+      preLoaderRoute: typeof AuthenticatedPracticeGrammarVocabRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
     '/_authenticated/coming-soon/$skill': {
       id: '/_authenticated/coming-soon/$skill'
       path: '/coming-soon/$skill'
@@ -283,12 +303,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedPracticeRouteChildren {
+  AuthenticatedPracticeGrammarVocabRoute: typeof AuthenticatedPracticeGrammarVocabRoute
   AuthenticatedPracticeListeningRoute: typeof AuthenticatedPracticeListeningRoute
   AuthenticatedPracticeReadingRoute: typeof AuthenticatedPracticeReadingRoute
   AuthenticatedPracticeIndexRoute: typeof AuthenticatedPracticeIndexRoute
 }
 
 const AuthenticatedPracticeRouteChildren: AuthenticatedPracticeRouteChildren = {
+  AuthenticatedPracticeGrammarVocabRoute:
+    AuthenticatedPracticeGrammarVocabRoute,
   AuthenticatedPracticeListeningRoute: AuthenticatedPracticeListeningRoute,
   AuthenticatedPracticeReadingRoute: AuthenticatedPracticeReadingRoute,
   AuthenticatedPracticeIndexRoute: AuthenticatedPracticeIndexRoute,
