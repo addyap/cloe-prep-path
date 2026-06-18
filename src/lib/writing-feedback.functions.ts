@@ -106,7 +106,7 @@ Evaluate the response against the task and the target level. Return:
         user_answer: data.user_text,
         is_correct: null,
         score: overall / 100,
-        feedback: feedback as unknown as Record<string, unknown>,
+        feedback: feedback as never,
       })
       .select("id")
       .single();
