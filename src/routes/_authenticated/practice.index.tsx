@@ -20,9 +20,10 @@ function PracticePage() {
         <p className="text-sm text-muted-foreground mt-1">Choose a skill to drill.</p>
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
           {SKILLS.map((s) => {
-            const readyTo: Record<string, "/practice/listening" | "/practice/reading"> = {
+            const readyTo: Record<string, "/practice/listening" | "/practice/reading" | "/practice/grammar-vocab"> = {
               listening: "/practice/listening",
               reading: "/practice/reading",
+              grammar_vocab: "/practice/grammar-vocab",
             };
             const ready = readyTo[s.slug];
             const linkProps = ready
