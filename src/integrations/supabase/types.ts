@@ -226,6 +226,9 @@ export type Database = {
         | "phrasal_verbs"
         | "formal_register"
         | "collocations"
+        | "interview"
+        | "role_play"
+        | "discussion"
       question_type: "mcq" | "gap_fill" | "open_text" | "prompt"
       session_mode: "practice" | "mock" | "skill_drill"
       skill_type:
@@ -375,6 +378,9 @@ export const Constants = {
         "phrasal_verbs",
         "formal_register",
         "collocations",
+        "interview",
+        "role_play",
+        "discussion",
       ],
       question_type: ["mcq", "gap_fill", "open_text", "prompt"],
       session_mode: ["practice", "mock", "skill_drill"],
