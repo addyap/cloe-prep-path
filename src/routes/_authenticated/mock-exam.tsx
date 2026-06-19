@@ -147,7 +147,7 @@ function MockExamPage() {
     if (!u.user) return;
     const { data, error: insErr } = await supabase
       .from("practice_sessions")
-      .insert({ user_id: u.user.id, mode: "exam" })
+      .insert({ user_id: u.user.id, mode: "mock" })
       .select("id")
       .single();
     if (!insErr && data) setSessionId(data.id);

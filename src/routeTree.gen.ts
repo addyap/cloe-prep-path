@@ -16,7 +16,7 @@ import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedMockRouteImport } from './routes/_authenticated/mock'
+import { Route as AuthenticatedMockExamRouteImport } from './routes/_authenticated/mock-exam'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
 import { Route as ApiSpeakingEvaluateRouteImport } from './routes/api/speaking/evaluate'
@@ -61,9 +61,9 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMockRoute = AuthenticatedMockRouteImport.update({
-  id: '/mock',
-  path: '/mock',
+const AuthenticatedMockExamRoute = AuthenticatedMockExamRouteImport.update({
+  id: '/mock-exam',
+  path: '/mock-exam',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -123,7 +123,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/mock': typeof AuthenticatedMockRoute
+  '/mock-exam': typeof AuthenticatedMockExamRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
@@ -141,7 +141,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/mock': typeof AuthenticatedMockRoute
+  '/mock-exam': typeof AuthenticatedMockExamRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
@@ -160,7 +160,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/mock': typeof AuthenticatedMockRoute
+  '/_authenticated/mock-exam': typeof AuthenticatedMockExamRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -180,7 +180,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
-    | '/mock'
+    | '/mock-exam'
     | '/onboarding'
     | '/practice'
     | '/profile'
@@ -198,7 +198,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
-    | '/mock'
+    | '/mock-exam'
     | '/onboarding'
     | '/profile'
     | '/progress'
@@ -216,7 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
-    | '/_authenticated/mock'
+    | '/_authenticated/mock-exam'
     | '/_authenticated/onboarding'
     | '/_authenticated/practice'
     | '/_authenticated/profile'
@@ -289,11 +289,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/mock': {
-      id: '/_authenticated/mock'
-      path: '/mock'
-      fullPath: '/mock'
-      preLoaderRoute: typeof AuthenticatedMockRouteImport
+    '/_authenticated/mock-exam': {
+      id: '/_authenticated/mock-exam'
+      path: '/mock-exam'
+      fullPath: '/mock-exam'
+      preLoaderRoute: typeof AuthenticatedMockExamRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -388,7 +388,7 @@ const AuthenticatedPracticeRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedMockRoute: typeof AuthenticatedMockRoute
+  AuthenticatedMockExamRoute: typeof AuthenticatedMockExamRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPracticeRoute: typeof AuthenticatedPracticeRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -398,7 +398,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedMockRoute: AuthenticatedMockRoute,
+  AuthenticatedMockExamRoute: AuthenticatedMockExamRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPracticeRoute: AuthenticatedPracticeRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
