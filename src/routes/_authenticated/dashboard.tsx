@@ -98,8 +98,7 @@ function Dashboard() {
           })}
 
           <Link
-            to="/coming-soon/$skill"
-            params={{ skill: "mock" }}
+            to="/mock-exam"
             className="group rounded-2xl bg-primary text-primary-foreground p-5 shadow-elevated hover:opacity-95 transition"
           >
             <div className="h-10 w-10 rounded-xl bg-accent text-accent-foreground flex items-center justify-center">
