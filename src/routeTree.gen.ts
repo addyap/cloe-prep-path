@@ -26,6 +26,7 @@ import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_auth
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
 import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
 import { Route as AuthenticatedComingSoonSkillRouteImport } from './routes/_authenticated/coming-soon.$skill'
+import { Route as AuthenticatedAdminGenerateRouteImport } from './routes/_authenticated/admin.generate'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -118,6 +119,12 @@ const AuthenticatedComingSoonSkillRoute =
     path: '/coming-soon/$skill',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminGenerateRoute =
+  AuthenticatedAdminGenerateRouteImport.update({
+    id: '/admin/generate',
+    path: '/admin/generate',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
+  '/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
+  '/_authenticated/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/_authenticated/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/_authenticated/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/practice'
     | '/profile'
     | '/progress'
+    | '/admin/generate'
     | '/coming-soon/$skill'
     | '/practice/grammar-vocab'
     | '/practice/listening'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/progress'
+    | '/admin/generate'
     | '/coming-soon/$skill'
     | '/practice/grammar-vocab'
     | '/practice/listening'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/practice'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
+    | '/_authenticated/admin/generate'
     | '/_authenticated/coming-soon/$skill'
     | '/_authenticated/practice/grammar-vocab'
     | '/_authenticated/practice/listening'
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedComingSoonSkillRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/generate': {
+      id: '/_authenticated/admin/generate'
+      path: '/admin/generate'
+      fullPath: '/admin/generate'
+      preLoaderRoute: typeof AuthenticatedAdminGenerateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -393,6 +413,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPracticeRoute: typeof AuthenticatedPracticeRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
+  AuthenticatedAdminGenerateRoute: typeof AuthenticatedAdminGenerateRoute
   AuthenticatedComingSoonSkillRoute: typeof AuthenticatedComingSoonSkillRoute
 }
 
@@ -403,6 +424,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPracticeRoute: AuthenticatedPracticeRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
+  AuthenticatedAdminGenerateRoute: AuthenticatedAdminGenerateRoute,
   AuthenticatedComingSoonSkillRoute: AuthenticatedComingSoonSkillRoute,
 }
 
