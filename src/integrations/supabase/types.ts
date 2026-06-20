@@ -61,6 +61,27 @@ export type Database = {
           },
         ]
       }
+      badges: {
+        Row: {
+          code: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       passages: {
         Row: {
           body: string
@@ -127,8 +148,10 @@ export type Database = {
           current_estimated_level:
             | Database["public"]["Enums"]["cefr_level"]
             | null
+          daily_goal_minutes: number
           full_name: string | null
           id: string
+          onboarding_completed: boolean
           target_cefr_level: Database["public"]["Enums"]["cefr_level"] | null
         }
         Insert: {
@@ -136,8 +159,10 @@ export type Database = {
           current_estimated_level?:
             | Database["public"]["Enums"]["cefr_level"]
             | null
+          daily_goal_minutes?: number
           full_name?: string | null
           id: string
+          onboarding_completed?: boolean
           target_cefr_level?: Database["public"]["Enums"]["cefr_level"] | null
         }
         Update: {
@@ -145,8 +170,10 @@ export type Database = {
           current_estimated_level?:
             | Database["public"]["Enums"]["cefr_level"]
             | null
+          daily_goal_minutes?: number
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean
           target_cefr_level?: Database["public"]["Enums"]["cefr_level"] | null
         }
         Relationships: []
@@ -204,14 +231,42 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       cefr_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
       context_tag:
         | "email"
@@ -364,6 +419,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       cefr_level: ["A1", "A2", "B1", "B2", "C1", "C2"],
       context_tag: [
         "email",
