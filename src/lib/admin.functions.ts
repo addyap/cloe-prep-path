@@ -145,7 +145,7 @@ Vary the items. Do not repeat structures or vocabulary across items.`;
     const rows = parsed.questions.map((q) => ({
       prompt_text: q.prompt_text,
       type: q.type,
-      options: q.options ? (q.options as unknown as object) : null,
+      options: (q.options ?? null) as never,
       correct_answer: q.correct_answer ?? null,
       explanation: q.explanation,
       skill: data.skill,
