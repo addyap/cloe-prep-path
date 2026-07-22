@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /practice
+Disallow: /mock-exam
+Disallow: /progress
+Disallow: /profile
+Disallow: /onboarding
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://cloe.antonyaddy.com/sitemap.xml

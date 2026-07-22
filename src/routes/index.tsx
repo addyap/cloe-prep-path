@@ -21,7 +21,9 @@ export const Route = createFileRoute("/")({
         content:
           "Independent, structured preparation for the CLOE English certification. Adaptive practice across all four skills.",
       },
+      { property: "og:url", content: "https://cloe.antonyaddy.com/" },
     ],
+    links: [{ rel: "canonical", href: "https://cloe.antonyaddy.com/" }],
   }),
   component: Landing,
 });

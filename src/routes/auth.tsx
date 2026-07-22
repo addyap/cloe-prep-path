@@ -13,7 +13,9 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in — CLOE Prep" },
       { name: "description", content: "Sign in or create your CLOE Prep account." },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://cloe.antonyaddy.com/auth" }],
   }),
   component: AuthPage,
 });
