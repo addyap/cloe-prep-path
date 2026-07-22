@@ -1,11 +1,26 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ClipboardCheck, Loader2, Play, Square, Mic, AlertCircle, ArrowRight, Trophy,
-  ShieldAlert, RotateCcw, Sparkles, Volume2,
+  ClipboardCheck,
+  Loader2,
+  Play,
+  Square,
+  Mic,
+  AlertCircle,
+  ArrowRight,
+  Trophy,
+  ShieldAlert,
+  RotateCcw,
+  Sparkles,
+  Volume2,
 } from "lucide-react";
 import {
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
@@ -103,16 +118,31 @@ function MockExamPage() {
         const [{ data: qs, error: qErr }, { data: ps }, userRes] = await Promise.all([
           supabase
             .from("questions")
-            .select("id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id"),
+            .select(
+              "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
+            ),
           supabase.from("passages").select("id, title, body"),
           supabase.auth.getUser(),
         ]);
         if (qErr) throw qErr;
         const all = (qs ?? []) as Question[];
-        setBank(all.filter((q) => WRITTEN_SKILLS.includes(q.skill as WrittenSkill) && q.type !== "open_text" && q.type !== "prompt"));
-        setOralPrompts(all.filter((q) => q.skill === ("speaking" as unknown as WrittenSkill) && q.type === "prompt") as Question[]);
+        setBank(
+          all.filter(
+            (q) =>
+              WRITTEN_SKILLS.includes(q.skill as WrittenSkill) &&
+              q.type !== "open_text" &&
+              q.type !== "prompt",
+          ),
+        );
+        setOralPrompts(
+          all.filter(
+            (q) => q.skill === ("speaking" as unknown as WrittenSkill) && q.type === "prompt",
+          ) as Question[],
+        );
         const pmap: Record<string, Passage> = {};
-        (ps ?? []).forEach((p) => { pmap[p.id] = p as Passage; });
+        (ps ?? []).forEach((p) => {
+          pmap[p.id] = p as Passage;
+        });
         setPassages(pmap);
         if (userRes.data.user) {
           const { data: prof } = await supabase
@@ -120,7 +150,8 @@ function MockExamPage() {
             .select("current_estimated_level")
             .eq("id", userRes.data.user.id)
             .maybeSingle();
-          if (prof?.current_estimated_level) setStartTheta(LEVEL_TO_NUM[prof.current_estimated_level as Level]);
+          if (prof?.current_estimated_level)
+            setStartTheta(LEVEL_TO_NUM[prof.current_estimated_level as Level]);
         }
       } catch (e) {
         setError((e as Error).message ?? "Failed to load exam.");
@@ -135,7 +166,9 @@ function MockExamPage() {
     (async () => {
       const { data } = await supabase
         .from("questions")
-        .select("id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id")
+        .select(
+          "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
+        )
         .eq("skill", "speaking")
         .eq("type", "prompt");
       setOralPrompts((data ?? []) as Question[]);
@@ -176,7 +209,9 @@ function MockExamPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="p-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        <div className="p-10 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
       </AppShell>
     );
   }
@@ -192,14 +227,18 @@ function MockExamPage() {
     );
   }
 
-  if (step === "intro") return <Intro onStart={startSession} bankSize={bank.length} oralCount={oralPrompts.length} />;
+  if (step === "intro")
+    return <Intro onStart={startSession} bankSize={bank.length} oralCount={oralPrompts.length} />;
   if (step === "written") {
     return (
       <WrittenAdaptive
         bank={bank}
         passages={passages}
         startTheta={startTheta}
-        onDone={(items) => { setWritten(items); setStep("written_done"); }}
+        onDone={(items) => {
+          setWritten(items);
+          setStep("written_done");
+        }}
         onAbort={() => navigate({ to: "/dashboard" })}
       />
     );
@@ -212,7 +251,10 @@ function MockExamPage() {
       <OralRunner
         prompts={oralPrompts}
         targetLevel={NUM_TO_LEVEL(estimateLevel(written))}
-        onDone={(results) => { setOral(results); void finalize(written, results); }}
+        onDone={(results) => {
+          setOral(results);
+          void finalize(written, results);
+        }}
       />
     );
   }
@@ -221,16 +263,28 @@ function MockExamPage() {
 
 /* ---------------- Intro ---------------- */
 
-function Intro({ onStart, bankSize, oralCount }: { onStart: () => void; bankSize: number; oralCount: number }) {
+function Intro({
+  onStart,
+  bankSize,
+  oralCount,
+}: {
+  onStart: () => void;
+  bankSize: number;
+  oralCount: number;
+}) {
   const [ack, setAck] = useState(false);
   return (
     <AppShell>
       <div className="p-5 md:p-10 max-w-3xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center"><ClipboardCheck className="h-5 w-5" /></div>
+          <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+            <ClipboardCheck className="h-5 w-5" />
+          </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-primary">Full Mock Exam</h1>
-            <p className="text-sm text-muted-foreground">Simulates the two-part CLOE under real conditions.</p>
+            <p className="text-sm text-muted-foreground">
+              Simulates the two-part CLOE under real conditions.
+            </p>
           </div>
         </div>
 
@@ -238,33 +292,61 @@ function Intro({ onStart, bankSize, oralCount }: { onStart: () => void; bankSize
           <ShieldAlert className="h-5 w-5 shrink-0 mt-0.5" />
           <div>
             <div className="font-semibold">Proctor mode</div>
-            <p className="mt-1">Do not leave this tab once the exam starts. Switching apps, scrolling away or reloading will end your session. There is no going back to previous questions, and listening audio plays only once.</p>
+            <p className="mt-1">
+              Do not leave this tab once the exam starts. Switching apps, scrolling away or
+              reloading will end your session. There is no going back to previous questions, and
+              listening audio plays only once.
+            </p>
           </div>
         </div>
 
         <div className="mt-4 grid sm:grid-cols-2 gap-4">
           <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-            <div className="text-xs uppercase tracking-wide text-accent font-semibold">Part 1 · Written</div>
+            <div className="text-xs uppercase tracking-wide text-accent font-semibold">
+              Part 1 · Written
+            </div>
             <div className="mt-2 font-semibold">Adaptive · ~25 min</div>
-            <p className="text-sm text-muted-foreground mt-1">Up to {WRITTEN_MAX_ITEMS} items across listening, reading and grammar. The difficulty adapts to your answers — you won't see a score, just "calibrating".</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Up to {WRITTEN_MAX_ITEMS} items across listening, reading and grammar. The difficulty
+              adapts to your answers — you won't see a score, just "calibrating".
+            </p>
           </div>
           <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-            <div className="text-xs uppercase tracking-wide text-accent font-semibold">Part 2 · Oral</div>
+            <div className="text-xs uppercase tracking-wide text-accent font-semibold">
+              Part 2 · Oral
+            </div>
             <div className="mt-2 font-semibold">3 phases · ~10 min</div>
-            <p className="text-sm text-muted-foreground mt-1">Interview, role-play and discussion. Spoken responses are transcribed and scored by AI.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Interview, role-play and discussion. Spoken responses are transcribed and scored by
+              AI.
+            </p>
           </div>
         </div>
 
         <label className="mt-6 flex items-start gap-3 text-sm">
-          <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} className="mt-0.5 h-4 w-4" />
-          <span>I understand the exam rules and I am ready to take it in one sitting ({bankSize} items available, {oralCount} oral prompts).</span>
+          <input
+            type="checkbox"
+            checked={ack}
+            onChange={(e) => setAck(e.target.checked)}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span>
+            I understand the exam rules and I am ready to take it in one sitting ({bankSize} items
+            available, {oralCount} oral prompts).
+          </span>
         </label>
 
         <div className="mt-4 flex gap-3">
-          <Button disabled={!ack} onClick={onStart} className="bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            disabled={!ack}
+            onClick={onStart}
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             Start mock exam <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
-          <Link to="/dashboard"><Button variant="outline">Cancel</Button></Link>
+          <Link to="/dashboard">
+            <Button variant="outline">Cancel</Button>
+          </Link>
         </div>
       </div>
     </AppShell>
@@ -285,7 +367,10 @@ function pickNext(
   const sameSkill = available.filter((q) => q.skill === preferSkill);
   const pool = sameSkill.length ? sameSkill : available;
   // sort by closeness to target then random
-  pool.sort((a, b) => Math.abs(LEVEL_TO_NUM[a.cefr_level] - target) - Math.abs(LEVEL_TO_NUM[b.cefr_level] - target));
+  pool.sort(
+    (a, b) =>
+      Math.abs(LEVEL_TO_NUM[a.cefr_level] - target) - Math.abs(LEVEL_TO_NUM[b.cefr_level] - target),
+  );
   const closest = pool[0];
   const closestDist = Math.abs(LEVEL_TO_NUM[closest.cefr_level] - target);
   const tier = pool.filter((q) => Math.abs(LEVEL_TO_NUM[q.cefr_level] - target) === closestDist);
@@ -302,7 +387,11 @@ function isStable(history: Answered[]): boolean {
 }
 
 function WrittenAdaptive({
-  bank, passages, startTheta, onDone, onAbort,
+  bank,
+  passages,
+  startTheta,
+  onDone,
+  onAbort,
 }: {
   bank: Question[];
   passages: Record<string, Passage>;
@@ -347,9 +436,14 @@ function WrittenAdaptive({
 
   // Proctor: warn on tab hide
   useEffect(() => {
-    const onVis = () => { if (document.hidden) setWarning("Tab switch detected — stay on this page during the exam."); };
+    const onVis = () => {
+      if (document.hidden) setWarning("Tab switch detected — stay on this page during the exam.");
+    };
     document.addEventListener("visibilitychange", onVis);
-    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => {
       document.removeEventListener("visibilitychange", onVis);
@@ -363,9 +457,10 @@ function WrittenAdaptive({
     if (playsUsed >= 1) return; // strict: 1 play in exam
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const text = current.audio_url && current.audio_url.startsWith("tts:")
-      ? current.audio_url.slice(4)
-      : current.prompt_text;
+    const text =
+      current.audio_url && current.audio_url.startsWith("tts:")
+        ? current.audio_url.slice(4)
+        : current.prompt_text;
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.95;
     u.lang = "en-US";
@@ -378,7 +473,8 @@ function WrittenAdaptive({
     if (!current) return;
     const userAnswer = selection.trim();
     if (!userAnswer) return;
-    const correct = !!current.correct_answer &&
+    const correct =
+      !!current.correct_answer &&
       userAnswer.toLowerCase() === current.correct_answer.trim().toLowerCase();
     const delta = correct ? 0.33 : -0.33;
     const nextTheta = Math.max(1, Math.min(6, theta + delta));
@@ -389,7 +485,8 @@ function WrittenAdaptive({
       theta_after: nextTheta,
     };
     const nextHistory = [...history, answered];
-    const nextUsed = new Set(used); nextUsed.add(current.id);
+    const nextUsed = new Set(used);
+    nextUsed.add(current.id);
 
     setHistory(nextHistory);
     setUsed(nextUsed);
@@ -413,7 +510,9 @@ function WrittenAdaptive({
   if (!current) {
     return (
       <AppShell>
-        <div className="p-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>
+        <div className="p-10 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
       </AppShell>
     );
   }
@@ -430,7 +529,10 @@ function WrittenAdaptive({
           <div className="font-mono tabular-nums">{formatTime(remaining)} left</div>
         </div>
         <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
-          <div className="h-full bg-accent transition-all" style={{ width: `${Math.min(100, (history.length / WRITTEN_MAX_ITEMS) * 100)}%` }} />
+          <div
+            className="h-full bg-accent transition-all"
+            style={{ width: `${Math.min(100, (history.length / WRITTEN_MAX_ITEMS) * 100)}%` }}
+          />
         </div>
 
         <div className="mt-4 flex items-center justify-between">
@@ -453,7 +555,9 @@ function WrittenAdaptive({
         <div className="mt-4 rounded-2xl border border-border bg-card shadow-card p-5">
           {passage && (
             <div className="mb-4 rounded-xl bg-muted/30 border border-border p-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">{passage.title}</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                {passage.title}
+              </div>
               <p className="mt-2 text-sm whitespace-pre-wrap leading-relaxed">{passage.body}</p>
             </div>
           )}
@@ -461,7 +565,8 @@ function WrittenAdaptive({
           {current.skill === "listening" && (
             <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3">
               <Button onClick={playAudio} disabled={playsUsed >= 1} variant="outline" size="sm">
-                <Volume2 className="h-4 w-4 mr-2" /> {playsUsed === 0 ? "Play audio (1 play only)" : "Already played"}
+                <Volume2 className="h-4 w-4 mr-2" />{" "}
+                {playsUsed === 0 ? "Play audio (1 play only)" : "Already played"}
               </Button>
               <span className="text-xs text-muted-foreground">Exam rules: audio plays once.</span>
             </div>
@@ -470,16 +575,22 @@ function WrittenAdaptive({
           <p className="text-base leading-relaxed text-foreground">{current.prompt_text}</p>
 
           <div className="mt-4 space-y-2">
-            {current.type === "mcq" && opts.length > 0 && opts.map((o) => (
-              <button
-                key={o}
-                onClick={() => setSelection(o)}
-                className={cn(
-                  "w-full text-left rounded-xl border px-4 py-3 text-sm transition",
-                  selection === o ? "border-accent bg-accent/10" : "border-border hover:border-accent/50",
-                )}
-              >{o}</button>
-            ))}
+            {current.type === "mcq" &&
+              opts.length > 0 &&
+              opts.map((o) => (
+                <button
+                  key={o}
+                  onClick={() => setSelection(o)}
+                  className={cn(
+                    "w-full text-left rounded-xl border px-4 py-3 text-sm transition",
+                    selection === o
+                      ? "border-accent bg-accent/10"
+                      : "border-border hover:border-accent/50",
+                  )}
+                >
+                  {o}
+                </button>
+              ))}
             {current.type === "gap_fill" && (
               <input
                 value={selection}
@@ -491,10 +602,17 @@ function WrittenAdaptive({
           </div>
 
           <div className="mt-5 flex items-center justify-between">
-            <button onClick={onAbort} className="text-xs text-muted-foreground hover:text-foreground underline">
+            <button
+              onClick={onAbort}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
               Abandon exam
             </button>
-            <Button onClick={submit} disabled={!selection.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              onClick={submit}
+              disabled={!selection.trim()}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               Submit & continue <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -508,10 +626,18 @@ function WrittenBreak({ written, onContinue }: { written: Answered[]; onContinue
   return (
     <AppShell>
       <div className="p-5 md:p-10 max-w-2xl mx-auto text-center">
-        <div className="mx-auto h-14 w-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center"><ClipboardCheck className="h-7 w-7" /></div>
+        <div className="mx-auto h-14 w-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center">
+          <ClipboardCheck className="h-7 w-7" />
+        </div>
         <h1 className="mt-4 text-2xl font-bold text-primary">Part 1 complete</h1>
-        <p className="text-sm text-muted-foreground mt-2">You answered {written.length} written items. Take a short breath — Part 2 is the oral interview.</p>
-        <Button onClick={onContinue} className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">
+        <p className="text-sm text-muted-foreground mt-2">
+          You answered {written.length} written items. Take a short breath — Part 2 is the oral
+          interview.
+        </p>
+        <Button
+          onClick={onContinue}
+          className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90"
+        >
           Start oral part <Mic className="h-4 w-4 ml-2" />
         </Button>
       </div>
@@ -526,17 +652,30 @@ function pickOralForPhase(prompts: Question[], phase: Phase, target: Level): Que
   if (!pool.length) return null;
   const exact = pool.find((p) => p.cefr_level === target);
   if (exact) return exact;
-  pool.sort((a, b) => Math.abs(LEVEL_TO_NUM[a.cefr_level] - LEVEL_TO_NUM[target]) - Math.abs(LEVEL_TO_NUM[b.cefr_level] - LEVEL_TO_NUM[target]));
+  pool.sort(
+    (a, b) =>
+      Math.abs(LEVEL_TO_NUM[a.cefr_level] - LEVEL_TO_NUM[target]) -
+      Math.abs(LEVEL_TO_NUM[b.cefr_level] - LEVEL_TO_NUM[target]),
+  );
   return pool[0];
 }
 
 function OralRunner({
-  prompts, targetLevel, onDone,
-}: { prompts: Question[]; targetLevel: Level; onDone: (results: OralResult[]) => void }) {
+  prompts,
+  targetLevel,
+  onDone,
+}: {
+  prompts: Question[];
+  targetLevel: Level;
+  onDone: (results: OralResult[]) => void;
+}) {
   const [idx, setIdx] = useState(0);
   const [results, setResults] = useState<OralResult[]>([]);
   const phase = ORAL_PHASES[idx];
-  const prompt = useMemo(() => pickOralForPhase(prompts, phase, targetLevel), [prompts, phase, targetLevel]);
+  const prompt = useMemo(
+    () => pickOralForPhase(prompts, phase, targetLevel),
+    [prompts, phase, targetLevel],
+  );
 
   function onPhaseDone(r: OralResult) {
     const next = [...results, r];
@@ -551,7 +690,9 @@ function OralRunner({
         <div className="p-10 max-w-2xl mx-auto text-center">
           <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto" />
           <p className="mt-3">No oral prompt available for this phase.</p>
-          <Button className="mt-4" onClick={() => onDone(results)}>Skip to results</Button>
+          <Button className="mt-4" onClick={() => onDone(results)}>
+            Skip to results
+          </Button>
         </div>
       </AppShell>
     );
@@ -562,7 +703,9 @@ function OralRunner({
       <div className="p-5 md:p-10 max-w-3xl mx-auto">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div>Part 2 · Oral · {PHASE_META[phase].title}</div>
-          <div>Phase {idx + 1} of {ORAL_PHASES.length}</div>
+          <div>
+            Phase {idx + 1} of {ORAL_PHASES.length}
+          </div>
         </div>
         <OralPhase
           key={phase}
@@ -577,8 +720,16 @@ function OralRunner({
 }
 
 function OralPhase({
-  phase, prompt, targetLevel, onSubmitted,
-}: { phase: Phase; prompt: Question; targetLevel: Level; onSubmitted: (r: OralResult) => void }) {
+  phase,
+  prompt,
+  targetLevel,
+  onSubmitted,
+}: {
+  phase: Phase;
+  prompt: Question;
+  targetLevel: Level;
+  onSubmitted: (r: OralResult) => void;
+}) {
   const meta = PHASE_META[phase];
   const [recording, setRecording] = useState(false);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -590,22 +741,36 @@ function OralPhase({
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-  }, []);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    },
+    [],
+  );
 
   async function startRecording() {
-    setError(null); setBlob(null);
+    setError(null);
+    setBlob(null);
     let stream: MediaStream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
-    catch { setError("Microphone access required."); return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      setError("Microphone access required.");
+      return;
+    }
     streamRef.current = stream;
     const mimeType = ["audio/webm", "audio/mp4"].find((t) => MediaRecorder.isTypeSupported(t));
-    if (!mimeType) { stream.getTracks().forEach((t) => t.stop()); setError("Browser cannot record."); return; }
+    if (!mimeType) {
+      stream.getTracks().forEach((t) => t.stop());
+      setError("Browser cannot record.");
+      return;
+    }
     const rec = new MediaRecorder(stream, { mimeType });
     chunksRef.current = [];
-    rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+    rec.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
     rec.onstop = () => {
       const b = new Blob(chunksRef.current, { type: rec.mimeType });
       stream.getTracks().forEach((t) => t.stop());
@@ -625,14 +790,18 @@ function OralPhase({
   }
 
   function stopRecording() {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     if (recorderRef.current && recorderRef.current.state !== "inactive") recorderRef.current.stop();
     setRecording(false);
   }
 
   async function submit() {
     if (!blob) return;
-    setSubmitting(true); setError(null);
+    setSubmitting(true);
+    setError(null);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
@@ -653,8 +822,18 @@ function OralPhase({
         const j = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(j.error ?? `Failed (${res.status})`);
       }
-      const data = (await res.json()) as { transcript: string; feedback: SpeakingFeedback; overall: number };
-      onSubmitted({ phase, prompt, transcript: data.transcript, feedback: data.feedback, overall: data.overall });
+      const data = (await res.json()) as {
+        transcript: string;
+        feedback: SpeakingFeedback;
+        overall: number;
+      };
+      onSubmitted({
+        phase,
+        prompt,
+        transcript: data.transcript,
+        feedback: data.feedback,
+        overall: data.overall,
+      });
     } catch (e: unknown) {
       setError((e as Error).message);
     } finally {
@@ -673,25 +852,52 @@ function OralPhase({
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm font-mono tabular-nums">
-        <span>{formatTime(elapsed)} / {formatTime(meta.seconds)}</span>
-        {recording && <span className="text-red-500 text-xs flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />recording</span>}
+        <span>
+          {formatTime(elapsed)} / {formatTime(meta.seconds)}
+        </span>
+        {recording && (
+          <span className="text-red-500 text-xs flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+            recording
+          </span>
+        )}
       </div>
       <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
-        <div className={cn("h-full transition-all", recording ? "bg-red-500" : "bg-accent")} style={{ width: `${progressPct}%` }} />
+        <div
+          className={cn("h-full transition-all", recording ? "bg-red-500" : "bg-accent")}
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3">
         {!recording && !blob && (
-          <Button onClick={startRecording} className="bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            onClick={startRecording}
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             <Mic className="h-4 w-4 mr-2" /> Start recording
           </Button>
         )}
         {recording && (
-          <Button variant="destructive" onClick={stopRecording}><Square className="h-4 w-4 mr-2" /> Stop</Button>
+          <Button variant="destructive" onClick={stopRecording}>
+            <Square className="h-4 w-4 mr-2" /> Stop
+          </Button>
         )}
         {!recording && blob && (
-          <Button onClick={submit} disabled={submitting} className="bg-primary text-primary-foreground hover:bg-primary/90">
-            {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Scoring…</> : <>Submit & continue <ArrowRight className="h-4 w-4 ml-2" /></>}
+          <Button
+            onClick={submit}
+            disabled={submitting}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Scoring…
+              </>
+            ) : (
+              <>
+                Submit & continue <ArrowRight className="h-4 w-4 ml-2" />
+              </>
+            )}
           </Button>
         )}
       </div>
@@ -732,9 +938,15 @@ function buildSummary(written: Answered[], oral: OralResult[]) {
   const writtenTheta = estimateLevel(written);
   const skillBreak = perSkillAccuracy(written);
   const skills = {
-    listening: skillBreak.listening.total ? Math.round((skillBreak.listening.correct / skillBreak.listening.total) * 100) : 0,
-    reading: skillBreak.reading.total ? Math.round((skillBreak.reading.correct / skillBreak.reading.total) * 100) : 0,
-    grammar_vocab: skillBreak.grammar_vocab.total ? Math.round((skillBreak.grammar_vocab.correct / skillBreak.grammar_vocab.total) * 100) : 0,
+    listening: skillBreak.listening.total
+      ? Math.round((skillBreak.listening.correct / skillBreak.listening.total) * 100)
+      : 0,
+    reading: skillBreak.reading.total
+      ? Math.round((skillBreak.reading.correct / skillBreak.reading.total) * 100)
+      : 0,
+    grammar_vocab: skillBreak.grammar_vocab.total
+      ? Math.round((skillBreak.grammar_vocab.correct / skillBreak.grammar_vocab.total) * 100)
+      : 0,
     speaking: oral.length ? Math.round(oral.reduce((s, r) => s + r.overall, 0) / oral.length) : 0,
   };
   const oralLevelAvg = oral.length
@@ -750,7 +962,8 @@ function buildSummary(written: Answered[], oral: OralResult[]) {
     { key: "grammar_vocab", label: "Grammar & Vocabulary", pct: skills.grammar_vocab },
     { key: "speaking", label: "Speaking", pct: skills.speaking },
   ];
-  const weakest = skillList.filter((s) => s.pct > 0).sort((a, b) => a.pct - b.pct)[0]?.label ?? "Speaking";
+  const weakest =
+    skillList.filter((s) => s.pct > 0).sort((a, b) => a.pct - b.pct)[0]?.label ?? "Speaking";
 
   return {
     overall_level,
@@ -766,8 +979,14 @@ function buildSummary(written: Answered[], oral: OralResult[]) {
 /* ---------------- Results / Certificate ---------------- */
 
 function Results({
-  written, oral, onRestart,
-}: { written: Answered[]; oral: OralResult[]; onRestart: () => void }) {
+  written,
+  oral,
+  onRestart,
+}: {
+  written: Answered[];
+  oral: OralResult[];
+  onRestart: () => void;
+}) {
   const summary = buildSummary(written, oral);
   const radarData = [
     { skill: "Listening", score: summary.skills.listening },
@@ -783,10 +1002,16 @@ function Results({
           <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-accent/10" />
           <div className="absolute -bottom-12 -left-12 h-44 w-44 rounded-full bg-primary/5" />
           <Trophy className="h-10 w-10 text-accent mx-auto relative" />
-          <div className="mt-2 text-xs uppercase tracking-[0.3em] text-muted-foreground">CLOE Prep · mock certificate</div>
-          <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-primary relative">Estimated level</h1>
+          <div className="mt-2 text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            CLOE Prep · mock certificate
+          </div>
+          <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-primary relative">
+            Estimated level
+          </h1>
           <div className="mt-3 inline-flex items-baseline gap-2 relative">
-            <span className="text-6xl md:text-7xl font-black text-accent">{summary.overall_level}</span>
+            <span className="text-6xl md:text-7xl font-black text-accent">
+              {summary.overall_level}
+            </span>
             <span className="text-sm text-muted-foreground">CEFR</span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto relative">
@@ -801,15 +1026,26 @@ function Results({
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(var(--border))" />
-                  <PolarAngleAxis dataKey="skill" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                  <PolarAngleAxis
+                    dataKey="skill"
+                    tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                  />
                   <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-                  <Radar dataKey="score" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.35} />
+                  <Radar
+                    dataKey="score"
+                    stroke="hsl(var(--accent))"
+                    fill="hsl(var(--accent))"
+                    fillOpacity={0.35}
+                  />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
             <ul className="mt-2 text-xs space-y-1">
               {radarData.map((d) => (
-                <li key={d.skill} className="flex justify-between"><span>{d.skill}</span><span className="font-mono">{d.score}%</span></li>
+                <li key={d.skill} className="flex justify-between">
+                  <span>{d.skill}</span>
+                  <span className="font-mono">{d.score}%</span>
+                </li>
               ))}
             </ul>
           </div>
@@ -818,26 +1054,32 @@ function Results({
             <div className="text-sm font-semibold">Guidance</div>
             <div className="mt-3 rounded-xl bg-accent/10 text-accent border border-accent/30 p-3 text-sm">
               <Sparkles className="h-4 w-4 inline mr-1.5 -mt-0.5" />
-              You're ready for <strong>{summary.overall_level}</strong>-level practice and assessment.
+              You're ready for <strong>{summary.overall_level}</strong>-level practice and
+              assessment.
             </div>
             <div className="mt-3 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 p-3 text-sm">
               Focus on <strong>{summary.weakest}</strong> before booking the real exam.
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
-              Written estimate: {NUM_TO_LEVEL(summary.written_theta)} · Oral estimate: {NUM_TO_LEVEL(summary.oral_avg)}
+              Written estimate: {NUM_TO_LEVEL(summary.written_theta)} · Oral estimate:{" "}
+              {NUM_TO_LEVEL(summary.oral_avg)}
             </div>
           </div>
         </div>
 
         <div className="mt-5 rounded-2xl bg-card border border-border p-5 shadow-card">
           <div className="text-sm font-semibold mb-3">Oral phase highlights</div>
-          {oral.length === 0 && <p className="text-sm text-muted-foreground">No oral results recorded.</p>}
+          {oral.length === 0 && (
+            <p className="text-sm text-muted-foreground">No oral results recorded.</p>
+          )}
           <div className="space-y-3">
             {oral.map((r, i) => (
               <div key={i} className="rounded-xl border border-border p-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-accent font-semibold">{PHASE_META[r.phase].title}</span>
-                  <span className="font-mono">{r.overall}% · {r.feedback.estimated_level}</span>
+                  <span className="font-mono">
+                    {r.overall}% · {r.feedback.estimated_level}
+                  </span>
                 </div>
                 <p className="mt-1 text-sm">{r.feedback.summary}</p>
               </div>
@@ -846,10 +1088,15 @@ function Results({
         </div>
 
         <div className="mt-6 flex gap-3">
-          <Button onClick={onRestart} className="bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            onClick={onRestart}
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             <RotateCcw className="h-4 w-4 mr-2" /> Back to dashboard
           </Button>
-          <Link to="/progress"><Button variant="outline">View progress</Button></Link>
+          <Link to="/progress">
+            <Button variant="outline">View progress</Button>
+          </Link>
         </div>
       </div>
     </AppShell>

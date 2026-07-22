@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createOpenAiProvider } from "@/lib/ai-gateway.server";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 
@@ -38,11 +38,11 @@ export const evaluateWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("Missing OPENAI_API_KEY");
 
-    const gateway = createLovableAiGatewayProvider(key);
-    const model = gateway("google/gemini-3-flash-preview");
+    const gateway = createOpenAiProvider(key);
+    const model = gateway("gpt-4o-mini");
 
     const system = `You are an experienced CLOE / CEFR English examiner.
 You assess short professional writing tasks on the CEFR scale (A1–C2).
@@ -93,7 +93,8 @@ Evaluate the response against the task and the target level. Return:
         feedback.scores.coherence +
         feedback.scores.grammar_range +
         feedback.scores.vocabulary) /
-        20) * 100,
+        20) *
+        100,
     );
 
     const { data: attempt, error } = await context.supabase

@@ -12,9 +12,20 @@ export function DailyGoalRing({
   const c = 2 * Math.PI * r;
   const offset = c * (1 - pct);
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative inline-flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="currentColor" className="text-secondary" strokeWidth="8" fill="none" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="currentColor"
+          className="text-secondary"
+          strokeWidth="8"
+          fill="none"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}

@@ -61,9 +61,11 @@ export function StreakHeatmap({
         <span>{weeks} weeks ago</span>
         <div className="flex items-center gap-1">
           <span>Less</span>
-          {["bg-secondary", "bg-accent/30", "bg-accent/55", "bg-accent/80", "bg-accent"].map((c) => (
-            <span key={c} className={cn("h-2 w-2 rounded-[2px]", c)} />
-          ))}
+          {["bg-secondary", "bg-accent/30", "bg-accent/55", "bg-accent/80", "bg-accent"].map(
+            (c) => (
+              <span key={c} className={cn("h-2 w-2 rounded-[2px]", c)} />
+            ),
+          )}
           <span>More</span>
         </div>
         <span>Today</span>

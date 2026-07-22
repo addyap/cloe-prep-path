@@ -23,11 +23,36 @@ const LEVELS: { value: CefrLevel; label: string; desc: string }[] = [
 
 type Q = { q: string; opts: string[]; correct: number; level: CefrLevel };
 const PLACEMENT: Q[] = [
-  { q: 'Choose: "She ___ to the office every day."', opts: ["go", "goes", "going", "gone"], correct: 1, level: "A1" },
-  { q: 'Choose: "If I ___ time, I would call him."', opts: ["have", "had", "will have", "would have"], correct: 1, level: "B1" },
-  { q: 'Best email opening to a new client:', opts: ["Hey!", "Yo", "Dear Mr. Dubois,", "Hi dude"], correct: 2, level: "A2" },
-  { q: '"We need to ___ the deadline by one week."', opts: ["extend", "expand", "expend", "expense"], correct: 0, level: "B2" },
-  { q: '"Had I known earlier, I ___ acted differently."', opts: ["would", "would have", "will have", "had"], correct: 1, level: "C1" },
+  {
+    q: 'Choose: "She ___ to the office every day."',
+    opts: ["go", "goes", "going", "gone"],
+    correct: 1,
+    level: "A1",
+  },
+  {
+    q: 'Choose: "If I ___ time, I would call him."',
+    opts: ["have", "had", "will have", "would have"],
+    correct: 1,
+    level: "B1",
+  },
+  {
+    q: "Best email opening to a new client:",
+    opts: ["Hey!", "Yo", "Dear Mr. Dubois,", "Hi dude"],
+    correct: 2,
+    level: "A2",
+  },
+  {
+    q: '"We need to ___ the deadline by one week."',
+    opts: ["extend", "expand", "expend", "expense"],
+    correct: 0,
+    level: "B2",
+  },
+  {
+    q: '"Had I known earlier, I ___ acted differently."',
+    opts: ["would", "would have", "will have", "had"],
+    correct: 1,
+    level: "C1",
+  },
 ];
 
 function estimate(answers: (number | null)[]): CefrLevel {
@@ -92,8 +117,14 @@ function Onboarding() {
         {step === "target" && (
           <>
             <h1 className="text-2xl font-bold text-primary">What level are you aiming for?</h1>
-            <p className="text-sm text-muted-foreground mt-2">Pick your target CEFR level. You can change it later.</p>
-            <RadioGroup className="mt-6 space-y-2" value={target ?? undefined} onValueChange={(v) => setTarget(v as CefrLevel)}>
+            <p className="text-sm text-muted-foreground mt-2">
+              Pick your target CEFR level. You can change it later.
+            </p>
+            <RadioGroup
+              className="mt-6 space-y-2"
+              value={target ?? undefined}
+              onValueChange={(v) => setTarget(v as CefrLevel)}
+            >
               {LEVELS.map((l) => (
                 <Label
                   key={l.value}

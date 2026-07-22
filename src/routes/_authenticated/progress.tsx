@@ -27,8 +27,7 @@ export const Route = createFileRoute("/_authenticated/progress")({
 });
 
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
-const levelToNum = (l: string | null | undefined) =>
-  l ? LEVELS.indexOf(l as CefrLevel) + 1 : 0;
+const levelToNum = (l: string | null | undefined) => (l ? LEVELS.indexOf(l as CefrLevel) + 1 : 0);
 const numToLevel = (n: number): CefrLevel => {
   const i = Math.max(1, Math.min(6, Math.round(n))) - 1;
   return LEVELS[i];
@@ -86,7 +85,9 @@ function ProgressPage() {
           .maybeSingle(),
         supabase
           .from("attempts")
-          .select("id, created_at, skill, cefr_level, is_correct, score, question_id, questions(context_tag)")
+          .select(
+            "id, created_at, skill, cefr_level, is_correct, score, question_id, questions(context_tag)",
+          )
           .eq("user_id", u.user.id)
           .order("created_at", { ascending: true }),
         supabase
@@ -193,8 +194,7 @@ function ProgressPage() {
 
   const currentNum = levelToNum(current);
   const targetNum = levelToNum(target);
-  const readiness =
-    targetNum > 0 ? Math.min(100, Math.round((currentNum / targetNum) * 100)) : 0;
+  const readiness = targetNum > 0 ? Math.min(100, Math.round((currentNum / targetNum) * 100)) : 0;
 
   if (loading) {
     return (
@@ -237,7 +237,8 @@ function ProgressPage() {
               <div className="mt-2 flex items-baseline gap-3">
                 <div className="text-5xl font-extrabold text-primary">{readiness}%</div>
                 <div className="text-sm text-muted-foreground">
-                  there toward <span className="font-semibold text-foreground">{target ?? "—"}</span>
+                  there toward{" "}
+                  <span className="font-semibold text-foreground">{target ?? "—"}</span>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground mt-2 max-w-md">
@@ -258,9 +259,21 @@ function ProgressPage() {
 
         {/* Quick stats */}
         <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <StatCard icon={<Flame className="h-5 w-5" />} label="Day streak" value={`${stats.streak}`} />
-          <StatCard icon={<Clock className="h-5 w-5" />} label="Practice time" value={`${stats.totalMinutes} min`} />
-          <StatCard icon={<TrendingUp className="h-5 w-5" />} label="Attempts" value={`${attempts.length}`} />
+          <StatCard
+            icon={<Flame className="h-5 w-5" />}
+            label="Day streak"
+            value={`${stats.streak}`}
+          />
+          <StatCard
+            icon={<Clock className="h-5 w-5" />}
+            label="Practice time"
+            value={`${stats.totalMinutes} min`}
+          />
+          <StatCard
+            icon={<TrendingUp className="h-5 w-5" />}
+            label="Attempts"
+            value={`${attempts.length}`}
+          />
         </section>
 
         {/* Charts row */}
@@ -380,15 +393,7 @@ function ProgressPage() {
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl bg-card border border-border p-4 shadow-card">
       <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wide">

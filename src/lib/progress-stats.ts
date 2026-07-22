@@ -20,7 +20,10 @@ export type SessionLite = {
 
 const dayKey = (d: Date) => d.toISOString().slice(0, 10);
 
-export function computeActivity(sessions: SessionLite[], attempts: AttemptLite[]): Record<string, number> {
+export function computeActivity(
+  sessions: SessionLite[],
+  attempts: AttemptLite[],
+): Record<string, number> {
   const map: Record<string, number> = {};
   for (const s of sessions) {
     if (!s.completed_at) continue;
@@ -72,9 +75,7 @@ export function evaluateBadges(
   const levels = attempts.map((a) => levelToNum(a.cefr_level)).filter((n) => n > 0);
   if (levels.length > 0) {
     const min = Math.min(...levels);
-    const beat = attempts.some(
-      (a) => a.is_correct === true && levelToNum(a.cefr_level) > min,
-    );
+    const beat = attempts.some((a) => a.is_correct === true && levelToNum(a.cefr_level) > min);
     if (beat) earned.push("level_up");
   }
 

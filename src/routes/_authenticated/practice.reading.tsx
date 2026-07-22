@@ -176,9 +176,10 @@ function ReadingPractice() {
   async function submit() {
     if (!current || submitted) return;
     if (current.questions.some((q) => !answers[q.id])) return;
-    const seconds = timerEnabled && startRef.current !== null
-      ? Math.max(1, Math.floor((Date.now() - startRef.current) / 1000))
-      : null;
+    const seconds =
+      timerEnabled && startRef.current !== null
+        ? Math.max(1, Math.floor((Date.now() - startRef.current) / 1000))
+        : null;
     setSubmitted(true);
     const graded: AnsweredQ[] = current.questions.map((q) => ({
       question: q,
@@ -208,12 +209,26 @@ function ReadingPractice() {
     const acc = last ? last.answers.filter((a) => a.correct).length / last.answers.length : 0;
     let newRight = streakRight;
     let newWrong = streakWrong;
-    if (acc >= 0.75) { newRight += 1; newWrong = 0; }
-    else if (acc <= 0.25) { newWrong += 1; newRight = 0; }
-    else { newRight = 0; newWrong = 0; }
+    if (acc >= 0.75) {
+      newRight += 1;
+      newWrong = 0;
+    } else if (acc <= 0.25) {
+      newWrong += 1;
+      newRight = 0;
+    } else {
+      newRight = 0;
+      newWrong = 0;
+    }
     let newLevel = level;
-    if (newRight >= 2 && level !== "C2") { newLevel = bumpLevel(level, 1); newRight = 0; newWrong = 0; }
-    else if (newWrong >= 2 && level !== "A1") { newLevel = bumpLevel(level, -1); newRight = 0; newWrong = 0; }
+    if (newRight >= 2 && level !== "C2") {
+      newLevel = bumpLevel(level, 1);
+      newRight = 0;
+      newWrong = 0;
+    } else if (newWrong >= 2 && level !== "A1") {
+      newLevel = bumpLevel(level, -1);
+      newRight = 0;
+      newWrong = 0;
+    }
     setLevel(newLevel);
     setStreakRight(newRight);
     setStreakWrong(newWrong);
@@ -230,7 +245,11 @@ function ReadingPractice() {
       return;
     }
     const nextP = pickNext(newLevel, newAsked);
-    if (!nextP) { setDone(true); setCurrent(null); return; }
+    if (!nextP) {
+      setDone(true);
+      setCurrent(null);
+      return;
+    }
     setCurrent(nextP);
     startRef.current = timerEnabled ? Date.now() : null;
   }
@@ -256,8 +275,12 @@ function ReadingPractice() {
     <AppShell>
       <div className="p-5 md:p-10 max-w-6xl mx-auto">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <Link to="/practice" className="hover:text-foreground">← All practice</Link>
-          <div>Passage {results.length + 1} of {SESSION_PASSAGES}</div>
+          <Link to="/practice" className="hover:text-foreground">
+            ← All practice
+          </Link>
+          <div>
+            Passage {results.length + 1} of {SESSION_PASSAGES}
+          </div>
         </div>
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           <BookOpen className="h-6 w-6 text-accent" />
@@ -267,9 +290,22 @@ function ReadingPractice() {
           </span>
           <div className="ml-auto flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">
-              {timerEnabled ? <Timer className="h-4 w-4 text-accent" /> : <TimerOff className="h-4 w-4 text-muted-foreground" />}
-              <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} aria-label="Toggle timer" />
-              <span className={cn("font-mono tabular-nums", timerEnabled ? "text-foreground" : "text-muted-foreground")}>
+              {timerEnabled ? (
+                <Timer className="h-4 w-4 text-accent" />
+              ) : (
+                <TimerOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <Switch
+                checked={timerEnabled}
+                onCheckedChange={setTimerEnabled}
+                aria-label="Toggle timer"
+              />
+              <span
+                className={cn(
+                  "font-mono tabular-nums",
+                  timerEnabled ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
                 {formatTime(elapsed)}
               </span>
             </div>
@@ -277,7 +313,8 @@ function ReadingPractice() {
         </div>
         {!timerEnabled && (
           <p className="mt-1 text-xs text-muted-foreground">
-            Tip: the real CLOE reading section is timed. Turn the timer on to simulate exam conditions.
+            Tip: the real CLOE reading section is timed. Turn the timer on to simulate exam
+            conditions.
           </p>
         )}
 
@@ -285,7 +322,9 @@ function ReadingPractice() {
           {/* Passage */}
           <div className="lg:col-span-2">
             <div className="rounded-3xl bg-card border border-border shadow-card p-6 lg:sticky lg:top-6">
-              <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">{current.title}</div>
+              <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+                {current.title}
+              </div>
               <div className="mt-3 text-sm md:text-base text-foreground/90 whitespace-pre-line leading-relaxed">
                 {current.body}
               </div>
@@ -302,7 +341,10 @@ function ReadingPractice() {
               const isCorrect = submitted && picked === q.correct_answer;
               const isWrong = submitted && picked && picked !== q.correct_answer;
               return (
-                <div key={q.id} className="rounded-3xl bg-card border border-border shadow-card p-5">
+                <div
+                  key={q.id}
+                  className="rounded-3xl bg-card border border-border shadow-card p-5"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="text-sm font-semibold text-foreground">
                       <span className="text-muted-foreground mr-1.5">{idx + 1}.</span>
@@ -312,7 +354,12 @@ function ReadingPractice() {
                       {q.type === "gap_fill" ? "Gap-fill" : q.options.length === 2 ? "T/F" : "MCQ"}
                     </span>
                   </div>
-                  <div className={cn("mt-3 grid gap-2", q.options.length <= 2 ? "grid-cols-2" : "sm:grid-cols-2")}>
+                  <div
+                    className={cn(
+                      "mt-3 grid gap-2",
+                      q.options.length <= 2 ? "grid-cols-2" : "sm:grid-cols-2",
+                    )}
+                  >
                     {q.options.map((opt) => {
                       const sel = picked === opt;
                       const right = submitted && opt === q.correct_answer;
@@ -331,13 +378,15 @@ function ReadingPractice() {
                             submitted && !right && !wrongPick && "border-border opacity-60",
                           )}
                         >
-                          <div className={cn(
-                            "h-5 w-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                            !submitted && sel && "border-accent bg-accent",
-                            !submitted && !sel && "border-muted-foreground/30",
-                            right && "border-success bg-success text-white",
-                            wrongPick && "border-destructive bg-destructive text-white",
-                          )}>
+                          <div
+                            className={cn(
+                              "h-5 w-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
+                              !submitted && sel && "border-accent bg-accent",
+                              !submitted && !sel && "border-muted-foreground/30",
+                              right && "border-success bg-success text-white",
+                              wrongPick && "border-destructive bg-destructive text-white",
+                            )}
+                          >
                             {right && <Check className="h-3 w-3" />}
                             {wrongPick && <X className="h-3 w-3" />}
                           </div>
@@ -347,15 +396,26 @@ function ReadingPractice() {
                     })}
                   </div>
                   {submitted && (
-                    <div className={cn(
-                      "mt-3 rounded-xl p-3 text-sm border",
-                      isCorrect ? "border-success/30 bg-success/5 text-foreground" :
-                      isWrong ? "border-destructive/30 bg-destructive/5 text-foreground" :
-                      "border-border bg-muted/30",
-                    )}>
+                    <div
+                      className={cn(
+                        "mt-3 rounded-xl p-3 text-sm border",
+                        isCorrect
+                          ? "border-success/30 bg-success/5 text-foreground"
+                          : isWrong
+                            ? "border-destructive/30 bg-destructive/5 text-foreground"
+                            : "border-border bg-muted/30",
+                      )}
+                    >
                       <div className="font-semibold flex items-center gap-1.5">
-                        {isCorrect ? <><Check className="h-4 w-4 text-success" /> Correct</> :
-                         <><X className="h-4 w-4 text-destructive" /> Answer: {q.correct_answer}</>}
+                        {isCorrect ? (
+                          <>
+                            <Check className="h-4 w-4 text-success" /> Correct
+                          </>
+                        ) : (
+                          <>
+                            <X className="h-4 w-4 text-destructive" /> Answer: {q.correct_answer}
+                          </>
+                        )}
                       </div>
                       {q.explanation && <p className="mt-1 text-foreground/80">{q.explanation}</p>}
                     </div>
@@ -421,7 +481,9 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
     allAnswers.forEach((a) => {
       const t = a.question.context_tag;
       const s = m.get(t) ?? { right: 0, total: 0 };
-      s.total++; if (a.correct) s.right++; m.set(t, s);
+      s.total++;
+      if (a.correct) s.right++;
+      m.set(t, s);
     });
     const arr = [...m.entries()].map(([tag, s]) => ({ tag, ...s, acc: s.right / s.total }));
     return arr.length ? arr.sort((a, b) => a.acc - b.acc)[0] : null;
@@ -434,7 +496,9 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
           <div className="mx-auto h-14 w-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center">
             <Trophy className="h-7 w-7" />
           </div>
-          <h1 className="mt-4 text-2xl md:text-3xl font-bold text-primary text-center">Session complete</h1>
+          <h1 className="mt-4 text-2xl md:text-3xl font-bold text-primary text-center">
+            Session complete
+          </h1>
           <p className="text-center text-sm text-muted-foreground mt-1">
             {total === 0 ? "No questions answered." : "Here's how this reading session went."}
           </p>
@@ -442,7 +506,11 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
           <div className="mt-8 grid grid-cols-2 gap-4">
             <Stat label="Accuracy" value={`${accuracy}%`} sub={`${correct}/${total} correct`} />
             <Stat label="Estimated level" value={estimatedLevel} sub="Reading, this session" />
-            <Stat label="Reading speed" value={wpm !== null ? `${wpm}` : "—"} sub={wpm !== null ? "words / min (timed only)" : "Turn timer on to measure"} />
+            <Stat
+              label="Reading speed"
+              value={wpm !== null ? `${wpm}` : "—"}
+              sub={wpm !== null ? "words / min (timed only)" : "Turn timer on to measure"}
+            />
             <Stat
               label="Weakest context"
               value={weakestTag ? weakestTag.tag.replace("_", " ") : "—"}
@@ -451,10 +519,15 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
           </div>
 
           <div className="mt-8 flex gap-3 justify-center">
-            <Button onClick={() => window.location.reload()} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
               Practice again
             </Button>
-            <Link to="/dashboard"><Button variant="outline">Back to dashboard</Button></Link>
+            <Link to="/dashboard">
+              <Button variant="outline">Back to dashboard</Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -465,7 +538,9 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
 function Stat({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
     <div className="rounded-2xl bg-muted/40 p-5 text-center">
-      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+        {label}
+      </div>
       <div className="mt-1 text-2xl font-extrabold text-primary capitalize">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{sub}</div>
     </div>

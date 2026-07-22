@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import {
-  Check, X, Loader2, Trophy, Flame, Timer, PenLine, Zap, ArrowRight,
-} from "lucide-react";
+import { Check, X, Loader2, Trophy, Flame, Timer, PenLine, Zap, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -140,9 +138,12 @@ function GrammarVocabPractice() {
     setCurrent(next);
   }, [topic, loading, current, done, level, asked, pickNext]);
 
-  useEffect(() => () => {
-    if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
+    },
+    [],
+  );
 
   async function pick(opt: string) {
     if (!current || submitted) return;
@@ -259,7 +260,9 @@ function GrammarVocabPractice() {
   }
 
   if (done || !current) {
-    return <Summary history={history} estimatedLevel={level} elapsed={elapsed} bestStreak={bestStreak} />;
+    return (
+      <Summary history={history} estimatedLevel={level} elapsed={elapsed} bestStreak={bestStreak} />
+    );
   }
 
   const progress = history.length;
@@ -272,7 +275,9 @@ function GrammarVocabPractice() {
           <button onClick={() => setTopic(null)} className="hover:text-foreground">
             ← Change focus
           </button>
-          <div>Question {progress + 1} of {SESSION_LENGTH}</div>
+          <div>
+            Question {progress + 1} of {SESSION_LENGTH}
+          </div>
         </div>
 
         {/* HUD */}
@@ -280,10 +285,12 @@ function GrammarVocabPractice() {
           <span className="font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-1 rounded-full">
             {current.cefr_level} · {current.context_tag.replace("_", " ")}
           </span>
-          <span className={cn(
-            "inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold",
-            streakRight >= 2 ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground",
-          )}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold",
+              streakRight >= 2 ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground",
+            )}
+          >
             <Flame className="h-3.5 w-3.5" /> {streakRight}
           </span>
           <span className="ml-auto inline-flex items-center gap-1 text-muted-foreground">
@@ -358,7 +365,9 @@ function GrammarVocabPractice() {
               )}
             </div>
             <div className="flex-1">
-              <div className={cn("font-semibold", lastCorrect ? "text-success" : "text-destructive")}>
+              <div
+                className={cn("font-semibold", lastCorrect ? "text-success" : "text-destructive")}
+              >
                 {lastCorrect ? "Correct" : `Answer: ${current.correct_answer}`}
               </div>
               {current.explanation && (
@@ -387,9 +396,15 @@ function formatTime(s: number) {
 }
 
 function Summary({
-  history, estimatedLevel, elapsed, bestStreak,
+  history,
+  estimatedLevel,
+  elapsed,
+  bestStreak,
 }: {
-  history: HistoryItem[]; estimatedLevel: Level; elapsed: number; bestStreak: number;
+  history: HistoryItem[];
+  estimatedLevel: Level;
+  elapsed: number;
+  bestStreak: number;
 }) {
   const total = history.length;
   const correct = history.filter((h) => h.correct).length;
@@ -450,7 +465,11 @@ function Summary({
                       <div
                         className={cn(
                           "h-full transition-all",
-                          t.acc >= 0.75 ? "bg-success" : t.acc >= 0.5 ? "bg-accent" : "bg-destructive",
+                          t.acc >= 0.75
+                            ? "bg-success"
+                            : t.acc >= 0.5
+                              ? "bg-accent"
+                              : "bg-destructive",
                         )}
                         style={{ width: `${t.acc * 100}%` }}
                       />

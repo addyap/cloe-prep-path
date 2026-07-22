@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Mic, Square, Loader2, Trophy, RotateCcw, ArrowRight, AlertCircle, Sparkles, Play, Pause,
+  Mic,
+  Square,
+  Loader2,
+  Trophy,
+  RotateCcw,
+  ArrowRight,
+  AlertCircle,
+  Sparkles,
+  Play,
+  Pause,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
@@ -17,9 +26,21 @@ type Level = (typeof LEVELS)[number];
 type Phase = "interview" | "role_play" | "discussion";
 
 const PHASE_META: Record<Phase, { title: string; sub: string; seconds: number }> = {
-  interview: { title: "Phase 1 · Interview", sub: "Talk about your job and background.", seconds: 90 },
-  role_play: { title: "Phase 2 · Role-play", sub: "Handle a realistic workplace situation.", seconds: 120 },
-  discussion: { title: "Phase 3 · Discussion", sub: "Give your opinion on a workplace topic.", seconds: 150 },
+  interview: {
+    title: "Phase 1 · Interview",
+    sub: "Talk about your job and background.",
+    seconds: 90,
+  },
+  role_play: {
+    title: "Phase 2 · Role-play",
+    sub: "Handle a realistic workplace situation.",
+    seconds: 120,
+  },
+  discussion: {
+    title: "Phase 3 · Discussion",
+    sub: "Give your opinion on a workplace topic.",
+    seconds: 150,
+  },
 };
 
 type Prompt = {
@@ -88,7 +109,9 @@ function SpeakingPractice() {
   if (loading) {
     return (
       <AppShell>
-        <div className="p-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        <div className="p-10 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
       </AppShell>
     );
   }
@@ -98,10 +121,14 @@ function SpeakingPractice() {
       <AppShell>
         <div className="p-5 md:p-10 max-w-3xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center"><Mic className="h-5 w-5" /></div>
+            <div className="h-10 w-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+              <Mic className="h-5 w-5" />
+            </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-primary">Speaking simulator</h1>
-              <p className="text-sm text-muted-foreground">Mirror the real 15–20 min CLOE oral interview.</p>
+              <p className="text-sm text-muted-foreground">
+                Mirror the real 15–20 min CLOE oral interview.
+              </p>
             </div>
           </div>
 
@@ -118,7 +145,9 @@ function SpeakingPractice() {
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-background border-border hover:border-accent/50",
                   )}
-                >{l}</button>
+                >
+                  {l}
+                </button>
               ))}
             </div>
           </div>
@@ -128,22 +157,32 @@ function SpeakingPractice() {
               onClick={() => setMode("practice")}
               className="text-left rounded-2xl bg-card border border-border p-5 shadow-card hover:border-accent/50 transition"
             >
-              <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Sparkles className="h-4 w-4" /></div>
+              <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <Sparkles className="h-4 w-4" />
+              </div>
               <div className="mt-3 font-semibold">Practice mode</div>
-              <div className="text-sm text-muted-foreground mt-1">Rehearse any phase, no scoring pressure. Get AI feedback when you ask for it.</div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Rehearse any phase, no scoring pressure. Get AI feedback when you ask for it.
+              </div>
             </button>
             <button
               onClick={() => setMode("exam")}
               className="text-left rounded-2xl bg-primary text-primary-foreground p-5 shadow-elevated hover:opacity-95 transition"
             >
-              <div className="h-9 w-9 rounded-lg bg-accent text-accent-foreground flex items-center justify-center"><Trophy className="h-4 w-4" /></div>
+              <div className="h-9 w-9 rounded-lg bg-accent text-accent-foreground flex items-center justify-center">
+                <Trophy className="h-4 w-4" />
+              </div>
               <div className="mt-3 font-semibold">Exam simulation</div>
-              <div className="text-sm text-primary-foreground/80 mt-1">Full ~15 min timed run: interview → role-play → discussion, scored end-to-end.</div>
+              <div className="text-sm text-primary-foreground/80 mt-1">
+                Full ~15 min timed run: interview → role-play → discussion, scored end-to-end.
+              </div>
             </button>
           </div>
 
           <div className="mt-6 text-xs text-muted-foreground">
-            <Link to="/practice" className="underline">← Back to practice</Link>
+            <Link to="/practice" className="underline">
+              ← Back to practice
+            </Link>
           </div>
         </div>
       </AppShell>
@@ -161,12 +200,22 @@ function SpeakingPractice() {
 }
 
 function SpeakingSession({
-  mode, prompts, targetLevel, onExit,
-}: { mode: "practice" | "exam"; prompts: Prompt[]; targetLevel: Level; onExit: () => void }) {
+  mode,
+  prompts,
+  targetLevel,
+  onExit,
+}: {
+  mode: "practice" | "exam";
+  prompts: Prompt[];
+  targetLevel: Level;
+  onExit: () => void;
+}) {
   const examPhases: Phase[] = ["interview", "role_play", "discussion"];
   const [phase, setPhase] = useState<Phase>("interview");
   const [step, setStep] = useState(0); // index in examPhases for exam mode
-  const [results, setResults] = useState<Array<{ phase: Phase; prompt: Prompt; result: EvalResult }>>([]);
+  const [results, setResults] = useState<
+    Array<{ phase: Phase; prompt: Prompt; result: EvalResult }>
+  >([]);
   const [done, setDone] = useState(false);
 
   const current = useMemo(
@@ -196,7 +245,9 @@ function SpeakingSession({
         <div className="p-10 max-w-2xl mx-auto text-center">
           <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto" />
           <p className="mt-3 text-muted-foreground">No prompts available for this phase yet.</p>
-          <Button className="mt-4" onClick={onExit}>Back</Button>
+          <Button className="mt-4" onClick={onExit}>
+            Back
+          </Button>
         </div>
       </AppShell>
     );
@@ -206,7 +257,9 @@ function SpeakingSession({
     <AppShell>
       <div className="p-5 md:p-10 max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
-          <button onClick={onExit} className="text-xs text-muted-foreground hover:text-foreground">← Exit</button>
+          <button onClick={onExit} className="text-xs text-muted-foreground hover:text-foreground">
+            ← Exit
+          </button>
           <div className="text-xs text-muted-foreground">
             {mode === "exam" ? `Step ${step + 1} of ${examPhases.length}` : "Practice mode"}
           </div>
@@ -217,12 +270,19 @@ function SpeakingSession({
             {(Object.keys(PHASE_META) as Phase[]).map((p) => (
               <button
                 key={p}
-                onClick={() => { setPhase(p); setResults([]); }}
+                onClick={() => {
+                  setPhase(p);
+                  setResults([]);
+                }}
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs border transition",
-                  phase === p ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-accent/50",
+                  phase === p
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border hover:border-accent/50",
                 )}
-              >{PHASE_META[p].title}</button>
+              >
+                {PHASE_META[p].title}
+              </button>
             ))}
           </div>
         )}
@@ -241,7 +301,11 @@ function SpeakingSession({
 }
 
 function PhaseRecorder({
-  phase, prompt, targetLevel, mode, onSubmitted,
+  phase,
+  prompt,
+  targetLevel,
+  mode,
+  onSubmitted,
 }: {
   phase: Phase;
   prompt: Prompt;
@@ -265,15 +329,23 @@ function PhaseRecorder({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioElRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    if (audioUrl) URL.revokeObjectURL(audioUrl);
-  }, [audioUrl]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    },
+    [audioUrl],
+  );
 
   async function startRecording() {
-    setError(null); setBlob(null); setResult(null);
-    if (audioUrl) { URL.revokeObjectURL(audioUrl); setAudioUrl(null); }
+    setError(null);
+    setBlob(null);
+    setResult(null);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -290,7 +362,9 @@ function PhaseRecorder({
     }
     const rec = new MediaRecorder(stream, { mimeType });
     chunksRef.current = [];
-    rec.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+    rec.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
     rec.onstop = () => {
       const b = new Blob(chunksRef.current, { type: rec.mimeType });
       stream.getTracks().forEach((t) => t.stop());
@@ -313,7 +387,10 @@ function PhaseRecorder({
   }
 
   function stopRecording() {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
       recorderRef.current.stop();
     }
@@ -322,7 +399,8 @@ function PhaseRecorder({
 
   async function submit(save: boolean) {
     if (!blob) return;
-    setSubmitting(true); setError(null);
+    setSubmitting(true);
+    setError(null);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
@@ -354,8 +432,14 @@ function PhaseRecorder({
   }
 
   function reset() {
-    setBlob(null); setResult(null); setError(null); setElapsed(0);
-    if (audioUrl) { URL.revokeObjectURL(audioUrl); setAudioUrl(null); }
+    setBlob(null);
+    setResult(null);
+    setError(null);
+    setElapsed(0);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
   }
 
   const progressPct = Math.min(100, (elapsed / meta.seconds) * 100);
@@ -365,24 +449,37 @@ function PhaseRecorder({
       <div className="text-xs uppercase tracking-wide text-accent font-semibold">{meta.title}</div>
       <div className="mt-1 text-sm text-muted-foreground">{meta.sub}</div>
       <div className="mt-4 rounded-2xl bg-muted/40 border border-border p-4">
-        <div className="text-xs text-muted-foreground">Target {prompt.cefr_level} · {meta.title}</div>
+        <div className="text-xs text-muted-foreground">
+          Target {prompt.cefr_level} · {meta.title}
+        </div>
         <p className="mt-2 text-base leading-relaxed text-foreground">{prompt.prompt_text}</p>
       </div>
 
       <div className="mt-5 flex items-center justify-between">
         <div className="text-sm font-mono tabular-nums">
-          {formatTime(elapsed)} <span className="text-muted-foreground">/ {formatTime(meta.seconds)}</span>
+          {formatTime(elapsed)}{" "}
+          <span className="text-muted-foreground">/ {formatTime(meta.seconds)}</span>
         </div>
-        {recording && <span className="flex items-center gap-1.5 text-xs text-red-500"><span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" /> recording</span>}
+        {recording && (
+          <span className="flex items-center gap-1.5 text-xs text-red-500">
+            <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" /> recording
+          </span>
+        )}
       </div>
       <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
-        <div className={cn("h-full transition-all", recording ? "bg-red-500" : "bg-accent")} style={{ width: `${progressPct}%` }} />
+        <div
+          className={cn("h-full transition-all", recording ? "bg-red-500" : "bg-accent")}
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
 
       {!result && (
         <div className="mt-5 flex flex-wrap items-center gap-3">
           {!recording && !blob && (
-            <Button onClick={startRecording} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button
+              onClick={startRecording}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
               <Mic className="h-4 w-4 mr-2" /> Start recording
             </Button>
           )}
@@ -403,17 +500,40 @@ function PhaseRecorder({
               />
               <Button
                 variant="outline"
-                onClick={() => { if (!audioElRef.current) return; if (playing) audioElRef.current.pause(); else audioElRef.current.play(); }}
+                onClick={() => {
+                  if (!audioElRef.current) return;
+                  if (playing) audioElRef.current.pause();
+                  else audioElRef.current.play();
+                }}
               >
-                {playing ? <><Pause className="h-4 w-4 mr-2" /> Pause</> : <><Play className="h-4 w-4 mr-2" /> Play back</>}
+                {playing ? (
+                  <>
+                    <Pause className="h-4 w-4 mr-2" /> Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" /> Play back
+                  </>
+                )}
               </Button>
-              <Button variant="ghost" onClick={reset}><RotateCcw className="h-4 w-4 mr-2" /> Re-record</Button>
+              <Button variant="ghost" onClick={reset}>
+                <RotateCcw className="h-4 w-4 mr-2" /> Re-record
+              </Button>
               <Button
                 onClick={() => submit(mode === "exam" ? true : true)}
                 disabled={submitting}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Scoring…</> : <>{mode === "exam" ? "Submit & continue" : "Get feedback"} <ArrowRight className="h-4 w-4 ml-2" /></>}
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Scoring…
+                  </>
+                ) : (
+                  <>
+                    {mode === "exam" ? "Submit & continue" : "Get feedback"}{" "}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             </>
           )}
@@ -443,7 +563,9 @@ function FeedbackCard({ result, onTryAgain }: { result: EvalResult; onTryAgain: 
     <div className="mt-6 rounded-2xl border border-border bg-background p-5">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">Estimated level</div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Estimated level
+          </div>
           <div className="text-3xl font-extrabold text-primary">{feedback.estimated_level}</div>
         </div>
         <div className="text-right">
@@ -461,7 +583,10 @@ function FeedbackCard({ result, onTryAgain }: { result: EvalResult; onTryAgain: 
               <div className="text-sm font-mono">{feedback.scores[k]}/5</div>
             </div>
             <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-accent" style={{ width: `${(feedback.scores[k] / 5) * 100}%` }} />
+              <div
+                className="h-full bg-accent"
+                style={{ width: `${(feedback.scores[k] / 5) * 100}%` }}
+              />
             </div>
             <div className="mt-2 text-xs text-muted-foreground">{feedback.comments[k]}</div>
           </div>
@@ -472,26 +597,39 @@ function FeedbackCard({ result, onTryAgain }: { result: EvalResult; onTryAgain: 
         <div className="text-sm font-semibold mb-2">Tips</div>
         <ul className="space-y-1.5 text-sm">
           {feedback.tips.map((t, i) => (
-            <li key={i} className="flex gap-2"><Sparkles className="h-4 w-4 text-accent shrink-0 mt-0.5" /><span>{t}</span></li>
+            <li key={i} className="flex gap-2">
+              <Sparkles className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+              <span>{t}</span>
+            </li>
           ))}
         </ul>
       </div>
 
       <details className="mt-5 text-sm">
-        <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Show transcript</summary>
-        <p className="mt-2 whitespace-pre-wrap text-foreground/90 bg-muted/30 rounded-lg p-3">{transcript || "(no speech detected)"}</p>
+        <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+          Show transcript
+        </summary>
+        <p className="mt-2 whitespace-pre-wrap text-foreground/90 bg-muted/30 rounded-lg p-3">
+          {transcript || "(no speech detected)"}
+        </p>
       </details>
 
       <div className="mt-5">
-        <Button variant="outline" onClick={onTryAgain}><RotateCcw className="h-4 w-4 mr-2" /> Try another take</Button>
+        <Button variant="outline" onClick={onTryAgain}>
+          <RotateCcw className="h-4 w-4 mr-2" /> Try another take
+        </Button>
       </div>
     </div>
   );
 }
 
 function ExamSummary({
-  results, onRestart,
-}: { results: Array<{ phase: Phase; prompt: Prompt; result: EvalResult }>; onRestart: () => void }) {
+  results,
+  onRestart,
+}: {
+  results: Array<{ phase: Phase; prompt: Prompt; result: EvalResult }>;
+  onRestart: () => void;
+}) {
   const overallAvg = results.length
     ? Math.round(results.reduce((s, r) => s + r.result.overall, 0) / results.length)
     : 0;
@@ -500,7 +638,8 @@ function ExamSummary({
     const l = r.result.feedback.estimated_level;
     levelCount[l] = (levelCount[l] ?? 0) + 1;
   });
-  const estimatedLevel = (Object.entries(levelCount).sort((a, b) => b[1]! - a[1]!)[0]?.[0] as Level | undefined) ?? "B1";
+  const estimatedLevel =
+    (Object.entries(levelCount).sort((a, b) => b[1]! - a[1]!)[0]?.[0] as Level | undefined) ?? "B1";
 
   return (
     <AppShell>
@@ -524,14 +663,21 @@ function ExamSummary({
           {results.map((r, i) => (
             <div key={i} className="rounded-2xl bg-card border border-border p-5 shadow-card">
               <div className="flex items-center justify-between">
-                <div className="text-xs uppercase text-accent font-semibold">{PHASE_META[r.phase].title}</div>
-                <div className="text-sm font-mono">{r.result.overall}% · {r.result.feedback.estimated_level}</div>
+                <div className="text-xs uppercase text-accent font-semibold">
+                  {PHASE_META[r.phase].title}
+                </div>
+                <div className="text-sm font-mono">
+                  {r.result.overall}% · {r.result.feedback.estimated_level}
+                </div>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{r.prompt.prompt_text}</p>
               <p className="mt-3 text-sm">{r.result.feedback.summary}</p>
               <ul className="mt-3 space-y-1 text-sm">
                 {r.result.feedback.tips.slice(0, 2).map((t, j) => (
-                  <li key={j} className="flex gap-2"><Sparkles className="h-4 w-4 text-accent shrink-0 mt-0.5" /><span>{t}</span></li>
+                  <li key={j} className="flex gap-2">
+                    <Sparkles className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                    <span>{t}</span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -539,10 +685,15 @@ function ExamSummary({
         </div>
 
         <div className="mt-6 flex gap-3">
-          <Button onClick={onRestart} className="bg-accent text-accent-foreground hover:bg-accent/90">
+          <Button
+            onClick={onRestart}
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+          >
             <RotateCcw className="h-4 w-4 mr-2" /> Back to speaking menu
           </Button>
-          <Link to="/dashboard"><Button variant="outline">Dashboard</Button></Link>
+          <Link to="/dashboard">
+            <Button variant="outline">Dashboard</Button>
+          </Link>
         </div>
       </div>
     </AppShell>

@@ -27,9 +27,13 @@ function ComingSoon() {
             <Sparkles className="h-7 w-7" />
           </div>
           <h1 className="mt-4 text-2xl md:text-3xl font-bold text-primary">{label}</h1>
-          <p className="text-muted-foreground mt-2">This module is coming soon. We're building it next.</p>
+          <p className="text-muted-foreground mt-2">
+            This module is coming soon. We're building it next.
+          </p>
           <Link to="/dashboard">
-            <Button className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">Back to dashboard</Button>
+            <Button className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90">
+              Back to dashboard
+            </Button>
           </Link>
         </div>
       </div>

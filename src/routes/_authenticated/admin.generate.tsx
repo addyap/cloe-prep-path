@@ -26,7 +26,14 @@ const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const CONTEXTS_BY_SKILL: Record<string, readonly string[]> = {
   listening: ["call", "meeting", "customer_service", "negotiation", "general"],
   reading: ["email", "general", "customer_service", "negotiation"],
-  grammar_vocab: ["tenses", "prepositions", "business_vocab", "phrasal_verbs", "formal_register", "collocations"],
+  grammar_vocab: [
+    "tenses",
+    "prepositions",
+    "business_vocab",
+    "phrasal_verbs",
+    "formal_register",
+    "collocations",
+  ],
   writing: ["email", "general", "customer_service", "negotiation"],
   speaking: ["interview", "role_play", "discussion"],
 };
@@ -93,14 +100,17 @@ function AdminGenerate() {
     setPreview([]);
     setLastInserted(null);
     try {
-      const res = await genFn({ data: { skill, cefr_level: level, context_tag: contextTag as never, count } });
+      const res = await genFn({
+        data: { skill, cefr_level: level, context_tag: contextTag as never, count },
+      });
       setPreview(res.preview as PreviewItem[]);
       setLastInserted(res.inserted_count);
       toast.success(`Generated ${res.inserted_count} new questions.`);
     } catch (e) {
       const msg = (e as Error).message;
       if (msg === "RATE_LIMIT") toast.error("Rate limit hit. Try again in a moment.");
-      else if (msg === "CREDITS_EXHAUSTED") toast.error("AI credits exhausted. Add credits in your Lovable workspace.");
+      else if (msg === "CREDITS_EXHAUSTED")
+        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
       else toast.error(msg || "Failed to generate questions.");
     } finally {
       setBusy(false);
@@ -126,19 +136,22 @@ function AdminGenerate() {
             <ShieldCheck className="h-10 w-10 mx-auto text-muted-foreground" />
             <h1 className="mt-3 text-xl font-bold text-primary">Admins only</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              This tool generates new practice questions. If you're the first user setting up CLOE Prep, you can claim admin access now.
+              This tool generates new practice questions. If you're the first user setting up CLOE
+              Prep, you can claim admin access now.
             </p>
             <div className="mt-5 flex justify-center gap-3">
               <Button variant="ghost" onClick={() => navigate({ to: "/dashboard" })}>
                 Back
               </Button>
-              <Button onClick={claim} disabled={claiming} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button
+                onClick={claim}
+                disabled={claiming}
+                className="bg-accent text-accent-foreground hover:bg-accent/90"
+              >
                 {claiming ? "Claiming…" : "Claim first admin"}
               </Button>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Only works if no admin exists yet.
-            </p>
+            <p className="mt-3 text-xs text-muted-foreground">Only works if no admin exists yet.</p>
           </div>
         </div>
       </AppShell>
@@ -165,32 +178,56 @@ function AdminGenerate() {
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Skill</Label>
               <Select value={skill} onValueChange={(v) => setSkill(v as (typeof SKILLS)[number])}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {SKILLS.map((s) => <SelectItem key={s} value={s}>{s.replace("_", " & ")}</SelectItem>)}
+                  {SKILLS.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s.replace("_", " & ")}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">CEFR level</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                CEFR level
+              </Label>
               <Select value={level} onValueChange={(v) => setLevel(v as (typeof LEVELS)[number])}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                  {LEVELS.map((l) => (
+                    <SelectItem key={l} value={l}>
+                      {l}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Context / sub-topic</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                Context / sub-topic
+              </Label>
               <Select value={contextTag} onValueChange={setContextTag}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {contexts.map((c) => <SelectItem key={c} value={c}>{c.replaceAll("_", " ")}</SelectItem>)}
+                  {contexts.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c.replaceAll("_", " ")}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">How many</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                How many
+              </Label>
               <Input
                 type="number"
                 min={1}
@@ -207,7 +244,13 @@ function AdminGenerate() {
             disabled={busy}
             className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
           >
-            {busy ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating…</>) : `Generate ${count} questions`}
+            {busy ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating…
+              </>
+            ) : (
+              `Generate ${count} questions`
+            )}
           </Button>
           {lastInserted !== null && !busy && (
             <p className="text-xs text-center text-muted-foreground">
@@ -224,19 +267,23 @@ function AdminGenerate() {
                 <div className="text-xs text-muted-foreground uppercase tracking-wide">
                   #{i + 1} · {q.type}
                 </div>
-                <div className="mt-1 font-medium text-foreground whitespace-pre-wrap">{q.prompt_text}</div>
+                <div className="mt-1 font-medium text-foreground whitespace-pre-wrap">
+                  {q.prompt_text}
+                </div>
                 {q.options && (
                   <ul className="mt-2 text-sm text-muted-foreground space-y-1">
                     {q.options.map((o, k) => (
-                      <li key={k} className={o === q.correct_answer ? "text-accent font-semibold" : ""}>
-                        • {o}{o === q.correct_answer && " ✓"}
+                      <li
+                        key={k}
+                        className={o === q.correct_answer ? "text-accent font-semibold" : ""}
+                      >
+                        • {o}
+                        {o === q.correct_answer && " ✓"}
                       </li>
                     ))}
                   </ul>
                 )}
-                <div className="mt-2 text-xs text-muted-foreground italic">
-                  {q.explanation}
-                </div>
+                <div className="mt-2 text-xs text-muted-foreground italic">{q.explanation}</div>
               </div>
             ))}
           </section>

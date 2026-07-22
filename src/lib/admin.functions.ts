@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { generateText, Output } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createOpenAiProvider } from "@/lib/ai-gateway.server";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const SKILLS = ["listening", "reading", "grammar_vocab", "writing", "speaking"] as const;
@@ -84,11 +84,11 @@ export const generateQuestions = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden: admin only");
 
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("Missing OPENAI_API_KEY");
 
-    const gateway = createLovableAiGatewayProvider(key);
-    const model = gateway("google/gemini-3-flash-preview");
+    const gateway = createOpenAiProvider(key);
+    const model = gateway("gpt-4o-mini");
 
     const skillGuidance: Record<(typeof SKILLS)[number], string> = {
       listening:

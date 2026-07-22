@@ -5,7 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import type { CefrLevel } from "@/components/cefr-progress";
 
@@ -25,7 +31,11 @@ function ProfilePage() {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       setEmail(u.user.email ?? "");
-      const { data } = await supabase.from("profiles").select("full_name, target_cefr_level").eq("id", u.user.id).maybeSingle();
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, target_cefr_level")
+        .eq("id", u.user.id)
+        .maybeSingle();
       setFullName(data?.full_name ?? "");
       setTarget((data?.target_cefr_level as CefrLevel) ?? "");
     })();
@@ -35,10 +45,13 @@ function ProfilePage() {
     setSaving(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const { error } = await supabase.from("profiles").update({
-      full_name: fullName,
-      target_cefr_level: target || null,
-    }).eq("id", u.user.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: fullName,
+        target_cefr_level: target || null,
+      })
+      .eq("id", u.user.id);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated.");
@@ -65,15 +78,29 @@ function ProfilePage() {
           <div>
             <Label>Target CEFR level</Label>
             <Select value={target || undefined} onValueChange={(v) => setTarget(v as CefrLevel)}>
-              <SelectTrigger><SelectValue placeholder="Pick a level" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Pick a level" />
+              </SelectTrigger>
               <SelectContent>
-                {LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                {LEVELS.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {l}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex flex-wrap gap-2 pt-2">
-            <Button onClick={save} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">Save changes</Button>
-            <Button variant="outline" onClick={signOut}>Sign out</Button>
+            <Button
+              onClick={save}
+              disabled={saving}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              Save changes
+            </Button>
+            <Button variant="outline" onClick={signOut}>
+              Sign out
+            </Button>
           </div>
         </div>
       </div>

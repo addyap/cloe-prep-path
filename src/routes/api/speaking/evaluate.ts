@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createOpenAiProvider } from "@/lib/ai-gateway.server";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const PHASES = ["interview", "role_play", "discussion"] as const;
@@ -31,29 +31,30 @@ type Feedback = z.infer<typeof FeedbackSchema>;
 function extFromMime(mime: string): string {
   const m = mime.split(";")[0].trim();
   return (
-    ({
-      "audio/webm": "webm",
-      "audio/mp4": "mp4",
-      "audio/mpeg": "mp3",
-      "audio/wav": "wav",
-      "audio/x-wav": "wav",
-      "audio/ogg": "ogg",
-      "audio/aac": "aac",
-    } as Record<string, string>)[m] ?? "webm"
+    (
+      {
+        "audio/webm": "webm",
+        "audio/mp4": "mp4",
+        "audio/mpeg": "mp3",
+        "audio/wav": "wav",
+        "audio/x-wav": "wav",
+        "audio/ogg": "ogg",
+        "audio/aac": "aac",
+      } as Record<string, string>
+    )[m] ?? "webm"
   );
 }
 
-async function transcribe(audio: Blob, lovableKey: string): Promise<string> {
+async function transcribe(audio: Blob, openaiKey: string): Promise<string> {
   const form = new FormData();
-  form.append("model", "openai/gpt-4o-mini-transcribe");
+  form.append("model", "gpt-4o-mini-transcribe");
   form.append("file", audio, `recording.${extFromMime(audio.type || "audio/webm")}`);
   form.append("language", "en");
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
+  const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "Lovable-API-Key": lovableKey,
+      Authorization: `Bearer ${openaiKey}`,
     },
     body: form,
   });
@@ -70,10 +71,10 @@ async function evaluate(params: {
   target_level: (typeof LEVELS)[number];
   phase: (typeof PHASES)[number];
   transcript: string;
-  lovableKey: string;
+  openaiKey: string;
 }): Promise<Feedback> {
-  const gateway = createLovableAiGatewayProvider(params.lovableKey);
-  const model = gateway("google/gemini-3-flash-preview");
+  const gateway = createOpenAiProvider(params.openaiKey);
+  const model = gateway("gpt-4o-mini");
 
   const phaseLabel: Record<(typeof PHASES)[number], string> = {
     interview: "Phase 1 — Interview about candidate's background",
@@ -134,9 +135,9 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
 
           const SUPABASE_URL = process.env.SUPABASE_URL!;
           const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
-          const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-          if (!LOVABLE_API_KEY) {
-            return new Response(JSON.stringify({ error: "Missing LOVABLE_API_KEY" }), {
+          const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+          if (!OPENAI_API_KEY) {
+            return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
               status: 500,
               headers: { "Content-Type": "application/json" },
             });
@@ -182,13 +183,13 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
             });
           }
 
-          const transcript = await transcribe(audio, LOVABLE_API_KEY);
+          const transcript = await transcribe(audio, OPENAI_API_KEY);
           const feedback = await evaluate({
             prompt_text,
             target_level,
             phase,
             transcript,
-            lovableKey: LOVABLE_API_KEY,
+            openaiKey: OPENAI_API_KEY,
           });
 
           const overall = Math.round(

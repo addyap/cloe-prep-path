@@ -20,7 +20,14 @@ function PracticePage() {
         <p className="text-sm text-muted-foreground mt-1">Choose a skill to drill.</p>
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
           {SKILLS.map((s) => {
-            const readyTo: Record<string, "/practice/listening" | "/practice/reading" | "/practice/grammar-vocab" | "/practice/writing" | "/practice/speaking"> = {
+            const readyTo: Record<
+              string,
+              | "/practice/listening"
+              | "/practice/reading"
+              | "/practice/grammar-vocab"
+              | "/practice/writing"
+              | "/practice/speaking"
+            > = {
               listening: "/practice/listening",
               reading: "/practice/reading",
               grammar_vocab: "/practice/grammar-vocab",
@@ -32,8 +39,11 @@ function PracticePage() {
               ? ({ to: ready } as const)
               : ({ to: "/coming-soon/$skill", params: { skill: s.slug } } as const);
             return (
-              <Link key={s.slug} {...linkProps}
-                className="rounded-2xl bg-card border border-border p-5 shadow-card hover:border-accent/50 transition">
+              <Link
+                key={s.slug}
+                {...linkProps}
+                className="rounded-2xl bg-card border border-border p-5 shadow-card hover:border-accent/50 transition"
+              >
                 <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                   <s.icon className="h-5 w-5" />
                 </div>

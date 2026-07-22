@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Headphones, BookOpen, PenLine, Mic, ClipboardCheck, GraduationCap, ArrowRight, Flame, Pencil } from "lucide-react";
+import {
+  Headphones,
+  BookOpen,
+  PenLine,
+  Mic,
+  ClipboardCheck,
+  GraduationCap,
+  ArrowRight,
+  Flame,
+  Pencil,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { CefrProgress, type CefrLevel } from "@/components/cefr-progress";
@@ -26,9 +36,19 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const SKILLS = [
-  { slug: "listening", title: "Listening", icon: Headphones, desc: "Phone calls, meetings, announcements." },
+  {
+    slug: "listening",
+    title: "Listening",
+    icon: Headphones,
+    desc: "Phone calls, meetings, announcements.",
+  },
   { slug: "reading", title: "Reading", icon: BookOpen, desc: "Emails, reports, documents." },
-  { slug: "grammar_vocab", title: "Grammar & Vocab", icon: PenLine, desc: "Fix errors, build precision." },
+  {
+    slug: "grammar_vocab",
+    title: "Grammar & Vocab",
+    icon: PenLine,
+    desc: "Fix errors, build precision.",
+  },
   { slug: "writing", title: "Writing", icon: Pencil, desc: "Professional emails and short texts." },
   { slug: "speaking", title: "Speaking", icon: Mic, desc: "Respond to realistic prompts." },
 ];
@@ -122,9 +142,7 @@ function Dashboard() {
       <div className="p-5 md:p-10 max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-primary">
-              Hi {name || "there"} 👋
-            </h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-primary">Hi {name || "there"} 👋</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Let's get you closer to your CLOE goal today.
             </p>
@@ -168,7 +186,9 @@ function Dashboard() {
             {loading ? (
               <Skeleton className="h-24 w-24 rounded-full mt-2" />
             ) : (
-              <div className="mt-2"><DailyGoalRing minutes={today} goal={goal} /></div>
+              <div className="mt-2">
+                <DailyGoalRing minutes={today} goal={goal} />
+              </div>
             )}
             {editingGoal ? (
               <div className="mt-3 flex gap-2 items-center">
@@ -180,11 +200,15 @@ function Dashboard() {
                   onChange={(e) => setTempGoal(Number(e.target.value))}
                   className="w-20 h-8"
                 />
-                <Button size="sm" onClick={saveGoal}>Save</Button>
+                <Button size="sm" onClick={saveGoal}>
+                  Save
+                </Button>
               </div>
             ) : (
               <div className="text-xs text-muted-foreground mt-2">
-                {today >= goal ? "🎉 Goal hit — nice work!" : `${Math.max(0, goal - today)} min to go`}
+                {today >= goal
+                  ? "🎉 Goal hit — nice work!"
+                  : `${Math.max(0, goal - today)} min to go`}
               </div>
             )}
           </div>
@@ -199,7 +223,9 @@ function Dashboard() {
               <>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-5xl font-extrabold text-primary">{streak}</span>
-                  <span className="text-sm text-muted-foreground">day{streak === 1 ? "" : "s"}</span>
+                  <span className="text-sm text-muted-foreground">
+                    day{streak === 1 ? "" : "s"}
+                  </span>
                 </div>
                 <StreakHeatmap activity={activity} className="mt-4" weeks={10} />
               </>
@@ -212,7 +238,9 @@ function Dashboard() {
           <h2 className="text-lg font-bold text-foreground">Badges</h2>
           {loading ? (
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-2xl" />
+              ))}
             </div>
           ) : (
             <BadgesShelf earned={earned} className="mt-3" />
@@ -222,7 +250,14 @@ function Dashboard() {
         <h2 className="mt-10 text-lg font-bold text-foreground">Practice by skill</h2>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {SKILLS.map((s) => {
-            const readyTo: Record<string, "/practice/listening" | "/practice/reading" | "/practice/grammar-vocab" | "/practice/writing" | "/practice/speaking"> = {
+            const readyTo: Record<
+              string,
+              | "/practice/listening"
+              | "/practice/reading"
+              | "/practice/grammar-vocab"
+              | "/practice/writing"
+              | "/practice/speaking"
+            > = {
               listening: "/practice/listening",
               reading: "/practice/reading",
               grammar_vocab: "/practice/grammar-vocab",
@@ -245,7 +280,8 @@ function Dashboard() {
                 <div className="mt-4 font-semibold text-foreground">{s.title}</div>
                 <div className="text-sm text-muted-foreground mt-1">{s.desc}</div>
                 <div className="mt-4 text-sm font-medium text-accent flex items-center gap-1">
-                  {ready ? "Start" : "Coming soon"} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                  {ready ? "Start" : "Coming soon"}{" "}
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                 </div>
               </Link>
             );

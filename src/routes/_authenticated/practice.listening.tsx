@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Play, Pause, RotateCcw, Gauge, Check, X, ArrowRight, Headphones, Loader2, Trophy } from "lucide-react";
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Gauge,
+  Check,
+  X,
+  ArrowRight,
+  Headphones,
+  Loader2,
+  Trophy,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -120,7 +131,6 @@ function ListeningPractice() {
   // Stop audio when question changes / unmount
   useEffect(() => {
     return () => stopAudio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.id]);
 
   function stopAudio() {
@@ -247,8 +257,12 @@ function ListeningPractice() {
     <AppShell>
       <div className="p-5 md:p-10 max-w-3xl mx-auto">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <Link to="/practice" className="hover:text-foreground">← All practice</Link>
-          <div>Question {progress + 1} of {SESSION_LENGTH}</div>
+          <Link to="/practice" className="hover:text-foreground">
+            ← All practice
+          </Link>
+          <div>
+            Question {progress + 1} of {SESSION_LENGTH}
+          </div>
         </div>
         <div className="mt-2 flex items-center gap-3">
           <Headphones className="h-6 w-6 text-accent" />
@@ -299,7 +313,10 @@ function ListeningPractice() {
               ))}
             </div>
             <div className="ml-auto text-xs text-muted-foreground">
-              Plays left: <strong className={cn(playsLeft === 0 && "text-destructive")}>{playsLeft}/{MAX_PLAYS}</strong>
+              Plays left:{" "}
+              <strong className={cn(playsLeft === 0 && "text-destructive")}>
+                {playsLeft}/{MAX_PLAYS}
+              </strong>
             </div>
           </div>
           {submitted && (
@@ -365,9 +382,15 @@ function ListeningPractice() {
           >
             <div className="flex items-center gap-2 font-semibold">
               {history[history.length - 1]?.correct ? (
-                <><Check className="h-5 w-5 text-success" /> <span className="text-success">Correct</span></>
+                <>
+                  <Check className="h-5 w-5 text-success" />{" "}
+                  <span className="text-success">Correct</span>
+                </>
               ) : (
-                <><X className="h-5 w-5 text-destructive" /> <span className="text-destructive">Not quite</span></>
+                <>
+                  <X className="h-5 w-5 text-destructive" />{" "}
+                  <span className="text-destructive">Not quite</span>
+                </>
               )}
             </div>
             {current.explanation && (
@@ -430,9 +453,7 @@ function Summary({ history, estimatedLevel }: { history: HistoryItem[]; estimate
     return [...m.entries()].map(([tag, s]) => ({ tag, ...s, acc: s.right / s.total }));
   }, [history]);
 
-  const weakest = tagStats.length
-    ? tagStats.slice().sort((a, b) => a.acc - b.acc)[0]
-    : null;
+  const weakest = tagStats.length ? tagStats.slice().sort((a, b) => a.acc - b.acc)[0] : null;
 
   return (
     <AppShell>
@@ -441,7 +462,9 @@ function Summary({ history, estimatedLevel }: { history: HistoryItem[]; estimate
           <div className="mx-auto h-14 w-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center">
             <Trophy className="h-7 w-7" />
           </div>
-          <h1 className="mt-4 text-2xl md:text-3xl font-bold text-primary text-center">Session complete</h1>
+          <h1 className="mt-4 text-2xl md:text-3xl font-bold text-primary text-center">
+            Session complete
+          </h1>
           <p className="text-center text-sm text-muted-foreground mt-1">
             {total === 0 ? "No questions answered." : "Nice work — here's how you did."}
           </p>
@@ -453,7 +476,9 @@ function Summary({ history, estimatedLevel }: { history: HistoryItem[]; estimate
 
           {weakest && (
             <div className="mt-6 rounded-2xl bg-muted/40 p-4">
-              <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">Weakest context</div>
+              <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+                Weakest context
+              </div>
               <div className="mt-1 font-semibold text-foreground capitalize">
                 {weakest.tag.replace("_", " ")}{" "}
                 <span className="text-sm font-normal text-muted-foreground">
@@ -483,7 +508,9 @@ function Summary({ history, estimatedLevel }: { history: HistoryItem[]; estimate
 function Stat({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
     <div className="rounded-2xl bg-muted/40 p-5 text-center">
-      <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+        {label}
+      </div>
       <div className="mt-1 text-3xl font-extrabold text-primary">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{sub}</div>
     </div>

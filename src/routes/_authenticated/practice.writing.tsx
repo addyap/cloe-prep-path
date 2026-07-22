@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  PenLine, Timer, Loader2, Trophy, Check, RotateCcw, Sparkles, ArrowRight, AlertCircle,
+  PenLine,
+  Timer,
+  Loader2,
+  Trophy,
+  Check,
+  RotateCcw,
+  Sparkles,
+  ArrowRight,
+  AlertCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
@@ -111,8 +119,10 @@ function WritingPractice() {
       setOverall(res.overall);
     } catch (e: unknown) {
       const msg = (e as Error).message || "Something went wrong.";
-      if (msg.includes("RATE_LIMIT")) setError("AI rate limit reached. Wait a moment and try again.");
-      else if (msg.includes("CREDITS_EXHAUSTED")) setError("AI credits exhausted for this workspace.");
+      if (msg.includes("RATE_LIMIT"))
+        setError("AI rate limit reached. Wait a moment and try again.");
+      else if (msg.includes("CREDITS_EXHAUSTED"))
+        setError("AI credits exhausted for this workspace.");
       else setError("Couldn't evaluate your response. Please try again.");
     } finally {
       setSubmitting(false);
@@ -168,7 +178,9 @@ function WritingPractice() {
                       {p.context_tag.replace(/_/g, " ")}
                     </span>
                     {r && (
-                      <span className="ml-auto text-muted-foreground">{r[0]}–{r[1]} words</span>
+                      <span className="ml-auto text-muted-foreground">
+                        {r[0]}–{r[1]} words
+                      </span>
                     )}
                   </div>
                   <div className="mt-2 font-semibold text-foreground">{title}</div>
@@ -190,7 +202,9 @@ function WritingPractice() {
       <AppShell>
         <div className="p-5 md:p-10 max-w-3xl mx-auto">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <button onClick={reset} className="hover:text-foreground">← New task</button>
+            <button onClick={reset} className="hover:text-foreground">
+              ← New task
+            </button>
             <span>Target: {current.cefr_level}</span>
           </div>
 
@@ -276,7 +290,9 @@ function WritingPractice() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3 justify-end">
-            <Button variant="outline" onClick={reset}>Try another task</Button>
+            <Button variant="outline" onClick={reset}>
+              Try another task
+            </Button>
             <Button
               onClick={revise}
               className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2"
@@ -297,9 +313,12 @@ function WritingPractice() {
     <AppShell>
       <div className="p-5 md:p-10 max-w-3xl mx-auto">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <button onClick={reset} className="hover:text-foreground">← Change task</button>
+          <button onClick={reset} className="hover:text-foreground">
+            ← Change task
+          </button>
           <span className="inline-flex items-center gap-1">
-            <Timer className="h-4 w-4" /> {Math.floor(elapsed / 60)}:{(elapsed % 60).toString().padStart(2, "0")}
+            <Timer className="h-4 w-4" /> {Math.floor(elapsed / 60)}:
+            {(elapsed % 60).toString().padStart(2, "0")}
           </span>
         </div>
 
@@ -335,11 +354,16 @@ function WritingPractice() {
             >
               {words} words
               {range && (
-                <span className="text-muted-foreground"> · target {range[0]}–{range[1]}</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  · target {range[0]}–{range[1]}
+                </span>
               )}
             </span>
             <span className="text-muted-foreground">
-              {text.length === 0 ? "Start writing — the AI will grade against the target level." : "Tip: keep a professional, polite register."}
+              {text.length === 0
+                ? "Start writing — the AI will grade against the target level."
+                : "Tip: keep a professional, polite register."}
             </span>
           </div>
         </div>
@@ -359,9 +383,13 @@ function WritingPractice() {
             className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
           >
             {submitting ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> Evaluating…</>
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Evaluating…
+              </>
             ) : (
-              <>Submit for feedback <ArrowRight className="h-4 w-4" /></>
+              <>
+                Submit for feedback <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </Button>
         </div>
