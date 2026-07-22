@@ -15,7 +15,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { cn, extractSpokenScript } from "@/lib/utils";
+import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/listening")({
   component: ListeningPractice,
@@ -89,7 +89,7 @@ function ListeningPractice() {
         context_tag: q.context_tag,
         prompt_text: q.prompt_text,
         audio_url: q.audio_url,
-        options: Array.isArray(q.options) ? (q.options as string[]) : [],
+        options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
         correct_answer: q.correct_answer ?? "",
         explanation: q.explanation,
       }));

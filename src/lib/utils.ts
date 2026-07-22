@@ -15,3 +15,17 @@ export function extractSpokenScript(text: string): string {
   if (m) return m[1];
   return text.replace(/^You hear:\s*/i, "");
 }
+
+/**
+ * Fisher–Yates shuffle (returns a new array). Applied to MCQ options at load
+ * time so the stored answer-key position in the database is irrelevant to
+ * what users see — grading compares option text, never position.
+ */
+export function shuffle<T>(arr: readonly T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}

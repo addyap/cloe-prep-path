@@ -4,7 +4,7 @@ import { Check, X, Loader2, Trophy, Flame, Timer, PenLine, Zap, ArrowRight } fro
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
   component: GrammarVocabPractice,
@@ -99,7 +99,7 @@ function GrammarVocabPractice() {
         cefr_level: q.cefr_level as Level,
         context_tag: q.context_tag,
         prompt_text: q.prompt_text,
-        options: Array.isArray(q.options) ? (q.options as string[]) : [],
+        options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
         correct_answer: q.correct_answer ?? "",
         explanation: q.explanation,
       }));

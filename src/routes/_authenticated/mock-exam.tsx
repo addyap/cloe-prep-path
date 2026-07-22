@@ -25,7 +25,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { cn, extractSpokenScript } from "@/lib/utils";
+import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
   component: MockExamPage,
@@ -125,7 +125,10 @@ function MockExamPage() {
           supabase.auth.getUser(),
         ]);
         if (qErr) throw qErr;
-        const all = (qs ?? []) as Question[];
+        const all = ((qs ?? []) as Question[]).map((q) => ({
+          ...q,
+          options: Array.isArray(q.options) ? shuffle(q.options) : q.options,
+        }));
         setBank(
           all.filter(
             (q) =>
