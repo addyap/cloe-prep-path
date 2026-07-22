@@ -15,7 +15,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, extractSpokenScript } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/listening")({
   component: ListeningPractice,
@@ -157,7 +157,7 @@ function ListeningPractice() {
       void el.play();
       setIsPlaying(true);
     } else if (typeof window !== "undefined" && window.speechSynthesis) {
-      const text = current.prompt_text.replace(/^You hear:\s*/i, "").replace(/^["“]|["”]$/g, "");
+      const text = extractSpokenScript(current.prompt_text);
       const u = new SpeechSynthesisUtterance(text);
       u.rate = rate;
       u.lang = "en-US";

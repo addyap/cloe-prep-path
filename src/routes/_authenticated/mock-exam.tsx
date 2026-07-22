@@ -25,7 +25,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, extractSpokenScript } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
   component: MockExamPage,
@@ -460,7 +460,7 @@ function WrittenAdaptive({
     const text =
       current.audio_url && current.audio_url.startsWith("tts:")
         ? current.audio_url.slice(4)
-        : current.prompt_text;
+        : extractSpokenScript(current.prompt_text);
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.95;
     u.lang = "en-US";
