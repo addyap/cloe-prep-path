@@ -3,6 +3,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { createOpenAiProvider } from "@/lib/ai-gateway.server";
+import {
+  ENFORCE_ENTITLEMENTS,
+  hasFeature,
+  resolvePlan,
+  type SubscriptionRow,
+} from "@/lib/entitlements";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 
@@ -38,6 +44,16 @@ export const evaluateWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data, context }) => {
+    if (ENFORCE_ENTITLEMENTS) {
+      const { data: subRow } = await context.supabase
+        .from("subscriptions")
+        .select("plan, status, current_period_end")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      const plan = resolvePlan((subRow ?? null) as SubscriptionRow | null);
+      if (!hasFeature(plan, "ai_writing_feedback")) throw new Error("UPGRADE_REQUIRED");
+    }
+
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error("Missing OPENAI_API_KEY");
 

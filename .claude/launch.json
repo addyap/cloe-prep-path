@@ -3,8 +3,9 @@
   "configurations": [
     {
       "name": "cloe-prep-path-dev",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "export BUN_INSTALL=\"$HOME/.bun\"; export PATH=\"$BUN_INSTALL/bin:$PATH\"; bun run dev --port \"${PORT:-8080}\""],
+      "autoPort": true,
       "port": 8080
     }
   ]

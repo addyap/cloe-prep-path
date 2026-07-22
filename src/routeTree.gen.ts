@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMockExamRouteImport } from './routes/_authenticated/mock-exam'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as ApiSpeakingEvaluateRouteImport } from './routes/api/speaking/evaluate'
 import { Route as AuthenticatedPracticeWritingRouteImport } from './routes/_authenticated/practice.writing'
 import { Route as AuthenticatedPracticeSpeakingRouteImport } from './routes/_authenticated/practice.speaking'
@@ -78,6 +79,11 @@ const AuthenticatedPracticeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSpeakingEvaluateRoute = ApiSpeakingEvaluateRouteImport.update({
   id: '/api/speaking/evaluate',
   path: '/api/speaking/evaluate',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/practice/speaking': typeof AuthenticatedPracticeSpeakingRoute
   '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/practice/speaking': typeof AuthenticatedPracticeSpeakingRoute
   '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesById {
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/_authenticated/practice/speaking': typeof AuthenticatedPracticeSpeakingRoute
   '/_authenticated/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRouteTypes {
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/practice/speaking'
     | '/practice/writing'
     | '/api/speaking/evaluate'
+    | '/api/stripe/webhook'
     | '/practice/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/practice/speaking'
     | '/practice/writing'
     | '/api/speaking/evaluate'
+    | '/api/stripe/webhook'
     | '/practice'
   id:
     | '__root__'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/practice/speaking'
     | '/_authenticated/practice/writing'
     | '/api/speaking/evaluate'
+    | '/api/stripe/webhook'
     | '/_authenticated/practice/'
   fileRoutesById: FileRoutesById
 }
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiSpeakingEvaluateRoute: typeof ApiSpeakingEvaluateRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -322,6 +335,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/practice/'
       preLoaderRoute: typeof AuthenticatedPracticeIndexRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
+    }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/speaking/evaluate': {
       id: '/api/speaking/evaluate'
@@ -436,6 +456,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiSpeakingEvaluateRoute: ApiSpeakingEvaluateRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

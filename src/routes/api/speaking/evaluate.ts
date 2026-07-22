@@ -4,6 +4,12 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { createOpenAiProvider } from "@/lib/ai-gateway.server";
+import {
+  ENFORCE_ENTITLEMENTS,
+  hasFeature,
+  resolvePlan,
+  type SubscriptionRow,
+} from "@/lib/entitlements";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const PHASES = ["interview", "role_play", "discussion"] as const;
@@ -155,6 +161,21 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
             });
           }
           const userId = claimsData.claims.sub as string;
+
+          if (ENFORCE_ENTITLEMENTS) {
+            const { data: subRow } = await supabase
+              .from("subscriptions")
+              .select("plan, status, current_period_end")
+              .eq("user_id", userId)
+              .maybeSingle();
+            const plan = resolvePlan((subRow ?? null) as SubscriptionRow | null);
+            if (!hasFeature(plan, "ai_speaking_feedback")) {
+              return new Response(JSON.stringify({ error: "UPGRADE_REQUIRED" }), {
+                status: 402,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+          }
 
           const form = await request.formData();
           const audio = form.get("audio");
