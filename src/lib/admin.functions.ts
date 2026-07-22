@@ -40,18 +40,9 @@ export const checkIsAdmin = createServerFn({ method: "GET" })
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { count, error: countErr } = await supabaseAdmin
-      .from("user_roles")
-      .select("id", { count: "exact", head: true })
-      .eq("role", "admin");
-    if (countErr) throw new Error(countErr.message);
-    if ((count ?? 0) > 0) {
-      throw new Error("An admin already exists. Ask an existing admin to grant access.");
-    }
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: context.userId, role: "admin" });
+    const { error } = await context.supabase.rpc("claim_first_admin", {
+      p_user_id: context.userId,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
