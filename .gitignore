@@ -20,6 +20,10 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# One-off local convenience file (concatenated migrations for bootstrapping
+# a fresh Supabase project) — not a source of truth, delete after use.
+BOOTSTRAP_NEW_DB.sql
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
