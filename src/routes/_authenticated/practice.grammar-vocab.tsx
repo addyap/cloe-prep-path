@@ -129,13 +129,21 @@ function GrammarVocabPractice() {
 
   // Start first question
   useEffect(() => {
-    if (!topic || loading || current || done) return;
+    // `pool.length === 0` guards the load race: on topic pick this effect can
+    // run before the fetch's setLoading(true) is visible here (stale closure),
+    // which would call pickNext on an empty pool and instantly mark the drill
+    // "done" with 0 questions. The pool is only ever empty pre-load — genuine
+    // exhaustion is tracked via `asked`, so this never blocks a real finish.
+    if (!topic || loading || current || done || pool.length === 0) return;
     const next = pickNext(level, asked);
     if (!next) {
       setDone(true);
       return;
     }
     setCurrent(next);
+    // `pickNext` (useCallback on [pool]) changes identity when the pool loads,
+    // so this effect already re-runs once questions arrive — no need to add
+    // `pool.length` to the deps (doing so trips React's "deps size changed").
   }, [topic, loading, current, done, level, asked, pickNext]);
 
   useEffect(
