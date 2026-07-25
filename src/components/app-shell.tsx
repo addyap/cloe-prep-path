@@ -26,11 +26,16 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [isAdmin, setIsAdmin] = useState(false);
+  // Visitors browse via a silent anonymous account (no login). There's nothing
+  // to "sign out" of, and signing out would just reset their progress, so the
+  // control is only shown to real (non-anonymous) accounts.
+  const [isAnonymous, setIsAnonymous] = useState(true);
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
+      setIsAnonymous(u.user.is_anonymous ?? false);
       const { data } = await supabase
         .from("user_roles")
         .select("role")
@@ -92,15 +97,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           )}
         </nav>
-        <div className="p-3 border-t border-sidebar-border">
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" /> Sign out
-          </Button>
-        </div>
+        {!isAnonymous && (
+          <div className="p-3 border-t border-sidebar-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-4 w-4 mr-2" /> Sign out
+            </Button>
+          </div>
+        )}
       </aside>
 
       {/* Main */}

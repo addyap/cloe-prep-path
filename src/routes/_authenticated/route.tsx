@@ -6,8 +6,18 @@ export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/auth" });
-    return { user: data.user };
+    if (!error && data.user) return { user: data.user };
+
+    // No session yet: sign the visitor in anonymously so they get full access
+    // with no login screen. Progress-saving and the AI writing/speaking
+    // feedback all require a Supabase user, so an invisible anonymous account
+    // keeps every feature working. Requires "Anonymous sign-ins" to be enabled
+    // in the Supabase dashboard; if it isn't (or the call fails), we fall back
+    // to the /auth page so the app still degrades gracefully.
+    const { data: anon, error: anonError } =
+      await supabase.auth.signInAnonymously();
+    if (anonError || !anon.user) throw redirect({ to: "/auth" });
+    return { user: anon.user };
   },
   component: AuthLayout,
 });

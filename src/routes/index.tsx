@@ -40,10 +40,7 @@ function Landing() {
           <span className="font-bold text-lg text-foreground">CLOE Prep</span>
         </Link>
         <div className="flex items-center gap-2">
-          <Link to="/auth">
-            <Button variant="ghost">Log in</Button>
-          </Link>
-          <Link to="/auth">
+          <Link to="/dashboard">
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
               Get started
             </Button>
@@ -65,7 +62,7 @@ function Landing() {
             track your CEFR level from A1 to C2, and walk into exam day ready.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/auth">
+            <Link to="/dashboard">
               <Button
                 size="lg"
                 className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 px-6 text-base"
@@ -195,15 +192,15 @@ function Landing() {
           <div>
             <h3 className="text-2xl md:text-3xl font-bold">Ready to start?</h3>
             <p className="mt-2 text-primary-foreground/80">
-              Create a free account and take a quick placement test.
+              Jump straight in — no account needed — and take a quick placement test.
             </p>
           </div>
-          <Link to="/auth">
+          <Link to="/dashboard">
             <Button
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 px-6 text-base"
             >
-              Create my account
+              Start practising
             </Button>
           </Link>
         </div>

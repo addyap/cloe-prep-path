@@ -25,11 +25,14 @@ function ProfilePage() {
   const [fullName, setFullName] = useState("");
   const [target, setTarget] = useState<CefrLevel | "">("");
   const [saving, setSaving] = useState(false);
+  // Anonymous (no-login) visitors have no email and nothing to sign out of.
+  const [isAnonymous, setIsAnonymous] = useState(true);
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
+      setIsAnonymous(u.user.is_anonymous ?? false);
       setEmail(u.user.email ?? "");
       const { data } = await supabase
         .from("profiles")
@@ -67,10 +70,12 @@ function ProfilePage() {
       <div className="p-5 md:p-10 max-w-2xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">Profile</h1>
         <div className="mt-6 rounded-3xl bg-card border border-border p-6 md:p-8 shadow-card space-y-4">
-          <div>
-            <Label>Email</Label>
-            <Input value={email} disabled />
-          </div>
+          {!isAnonymous && (
+            <div>
+              <Label>Email</Label>
+              <Input value={email} disabled />
+            </div>
+          )}
           <div>
             <Label htmlFor="fn">Full name</Label>
             <Input id="fn" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -98,9 +103,11 @@ function ProfilePage() {
             >
               Save changes
             </Button>
-            <Button variant="outline" onClick={signOut}>
-              Sign out
-            </Button>
+            {!isAnonymous && (
+              <Button variant="outline" onClick={signOut}>
+                Sign out
+              </Button>
+            )}
           </div>
         </div>
       </div>
