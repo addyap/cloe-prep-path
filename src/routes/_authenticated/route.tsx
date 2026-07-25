@@ -14,8 +14,7 @@ export const Route = createFileRoute("/_authenticated")({
     // keeps every feature working. Requires "Anonymous sign-ins" to be enabled
     // in the Supabase dashboard; if it isn't (or the call fails), we fall back
     // to the /auth page so the app still degrades gracefully.
-    const { data: anon, error: anonError } =
-      await supabase.auth.signInAnonymously();
+    const { data: anon, error: anonError } = await supabase.auth.signInAnonymously();
     if (anonError || !anon.user) throw redirect({ to: "/auth" });
     return { user: anon.user };
   },

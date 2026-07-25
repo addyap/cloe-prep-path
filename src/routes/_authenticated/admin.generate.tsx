@@ -15,7 +15,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { checkIsAdmin, claimFirstAdmin, generateQuestions } from "@/lib/admin.functions";
-import { Sparkles, ShieldCheck, Loader2 } from "lucide-react";
+import { generateListeningAudio } from "@/lib/audio-gen.functions";
+import { Sparkles, ShieldCheck, Loader2, Volume2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/generate")({
   component: AdminGenerate,
@@ -60,9 +61,15 @@ function AdminGenerate() {
   const [preview, setPreview] = useState<PreviewItem[]>([]);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
 
+  const [audioBusy, setAudioBusy] = useState(false);
+  const [audioStatus, setAudioStatus] = useState<{ generated: number; remaining: number } | null>(
+    null,
+  );
+
   const isAdminFn = useServerFn(checkIsAdmin);
   const claimFn = useServerFn(claimFirstAdmin);
   const genFn = useServerFn(generateQuestions);
+  const audioFn = useServerFn(generateListeningAudio);
 
   useEffect(() => {
     (async () => {
@@ -114,6 +121,31 @@ function AdminGenerate() {
       else toast.error(msg || "Failed to generate questions.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const generateAudio = async () => {
+    setAudioBusy(true);
+    try {
+      const res = await audioFn({ data: { limit: 15 } });
+      setAudioStatus({ generated: res.generated, remaining: res.remaining });
+      if (res.errors?.length) {
+        toast.error(`${res.generated} generated, ${res.errors.length} failed. Try again.`);
+      } else if (res.generated === 0) {
+        toast.success("All listening audio already generated.");
+      } else {
+        toast.success(
+          `Generated ${res.generated} clips. ${res.remaining} still to go — click again to continue.`,
+        );
+      }
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg === "RATE_LIMIT") toast.error("Rate limit hit. Try again in a moment.");
+      else if (msg === "CREDITS_EXHAUSTED")
+        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
+      else toast.error(msg || "Failed to generate audio.");
+    } finally {
+      setAudioBusy(false);
     }
   };
 
@@ -255,6 +287,31 @@ function AdminGenerate() {
           {lastInserted !== null && !busy && (
             <p className="text-xs text-center text-muted-foreground">
               Last run: {lastInserted} inserted.
+            </p>
+          )}
+        </section>
+
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-card space-y-3">
+          <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wide">
+            <Volume2 className="h-4 w-4" /> Listening audio
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Listening items with no generated audio fall back to the browser's built-in
+            text-to-speech, which sounds robotic. Generate real audio (OpenAI TTS) in batches of 15
+            — click again to keep going until nothing's left.
+          </p>
+          <Button onClick={generateAudio} disabled={audioBusy} variant="outline" className="w-full">
+            {audioBusy ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
+              </>
+            ) : (
+              "Generate audio (next 15)"
+            )}
+          </Button>
+          {audioStatus && !audioBusy && (
+            <p className="text-xs text-center text-muted-foreground">
+              Last run: {audioStatus.generated} generated, {audioStatus.remaining} remaining.
             </p>
           )}
         </section>
