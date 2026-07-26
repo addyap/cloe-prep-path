@@ -411,6 +411,7 @@ function WrittenAdaptive({
   const [playsUsed, setPlaysUsed] = useState(0);
   const [warning, setWarning] = useState<string | null>(null);
   const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Round-robin skill selection
   const nextSkill = useMemo<WrittenSkill>(() => {
@@ -420,6 +421,8 @@ function WrittenAdaptive({
   // Pick first / next question
   useEffect(() => {
     if (current) return;
+    audioRef.current?.pause();
+    if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
     const q = pickNext(bank, used, theta, nextSkill);
     setCurrent(q);
     setPlaysUsed(0);
@@ -452,12 +455,23 @@ function WrittenAdaptive({
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("beforeunload", onBeforeUnload);
       if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
+      audioRef.current?.pause();
     };
   }, []);
 
   const playAudio = useCallback(() => {
     if (!current) return;
     if (playsUsed >= 1) return; // strict: 1 play in exam
+
+    const hasRealAudio = current.audio_url && !current.audio_url.startsWith("tts:");
+    if (hasRealAudio) {
+      const el = new Audio(current.audio_url!);
+      audioRef.current = el;
+      void el.play();
+      setPlaysUsed((n) => n + 1);
+      return;
+    }
+
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const text =

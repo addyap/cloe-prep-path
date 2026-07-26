@@ -149,8 +149,10 @@ function ListeningPractice() {
     if (plays >= MAX_PLAYS) return;
     stopAudio();
     if (current.audio_url) {
-      const el = audioRef.current ?? new Audio(current.audio_url);
-      audioRef.current = el;
+      if (!audioRef.current || audioRef.current.src !== current.audio_url) {
+        audioRef.current = new Audio(current.audio_url);
+      }
+      const el = audioRef.current;
       el.playbackRate = rate;
       el.onended = () => setIsPlaying(false);
       el.onpause = () => setIsPlaying(false);
