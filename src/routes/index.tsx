@@ -11,6 +11,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PublicFooter } from "@/components/public-page-shell";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,7 +40,13 @@ function Landing() {
           </div>
           <span className="font-bold text-lg text-foreground">CLOE Prep</span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/pricing"
+            className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Pricing
+          </Link>
           <Link to="/dashboard">
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
               Get started
@@ -206,21 +213,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 md:px-10 py-10 border-t border-border bg-card">
-        <div className="max-w-6xl mx-auto text-sm text-muted-foreground space-y-2">
-          <div className="flex items-center gap-2 text-foreground font-semibold">
-            <GraduationCap className="h-4 w-4" /> CLOE Prep
-          </div>
-          <p>
-            <strong>Disclaimer:</strong> CLOE Prep is an independent study tool. It is not
-            affiliated with, endorsed by, or connected to the official CLOE certification or the
-            organisations that deliver it. All practice material is original and designed only to
-            help learners prepare.
-          </p>
-          <p>© {new Date().getFullYear()} CLOE Prep.</p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
