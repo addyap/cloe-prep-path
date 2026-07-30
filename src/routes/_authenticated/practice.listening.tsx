@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/listening")({
@@ -421,6 +422,9 @@ function ListeningPractice() {
             {current.explanation && (
               <p className="text-sm mt-2 text-foreground/80">{current.explanation}</p>
             )}
+            <div className="mt-3">
+              <ReportIssueDialog questionId={current.id} userAnswer={selected} />
+            </div>
           </div>
         )}
 

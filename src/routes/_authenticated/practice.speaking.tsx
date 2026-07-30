@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/speaking")({
@@ -473,6 +474,9 @@ function PhaseRecorder({
           Target {prompt.cefr_level} · {meta.title}
         </div>
         <p className="mt-2 text-base leading-relaxed text-foreground">{prompt.prompt_text}</p>
+        <div className="mt-3">
+          <ReportIssueDialog questionId={prompt.id} />
+        </div>
       </div>
 
       <div className="mt-5 flex items-center justify-between">

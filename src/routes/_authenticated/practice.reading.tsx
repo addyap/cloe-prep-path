@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/reading")({
@@ -445,6 +446,9 @@ function ReadingPractice() {
                         )}
                       </div>
                       {q.explanation && <p className="mt-1 text-foreground/80">{q.explanation}</p>}
+                      <div className="mt-2">
+                        <ReportIssueDialog questionId={q.id} userAnswer={picked} />
+                      </div>
                     </div>
                   )}
                 </div>

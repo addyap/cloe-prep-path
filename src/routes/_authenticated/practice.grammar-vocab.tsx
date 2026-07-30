@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
@@ -405,6 +406,9 @@ function GrammarVocabPractice() {
               {current.explanation && (
                 <p className="text-sm mt-1 text-foreground/80">{current.explanation}</p>
               )}
+              <div className="mt-2">
+                <ReportIssueDialog questionId={current.id} userAnswer={selected} />
+              </div>
             </div>
             <Button
               size="sm"

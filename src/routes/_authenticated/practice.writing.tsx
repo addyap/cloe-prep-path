@@ -17,6 +17,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { cn } from "@/lib/utils";
 import { evaluateWriting, type WritingFeedback } from "@/lib/writing-feedback.functions";
 
@@ -354,6 +355,9 @@ function WritingPractice() {
               {body}
             </p>
           )}
+          <div className="mt-3">
+            <ReportIssueDialog questionId={current.id} />
+          </div>
         </div>
 
         <div className="mt-5">
