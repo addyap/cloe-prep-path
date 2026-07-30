@@ -105,8 +105,9 @@ function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-foreground">8. Termination</h2>
           <p className="mt-2">
-            You can stop using the service and delete your account at any time. We may suspend or
-            terminate accounts that violate these terms.
+            You can stop using the service at any time, and can request deletion of your account and
+            data as described in our Privacy Policy. We may suspend or terminate accounts that
+            violate these terms.
           </p>
         </section>
 

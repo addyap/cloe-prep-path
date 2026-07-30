@@ -18,17 +18,17 @@ const FAQS: Array<{ q: string; a: React.ReactNode; plainAnswer: string }> = [
     q: "What's free, and what needs a Pro plan?",
     a: (
       <>
-        Listening, reading, and grammar & vocabulary practice, plus your progress history, are free.
-        Writing practice, the speaking simulator, full mock exams, and AI-generated feedback are
-        part of the Pro plan — see{" "}
+        Everything is free right now, including writing practice, the speaking simulator, full mock
+        exams, and AI-generated feedback — Pro billing isn't live yet, so there's nothing to pay for
+        while we finish testing. See{" "}
         <Link to="/pricing" className="underline">
           Pricing
-        </Link>
-        .
+        </Link>{" "}
+        for what's planned once it launches.
       </>
     ),
     plainAnswer:
-      "Listening, reading, and grammar & vocabulary practice, plus your progress history, are free. Writing practice, the speaking simulator, full mock exams, and AI-generated feedback are part of the Pro plan.",
+      "Everything is free right now, including writing practice, the speaking simulator, full mock exams, and AI-generated feedback — Pro billing isn't live yet, so there's nothing to pay for while we finish testing.",
   },
   {
     q: "How does the AI feedback work?",
@@ -37,10 +37,10 @@ const FAQS: Array<{ q: string; a: React.ReactNode; plainAnswer: string }> = [
       "When you submit a writing task or a speaking recording, it's sent to an AI model that grades it against the CEFR scale (A1-C2) and gives you a score, strengths, and concrete suggestions. It's not a certified assessment.",
   },
   {
-    q: "Can I cancel anytime?",
-    a: "Yes. Cancelling stops future billing immediately; you keep Pro access until the end of the period you've already paid for. See our Refund Policy for details.",
+    q: "Will I have to pay eventually?",
+    a: "Not for what you're already using. If a paid Pro plan launches, it won't retroactively lock features you already have access to for free — see our Refund Policy for how billing would work once it's live.",
     plainAnswer:
-      "Yes. Cancelling stops future billing immediately; you keep Pro access until the end of the period you've already paid for.",
+      "Not for what you're already using. If a paid Pro plan launches, it won't retroactively lock features you already have access to for free.",
   },
   {
     q: "Is my data safe?",
