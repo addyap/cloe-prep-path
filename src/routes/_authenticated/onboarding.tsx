@@ -122,7 +122,7 @@ function Onboarding() {
             </p>
             <RadioGroup
               className="mt-6 space-y-2"
-              value={target ?? undefined}
+              value={target ?? ""}
               onValueChange={(v) => setTarget(v as CefrLevel)}
             >
               {LEVELS.map((l) => (
@@ -157,7 +157,7 @@ function Onboarding() {
             <h2 className="text-xl font-bold text-primary mt-2">{PLACEMENT[qIdx].q}</h2>
             <RadioGroup
               className="mt-6 space-y-2"
-              value={selected !== null ? String(selected) : undefined}
+              value={selected !== null ? String(selected) : ""}
               onValueChange={(v) => setSelected(Number(v))}
             >
               {PLACEMENT[qIdx].opts.map((opt, i) => (
