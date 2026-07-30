@@ -88,6 +88,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      {
+        "script:ld+json": {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CLOE Prep",
+          url: "https://cloe.antonyaddy.com/",
+          description:
+            "Independent prep app for the CLOE English certification. Adaptive practice across listening, reading, grammar & vocabulary, writing and speaking.",
+        },
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
