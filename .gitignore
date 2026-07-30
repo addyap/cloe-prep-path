@@ -20,6 +20,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Supabase CLI local cache
+supabase/.temp/
+
 # One-off local convenience file (concatenated migrations for bootstrapping
 # a fresh Supabase project) — not a source of truth, delete after use.
 BOOTSTRAP_NEW_DB.sql
