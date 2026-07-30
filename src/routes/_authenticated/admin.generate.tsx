@@ -127,7 +127,7 @@ function AdminGenerate() {
   const generateAudio = async () => {
     setAudioBusy(true);
     try {
-      const res = await audioFn({ data: { limit: 15 } });
+      const res = await audioFn({ data: { limit: 30 } });
       setAudioStatus({ generated: res.generated, remaining: res.remaining });
       if (res.errors?.length) {
         toast.error(`${res.generated} generated, ${res.errors.length} failed. Try again.`);
@@ -306,7 +306,7 @@ function AdminGenerate() {
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
               </>
             ) : (
-              "Generate audio (next 15)"
+              "Generate audio (next 30)"
             )}
           </Button>
           {audioStatus && !audioBusy && (
