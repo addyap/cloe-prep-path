@@ -15,10 +15,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/speaking")({
   component: SpeakingPractice,
+  errorComponent: PracticeRouteError,
 });
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
@@ -82,29 +84,41 @@ function SpeakingPractice() {
   const [loading, setLoading] = useState(true);
   const [targetLevel, setTargetLevel] = useState<Level>("B1");
   const [mode, setMode] = useState<Mode>("menu");
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [{ data: qs }, { data: userRes }] = await Promise.all([
-        supabase
-          .from("questions")
-          .select("id, cefr_level, context_tag, prompt_text")
-          .eq("skill", "speaking")
-          .eq("type", "prompt"),
-        supabase.auth.getUser(),
-      ]);
-      setPrompts((qs ?? []) as Prompt[]);
-      if (userRes?.user) {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("current_estimated_level")
-          .eq("id", userRes.user.id)
-          .maybeSingle();
-        if (prof?.current_estimated_level) setTargetLevel(prof.current_estimated_level as Level);
+      try {
+        const [{ data: qs, error: qError }, { data: userRes }] = await Promise.all([
+          supabase
+            .from("questions")
+            .select("id, cefr_level, context_tag, prompt_text")
+            .eq("skill", "speaking")
+            .eq("type", "prompt"),
+          supabase.auth.getUser(),
+        ]);
+        if (qError) throw qError;
+        setPrompts((qs ?? []) as Prompt[]);
+        if (userRes?.user) {
+          const { data: prof } = await supabase
+            .from("profiles")
+            .select("current_estimated_level")
+            .eq("id", userRes.user.id)
+            .maybeSingle();
+          if (prof?.current_estimated_level) setTargetLevel(prof.current_estimated_level as Level);
+        }
+      } catch (err) {
+        console.error(err);
+        setLoadError("We couldn't load the speaking prompts. Please try again.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, []);
+
+  if (loadError) {
+    return <PracticeErrorState message={loadError} />;
+  }
 
   if (loading) {
     return (
@@ -113,6 +127,12 @@ function SpeakingPractice() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       </AppShell>
+    );
+  }
+
+  if (!loading && prompts.length === 0) {
+    return (
+      <PracticeErrorState message="No speaking prompts are available right now. Please try again later." />
     );
   }
 

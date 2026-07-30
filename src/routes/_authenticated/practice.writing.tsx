@@ -16,11 +16,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { cn } from "@/lib/utils";
 import { evaluateWriting, type WritingFeedback } from "@/lib/writing-feedback.functions";
 
 export const Route = createFileRoute("/_authenticated/practice/writing")({
   component: WritingPractice,
+  errorComponent: PracticeRouteError,
 });
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
@@ -53,19 +55,26 @@ function WritingPractice() {
   const [feedback, setFeedback] = useState<WritingFeedback | null>(null);
   const [overall, setOverall] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const startedAt = useRef<number | null>(null);
   const evaluate = useServerFn(evaluateWriting);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("questions")
-        .select("id,cefr_level,context_tag,prompt_text")
-        .eq("skill", "writing")
-        .eq("type", "prompt");
-      const list = (data ?? []) as Prompt[];
-      setPrompts(list);
-      setLoading(false);
+      try {
+        const { data, error: qError } = await supabase
+          .from("questions")
+          .select("id,cefr_level,context_tag,prompt_text")
+          .eq("skill", "writing")
+          .eq("type", "prompt");
+        if (qError) throw qError;
+        setPrompts((data ?? []) as Prompt[]);
+      } catch (err) {
+        console.error(err);
+        setLoadError("We couldn't load the writing prompts. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -135,6 +144,10 @@ function WritingPractice() {
     startedAt.current = Date.now() - elapsed * 1000;
   }
 
+  if (loadError) {
+    return <PracticeErrorState message={loadError} />;
+  }
+
   if (loading) {
     return (
       <AppShell>
@@ -142,6 +155,12 @@ function WritingPractice() {
           <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading…
         </div>
       </AppShell>
+    );
+  }
+
+  if (!loading && prompts.length === 0) {
+    return (
+      <PracticeErrorState message="No writing prompts are available right now. Please try again later." />
     );
   }
 

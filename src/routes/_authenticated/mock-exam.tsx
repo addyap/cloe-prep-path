@@ -25,10 +25,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
   component: MockExamPage,
+  errorComponent: PracticeRouteError,
 });
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
@@ -134,7 +136,11 @@ function MockExamPage() {
             (q) =>
               WRITTEN_SKILLS.includes(q.skill as WrittenSkill) &&
               q.type !== "open_text" &&
-              q.type !== "prompt",
+              q.type !== "prompt" &&
+              // Guard against a malformed mcq row (missing options/answer) breaking the exam.
+              Array.isArray(q.options) &&
+              q.options.length > 0 &&
+              !!q.correct_answer,
           ),
         );
         setOralPrompts(
@@ -167,14 +173,21 @@ function MockExamPage() {
   // Speaking bank pulled separately (skill enum differs from WrittenSkill literal)
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("questions")
-        .select(
-          "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
-        )
-        .eq("skill", "speaking")
-        .eq("type", "prompt");
-      setOralPrompts((data ?? []) as Question[]);
+      try {
+        const { data, error: oralErr } = await supabase
+          .from("questions")
+          .select(
+            "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
+          )
+          .eq("skill", "speaking")
+          .eq("type", "prompt");
+        if (oralErr) throw oralErr;
+        setOralPrompts((data ?? []) as Question[]);
+      } catch (err) {
+        // Non-fatal: the written section still works without oral prompts loaded;
+        // the oral step itself guards against an empty prompt pool.
+        console.error(err);
+      }
     })();
   }, []);
 
@@ -220,13 +233,12 @@ function MockExamPage() {
   }
 
   if (error) {
+    return <PracticeErrorState message={error} />;
+  }
+
+  if (!loading && bank.length === 0) {
     return (
-      <AppShell>
-        <div className="p-10 max-w-2xl mx-auto text-center">
-          <AlertCircle className="h-8 w-8 text-red-500 mx-auto" />
-          <p className="mt-3 text-sm">{error}</p>
-        </div>
-      </AppShell>
+      <PracticeErrorState message="No exam questions are available right now. Please try again later." />
     );
   }
 

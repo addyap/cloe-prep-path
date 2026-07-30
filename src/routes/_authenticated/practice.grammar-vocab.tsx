@@ -4,10 +4,12 @@ import { Check, X, Loader2, Trophy, Flame, Timer, PenLine, Zap, ArrowRight } fro
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
   component: GrammarVocabPractice,
+  errorComponent: PracticeRouteError,
 });
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
@@ -47,6 +49,7 @@ function GrammarVocabPractice() {
   const [topic, setTopic] = useState<Topic | null>(null);
   const [pool, setPool] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState<Level>("A2");
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const [streakRight, setStreakRight] = useState(0);
@@ -75,36 +78,47 @@ function GrammarVocabPractice() {
   useEffect(() => {
     if (!topic) return;
     setLoading(true);
+    setError(null);
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const [profileRes, qRes] = await Promise.all([
-        u.user
-          ? supabase
-              .from("profiles")
-              .select("current_estimated_level")
-              .eq("id", u.user.id)
-              .maybeSingle()
-          : Promise.resolve({ data: null } as const),
-        topic === "mixed"
-          ? supabase.from("questions").select("*").eq("skill", "grammar_vocab")
-          : supabase
-              .from("questions")
-              .select("*")
-              .eq("skill", "grammar_vocab")
-              .eq("context_tag", topic),
-      ]);
-      setLevel((profileRes.data?.current_estimated_level as Level) ?? "A2");
-      const list: Question[] = (qRes.data ?? []).map((q) => ({
-        id: q.id,
-        cefr_level: q.cefr_level as Level,
-        context_tag: q.context_tag,
-        prompt_text: q.prompt_text,
-        options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
-        correct_answer: q.correct_answer ?? "",
-        explanation: q.explanation,
-      }));
-      setPool(list);
-      setLoading(false);
+      try {
+        const { data: u } = await supabase.auth.getUser();
+        const [profileRes, qRes] = await Promise.all([
+          u.user
+            ? supabase
+                .from("profiles")
+                .select("current_estimated_level")
+                .eq("id", u.user.id)
+                .maybeSingle()
+            : Promise.resolve({ data: null } as const),
+          topic === "mixed"
+            ? supabase.from("questions").select("*").eq("skill", "grammar_vocab")
+            : supabase
+                .from("questions")
+                .select("*")
+                .eq("skill", "grammar_vocab")
+                .eq("context_tag", topic),
+        ]);
+        if (qRes.error) throw qRes.error;
+        setLevel((profileRes.data?.current_estimated_level as Level) ?? "A2");
+        const list: Question[] = (qRes.data ?? [])
+          .map((q) => ({
+            id: q.id,
+            cefr_level: q.cefr_level as Level,
+            context_tag: q.context_tag,
+            prompt_text: q.prompt_text,
+            options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
+            correct_answer: q.correct_answer ?? "",
+            explanation: q.explanation,
+          }))
+          // Guard against a malformed row (missing options/answer) breaking the session.
+          .filter((q) => q.options.length > 0 && q.correct_answer);
+        setPool(list);
+      } catch (err) {
+        console.error(err);
+        setError("We couldn't load these questions. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [topic]);
 
@@ -257,6 +271,10 @@ function GrammarVocabPractice() {
     );
   }
 
+  if (error) {
+    return <PracticeErrorState message={error} />;
+  }
+
   if (loading) {
     return (
       <AppShell>
@@ -264,6 +282,12 @@ function GrammarVocabPractice() {
           <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading drill…
         </div>
       </AppShell>
+    );
+  }
+
+  if (!loading && pool.length === 0) {
+    return (
+      <PracticeErrorState message="No questions are available for this topic right now. Please try again later." />
     );
   }
 

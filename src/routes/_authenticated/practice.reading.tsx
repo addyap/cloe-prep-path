@@ -5,10 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/reading")({
   component: ReadingPractice,
+  errorComponent: PracticeRouteError,
 });
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
@@ -59,6 +61,7 @@ function wordCount(text: string): number {
 function ReadingPractice() {
   const [pool, setPool] = useState<Passage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState<Level>("A2");
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const [streakRight, setStreakRight] = useState(0);
@@ -74,48 +77,62 @@ function ReadingPractice() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const [profileRes, passRes, qRes] = await Promise.all([
-        u.user
-          ? supabase
-              .from("profiles")
-              .select("current_estimated_level")
-              .eq("id", u.user.id)
-              .maybeSingle()
-          : Promise.resolve({ data: null } as const),
-        supabase.from("passages").select("*").eq("skill", "reading"),
-        supabase.from("questions").select("*").eq("skill", "reading").not("passage_id", "is", null),
-      ]);
-      const starting = (profileRes.data?.current_estimated_level as Level) ?? "A2";
-      setLevel(starting);
-      const qsByPassage = new Map<string, Question[]>();
-      (qRes.data ?? []).forEach((q) => {
-        if (!q.passage_id) return;
-        const list = qsByPassage.get(q.passage_id) ?? [];
-        list.push({
-          id: q.id,
-          type: q.type,
-          cefr_level: q.cefr_level as Level,
-          context_tag: q.context_tag,
-          prompt_text: q.prompt_text,
-          options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
-          correct_answer: q.correct_answer ?? "",
-          explanation: q.explanation,
+      try {
+        const { data: u } = await supabase.auth.getUser();
+        const [profileRes, passRes, qRes] = await Promise.all([
+          u.user
+            ? supabase
+                .from("profiles")
+                .select("current_estimated_level")
+                .eq("id", u.user.id)
+                .maybeSingle()
+            : Promise.resolve({ data: null } as const),
+          supabase.from("passages").select("*").eq("skill", "reading"),
+          supabase
+            .from("questions")
+            .select("*")
+            .eq("skill", "reading")
+            .not("passage_id", "is", null),
+        ]);
+        if (passRes.error) throw passRes.error;
+        if (qRes.error) throw qRes.error;
+        const starting = (profileRes.data?.current_estimated_level as Level) ?? "A2";
+        setLevel(starting);
+        const qsByPassage = new Map<string, Question[]>();
+        (qRes.data ?? []).forEach((q) => {
+          if (!q.passage_id) return;
+          // Guard against a malformed row (missing options/answer) breaking the session.
+          if (!Array.isArray(q.options) || q.options.length === 0 || !q.correct_answer) return;
+          const list = qsByPassage.get(q.passage_id) ?? [];
+          list.push({
+            id: q.id,
+            type: q.type,
+            cefr_level: q.cefr_level as Level,
+            context_tag: q.context_tag,
+            prompt_text: q.prompt_text,
+            options: shuffle(q.options as string[]),
+            correct_answer: q.correct_answer ?? "",
+            explanation: q.explanation,
+          });
+          qsByPassage.set(q.passage_id, list);
         });
-        qsByPassage.set(q.passage_id, list);
-      });
-      const passages: Passage[] = (passRes.data ?? [])
-        .map((p) => ({
-          id: p.id,
-          title: p.title,
-          body: p.body,
-          cefr_level: p.cefr_level as Level,
-          context_tag: p.context_tag,
-          questions: qsByPassage.get(p.id) ?? [],
-        }))
-        .filter((p) => p.questions.length > 0);
-      setPool(passages);
-      setLoading(false);
+        const passages: Passage[] = (passRes.data ?? [])
+          .map((p) => ({
+            id: p.id,
+            title: p.title,
+            body: p.body,
+            cefr_level: p.cefr_level as Level,
+            context_tag: p.context_tag,
+            questions: qsByPassage.get(p.id) ?? [],
+          }))
+          .filter((p) => p.questions.length > 0);
+        setPool(passages);
+      } catch (err) {
+        console.error(err);
+        setError("We couldn't load the reading passages. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -254,6 +271,10 @@ function ReadingPractice() {
     startRef.current = timerEnabled ? Date.now() : null;
   }
 
+  if (error) {
+    return <PracticeErrorState message={error} />;
+  }
+
   if (loading) {
     return (
       <AppShell>
@@ -261,6 +282,12 @@ function ReadingPractice() {
           <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading session…
         </div>
       </AppShell>
+    );
+  }
+
+  if (!loading && pool.length === 0) {
+    return (
+      <PracticeErrorState message="No reading passages are available right now. Please try again later." />
     );
   }
 
