@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, gradeAnswer, shuffle } from "@/lib/utils";
+import { cn, gradeAnswer, scramble, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
   component: GrammarVocabPractice,
@@ -31,7 +31,7 @@ type Topic = (typeof SUB_TOPICS)[number]["slug"];
 
 type Question = {
   id: string;
-  type: "mcq" | "gap_fill";
+  type: "mcq" | "gap_fill" | "reconstruction";
   cefr_level: Level;
   context_tag: string;
   prompt_text: string;
@@ -41,6 +41,11 @@ type Question = {
 };
 
 type HistoryItem = { question: Question; answer: string; correct: boolean };
+
+/** A reconstruction chunk, tagged with its canonical-order index. Chips are
+ *  keyed/moved by `id`, never by `text` — natural sentences routinely repeat
+ *  a word/chunk, so text alone isn't a safe React key or move target. */
+type Chip = { id: number; text: string };
 
 function bumpLevel(level: Level, delta: 1 | -1): Level {
   const i = LEVELS.indexOf(level);
@@ -61,6 +66,8 @@ function GrammarVocabPractice() {
   const [current, setCurrent] = useState<Question | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [draftText, setDraftText] = useState("");
+  const [poolChips, setPoolChips] = useState<Chip[]>([]);
+  const [draftChips, setDraftChips] = useState<Chip[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [done, setDone] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -107,20 +114,28 @@ function GrammarVocabPractice() {
         const list: Question[] = (qRes.data ?? [])
           .map((q) => ({
             id: q.id,
-            type: q.type as "mcq" | "gap_fill",
+            type: q.type as "mcq" | "gap_fill" | "reconstruction",
             cefr_level: q.cefr_level as Level,
             context_tag: q.context_tag,
             prompt_text: q.prompt_text,
+            // For reconstruction this shuffle is a harmless no-op relative to
+            // correctness — grading compares against correct_answer (a
+            // separately stored joined string), never against options order.
+            // The real per-question scramble happens at render time so a
+            // retry reshuffles differently (see the chip-reset effect below).
             options: Array.isArray(q.options) ? shuffle(q.options as string[]) : [],
             correct_answer: q.correct_answer ?? "",
             explanation: q.explanation,
           }))
           // Allowlist, not denylist: only render types this page has a branch
-          // for. mcq needs real options; gap_fill only needs a correct_answer.
+          // for. mcq needs real options; gap_fill only needs a correct_answer;
+          // reconstruction needs the >=3 chunks the CHECK constraint enforces.
           .filter(
             (q) =>
               !!q.correct_answer &&
-              ((q.type === "mcq" && q.options.length > 0) || q.type === "gap_fill"),
+              ((q.type === "mcq" && q.options.length > 0) ||
+                q.type === "gap_fill" ||
+                (q.type === "reconstruction" && q.options.length >= 3)),
           );
         setPool(list);
       } catch (err) {
@@ -181,6 +196,17 @@ function GrammarVocabPractice() {
   useEffect(() => {
     if (current?.type === "gap_fill") gapFillInputRef.current?.focus();
   }, [current?.id, current?.type]);
+
+  // Re-scramble reconstruction chips on each new question — scramble(), not
+  // shuffle(), so the identity permutation (which would hand over the
+  // answer outright) never happens. Chips are tagged by canonical-order
+  // index, not text, so duplicate words/chunks are handled correctly.
+  useEffect(() => {
+    if (current?.type !== "reconstruction") return;
+    const chips: Chip[] = current.options.map((text, id) => ({ id, text }));
+    setPoolChips(scramble(chips));
+    setDraftChips([]);
+  }, [current]);
 
   async function submitAnswer(answerText: string) {
     if (!current || submitted || !answerText.trim()) return;
@@ -245,6 +271,7 @@ function GrammarVocabPractice() {
     setAsked(newAsked);
     setSelected(null);
     setDraftText("");
+    setDraftChips([]);
     setSubmitted(false);
     if (history.length >= SESSION_LENGTH || newAsked.size >= pool.length) {
       setDone(true);
@@ -438,6 +465,69 @@ function GrammarVocabPractice() {
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+
+          {current.type === "reconstruction" && (
+            <div className="mt-6">
+              <div
+                className={cn(
+                  "min-h-16 rounded-2xl border-2 p-3 flex flex-wrap gap-2 items-start content-start",
+                  !submitted && "border-border",
+                  submitted && lastCorrect && "border-success bg-success/10",
+                  submitted && !lastCorrect && "border-destructive bg-destructive/10",
+                )}
+              >
+                {draftChips.length === 0 && (
+                  <span className="text-sm text-muted-foreground/60 py-1.5">
+                    Tap the words below in order…
+                  </span>
+                )}
+                {draftChips.map((chip) => (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    disabled={submitted}
+                    onClick={() => {
+                      setDraftChips((d) => d.filter((c) => c.id !== chip.id));
+                      setPoolChips((p) => [...p, chip].sort((a, b) => a.id - b.id));
+                    }}
+                    className="rounded-xl border-2 border-accent bg-accent/10 px-3 py-1.5 text-base md:text-lg text-foreground disabled:opacity-90"
+                  >
+                    {chip.text}
+                  </button>
+                ))}
+              </div>
+
+              {!submitted && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {poolChips.map((chip) => (
+                    <button
+                      key={chip.id}
+                      type="button"
+                      onClick={() => {
+                        setPoolChips((p) => p.filter((c) => c.id !== chip.id));
+                        setDraftChips((d) => [...d, chip]);
+                      }}
+                      className="rounded-xl border-2 border-border bg-card px-3 py-1.5 text-base md:text-lg text-foreground hover:border-accent/60 hover:bg-accent/5 transition"
+                    >
+                      {chip.text}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {!submitted && (
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    onClick={() => submitAnswer(draftChips.map((c) => c.text).join(" "))}
+                    disabled={draftChips.length !== current.options.length}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Check
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -30,6 +30,22 @@ export function shuffle<T>(arr: readonly T[]): T[] {
   return out;
 }
 
+/**
+ * Fisher–Yates, but retries (capped) while the result equals the input
+ * order. shuffle() returning the identity permutation is harmless for MCQ
+ * (the correct option can legitimately land back where it started) but
+ * fatal for a text-reconstruction exercise — an unshuffled scramble hands
+ * the learner the answer outright.
+ */
+export function scramble<T>(arr: readonly T[]): T[] {
+  if (arr.length < 2) return [...arr];
+  let out = shuffle(arr);
+  for (let attempt = 0; attempt < 10 && out.every((v, i) => v === arr[i]); attempt++) {
+    out = shuffle(arr);
+  }
+  return out;
+}
+
 function normalizeAnswer(s: string): string {
   return s
     .trim()

@@ -381,7 +381,12 @@ export type Database = {
         | "interview"
         | "role_play"
         | "discussion"
-      question_type: "mcq" | "gap_fill" | "open_text" | "prompt"
+      question_type:
+        | "mcq"
+        | "gap_fill"
+        | "open_text"
+        | "prompt"
+        | "reconstruction"
       session_mode: "practice" | "mock" | "skill_drill"
       skill_type:
         | "listening"
@@ -545,7 +550,13 @@ export const Constants = {
         "role_play",
         "discussion",
       ],
-      question_type: ["mcq", "gap_fill", "open_text", "prompt"],
+      question_type: [
+        "mcq",
+        "gap_fill",
+        "open_text",
+        "prompt",
+        "reconstruction",
+      ],
       session_mode: ["practice", "mock", "skill_drill"],
       skill_type: [
         "listening",
