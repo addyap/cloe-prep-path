@@ -186,7 +186,16 @@ function GrammarVocabPractice() {
     if (!current || submitted || !answerText.trim()) return;
     setSelected(answerText);
     setSubmitted(true);
-    const isCorrect = gradeAnswer(current.type, answerText, current.correct_answer);
+    // For gap_fill, `options` (unused by the MCQ button UI for this type)
+    // doubles as the accepted-answers list — several genuinely correct
+    // synonyms are common for a free-typed answer, not just one canonical
+    // string. Falls back to correct_answer alone when empty.
+    const isCorrect = gradeAnswer(
+      current.type,
+      answerText,
+      current.correct_answer,
+      current.options,
+    );
     setHistory((h) => [...h, { question: current, answer: answerText, correct: isCorrect }]);
     const newRight = isCorrect ? streakRight + 1 : 0;
     const newWrong = isCorrect ? 0 : streakWrong + 1;

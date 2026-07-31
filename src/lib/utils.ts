@@ -43,11 +43,16 @@ function normalizeAnswer(s: string): string {
 /**
  * gap_fill grading: forgiving of whitespace/case/curly-quote/trailing-
  * punctuation differences, but not fuzzy — spelling is the point of a
- * grammar drill, so no edit-distance matching.
+ * grammar drill, so no edit-distance matching. Checks against every
+ * accepted answer, not just one — a content audit of the first gap_fill
+ * round found that most free-typed items genuinely admit more than one
+ * correct synonym ("bought" vs "purchased", "sign" vs "finalize"), and
+ * exact-match-only grading would mark an equally correct answer wrong.
  */
-export function gradeGapFill(userAnswer: string, correctAnswer: string | null): boolean {
-  if (!correctAnswer) return false;
-  return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
+export function gradeGapFill(userAnswer: string, acceptedAnswers: readonly string[]): boolean {
+  if (acceptedAnswers.length === 0) return false;
+  const norm = normalizeAnswer(userAnswer);
+  return acceptedAnswers.some((a) => normalizeAnswer(a) === norm);
 }
 
 /**
@@ -55,13 +60,25 @@ export function gradeGapFill(userAnswer: string, correctAnswer: string | null): 
  * and word_bank all grade by exact string equality (their answer space is
  * either a fixed option/token set or a shuffled-but-unmodified sentence, so
  * there's nothing to normalize); gap_fill is the only free-typed format and
- * routes through the more forgiving gradeGapFill.
+ * routes through the more forgiving gradeGapFill. `acceptedAnswers` is
+ * gap_fill-only (ignored for other types) and falls back to just
+ * `correctAnswer` when omitted or empty, so callers that don't have an
+ * accepted-answers list yet still grade correctly against the single answer.
  */
 export function gradeAnswer(
   type: string,
   userAnswer: string,
   correctAnswer: string | null,
+  acceptedAnswers?: readonly string[] | null,
 ): boolean {
-  if (type === "gap_fill") return gradeGapFill(userAnswer, correctAnswer);
+  if (type === "gap_fill") {
+    const pool =
+      acceptedAnswers && acceptedAnswers.length > 0
+        ? acceptedAnswers
+        : correctAnswer
+          ? [correctAnswer]
+          : [];
+    return gradeGapFill(userAnswer, pool);
+  }
   return !!correctAnswer && userAnswer === correctAnswer;
 }

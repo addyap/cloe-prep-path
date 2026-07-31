@@ -513,7 +513,9 @@ function WrittenAdaptive({
     if (!current) return;
     const userAnswer = selection.trim();
     if (!userAnswer) return;
-    const correct = gradeAnswer(current.type, userAnswer, current.correct_answer);
+    // gap_fill's `options` doubles as an accepted-answers list (several
+    // genuinely correct synonyms are common for a free-typed answer).
+    const correct = gradeAnswer(current.type, userAnswer, current.correct_answer, current.options);
     const delta = correct ? 0.33 : -0.33;
     const nextTheta = Math.max(1, Math.min(6, theta + delta));
     const answered: Answered = {
