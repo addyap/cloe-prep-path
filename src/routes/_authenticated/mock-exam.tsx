@@ -26,7 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
-import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
+import { cn, extractSpokenScript, gradeAnswer, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
   component: MockExamPage,
@@ -61,6 +61,24 @@ type Question = {
 };
 
 type Passage = { id: string; title: string; body: string };
+
+/**
+ * Per-type validity check for a written-bank item — an allowlist, not a
+ * denylist, so a future question type (reconstruction, word_bank) is
+ * excluded by default until this switch is deliberately extended to render
+ * it, rather than silently passing through with no matching render branch
+ * (which would soft-lock the exam: item shown, no input, Submit disabled).
+ */
+function isValidWrittenItem(q: Question): boolean {
+  switch (q.type) {
+    case "mcq":
+      return Array.isArray(q.options) && q.options.length > 0 && !!q.correct_answer;
+    case "gap_fill":
+      return !!q.correct_answer;
+    default:
+      return false;
+  }
+}
 
 type Answered = {
   question: Question;
@@ -133,14 +151,7 @@ function MockExamPage() {
         }));
         setBank(
           all.filter(
-            (q) =>
-              WRITTEN_SKILLS.includes(q.skill as WrittenSkill) &&
-              q.type !== "open_text" &&
-              q.type !== "prompt" &&
-              // Guard against a malformed mcq row (missing options/answer) breaking the exam.
-              Array.isArray(q.options) &&
-              q.options.length > 0 &&
-              !!q.correct_answer,
+            (q) => WRITTEN_SKILLS.includes(q.skill as WrittenSkill) && isValidWrittenItem(q),
           ),
         );
         setOralPrompts(
@@ -502,9 +513,7 @@ function WrittenAdaptive({
     if (!current) return;
     const userAnswer = selection.trim();
     if (!userAnswer) return;
-    const correct =
-      !!current.correct_answer &&
-      userAnswer.toLowerCase() === current.correct_answer.trim().toLowerCase();
+    const correct = gradeAnswer(current.type, userAnswer, current.correct_answer);
     const delta = correct ? 0.33 : -0.33;
     const nextTheta = Math.max(1, Math.min(6, theta + delta));
     const answered: Answered = {

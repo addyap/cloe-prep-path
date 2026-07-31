@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, shuffle } from "@/lib/utils";
+import { cn, gradeAnswer, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
   component: GrammarVocabPractice,
@@ -31,6 +31,7 @@ type Topic = (typeof SUB_TOPICS)[number]["slug"];
 
 type Question = {
   id: string;
+  type: "mcq" | "gap_fill";
   cefr_level: Level;
   context_tag: string;
   prompt_text: string;
@@ -59,11 +60,13 @@ function GrammarVocabPractice() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [current, setCurrent] = useState<Question | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [draftText, setDraftText] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [done, setDone] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const startedAt = useRef<number | null>(null);
   const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const gapFillInputRef = useRef<HTMLInputElement>(null);
 
   // Session timer
   useEffect(() => {
@@ -104,6 +107,7 @@ function GrammarVocabPractice() {
         const list: Question[] = (qRes.data ?? [])
           .map((q) => ({
             id: q.id,
+            type: q.type as "mcq" | "gap_fill",
             cefr_level: q.cefr_level as Level,
             context_tag: q.context_tag,
             prompt_text: q.prompt_text,
@@ -111,8 +115,13 @@ function GrammarVocabPractice() {
             correct_answer: q.correct_answer ?? "",
             explanation: q.explanation,
           }))
-          // Guard against a malformed row (missing options/answer) breaking the session.
-          .filter((q) => q.options.length > 0 && q.correct_answer);
+          // Allowlist, not denylist: only render types this page has a branch
+          // for. mcq needs real options; gap_fill only needs a correct_answer.
+          .filter(
+            (q) =>
+              !!q.correct_answer &&
+              ((q.type === "mcq" && q.options.length > 0) || q.type === "gap_fill"),
+          );
         setPool(list);
       } catch (err) {
         console.error(err);
@@ -168,12 +177,17 @@ function GrammarVocabPractice() {
     [],
   );
 
-  async function pick(opt: string) {
-    if (!current || submitted) return;
-    setSelected(opt);
+  // Autofocus the gap-fill input on each new question.
+  useEffect(() => {
+    if (current?.type === "gap_fill") gapFillInputRef.current?.focus();
+  }, [current?.id, current?.type]);
+
+  async function submitAnswer(answerText: string) {
+    if (!current || submitted || !answerText.trim()) return;
+    setSelected(answerText);
     setSubmitted(true);
-    const isCorrect = opt === current.correct_answer;
-    setHistory((h) => [...h, { question: current, answer: opt, correct: isCorrect }]);
+    const isCorrect = gradeAnswer(current.type, answerText, current.correct_answer);
+    setHistory((h) => [...h, { question: current, answer: answerText, correct: isCorrect }]);
     const newRight = isCorrect ? streakRight + 1 : 0;
     const newWrong = isCorrect ? 0 : streakWrong + 1;
     if (newRight > bestStreak) setBestStreak(newRight);
@@ -186,12 +200,16 @@ function GrammarVocabPractice() {
         question_id: current.id,
         skill: "grammar_vocab",
         cefr_level: current.cefr_level,
-        user_answer: opt,
+        user_answer: answerText,
         is_correct: isCorrect,
         score: isCorrect ? 1 : 0,
       });
     }
-    autoAdvanceRef.current = setTimeout(advance, AUTO_ADVANCE_MS);
+    // Auto-advance only for mcq — a typed gap-fill answer needs time to read
+    // the correct answer + explanation, the manual "Next" button covers it.
+    if (current.type === "mcq") {
+      autoAdvanceRef.current = setTimeout(advance, AUTO_ADVANCE_MS);
+    }
   }
 
   function advance() {
@@ -217,6 +235,7 @@ function GrammarVocabPractice() {
     if (current) newAsked.add(current.id);
     setAsked(newAsked);
     setSelected(null);
+    setDraftText("");
     setSubmitted(false);
     if (history.length >= SESSION_LENGTH || newAsked.size >= pool.length) {
       setDone(true);
@@ -299,7 +318,7 @@ function GrammarVocabPractice() {
   }
 
   const progress = history.length;
-  const lastCorrect = submitted && selected === current.correct_answer;
+  const lastCorrect = submitted && (history[history.length - 1]?.correct ?? false);
 
   return (
     <AppShell>
@@ -344,40 +363,74 @@ function GrammarVocabPractice() {
           <div className="text-xl md:text-2xl font-semibold text-foreground leading-snug">
             {current.prompt_text}
           </div>
-          <div className="mt-6 grid gap-3">
-            {current.options.map((opt) => {
-              const isSel = selected === opt;
-              const isRight = submitted && opt === current.correct_answer;
-              const isWrongPick = submitted && isSel && opt !== current.correct_answer;
-              return (
-                <button
-                  key={opt}
-                  onClick={() => pick(opt)}
-                  disabled={submitted}
-                  className={cn(
-                    "text-left rounded-2xl border-2 p-4 transition flex items-center gap-3 bg-card",
-                    !submitted && "border-border hover:border-accent/60 hover:bg-accent/5",
-                    isRight && "border-success bg-success/10",
-                    isWrongPick && "border-destructive bg-destructive/10",
-                    submitted && !isRight && !isWrongPick && "border-border opacity-60",
-                  )}
-                >
-                  <div
+          {current.type === "mcq" && (
+            <div className="mt-6 grid gap-3">
+              {current.options.map((opt) => {
+                const isSel = selected === opt;
+                const isRight = submitted && opt === current.correct_answer;
+                const isWrongPick = submitted && isSel && opt !== current.correct_answer;
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => submitAnswer(opt)}
+                    disabled={submitted}
                     className={cn(
-                      "h-6 w-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
-                      !submitted && "border-muted-foreground/30",
-                      isRight && "border-success bg-success text-white",
-                      isWrongPick && "border-destructive bg-destructive text-white",
+                      "text-left rounded-2xl border-2 p-4 transition flex items-center gap-3 bg-card",
+                      !submitted && "border-border hover:border-accent/60 hover:bg-accent/5",
+                      isRight && "border-success bg-success/10",
+                      isWrongPick && "border-destructive bg-destructive/10",
+                      submitted && !isRight && !isWrongPick && "border-border opacity-60",
                     )}
                   >
-                    {isRight && <Check className="h-4 w-4" />}
-                    {isWrongPick && <X className="h-4 w-4" />}
-                  </div>
-                  <span className="text-base md:text-lg text-foreground">{opt}</span>
-                </button>
-              );
-            })}
-          </div>
+                    <div
+                      className={cn(
+                        "h-6 w-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                        !submitted && "border-muted-foreground/30",
+                        isRight && "border-success bg-success text-white",
+                        isWrongPick && "border-destructive bg-destructive text-white",
+                      )}
+                    >
+                      {isRight && <Check className="h-4 w-4" />}
+                      {isWrongPick && <X className="h-4 w-4" />}
+                    </div>
+                    <span className="text-base md:text-lg text-foreground">{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {current.type === "gap_fill" && (
+            <div className="mt-6">
+              <div className="flex gap-2">
+                <input
+                  ref={gapFillInputRef}
+                  value={draftText}
+                  onChange={(e) => setDraftText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") submitAnswer(draftText);
+                  }}
+                  readOnly={submitted}
+                  placeholder="Type your answer"
+                  className={cn(
+                    "flex-1 rounded-2xl border-2 px-4 py-3 text-base md:text-lg bg-card focus:outline-none",
+                    !submitted && "border-border focus:border-accent",
+                    submitted && lastCorrect && "border-success bg-success/10",
+                    submitted && !lastCorrect && "border-destructive bg-destructive/10",
+                  )}
+                />
+                {!submitted && (
+                  <Button
+                    onClick={() => submitAnswer(draftText)}
+                    disabled={!draftText.trim()}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Check
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Feedback */}

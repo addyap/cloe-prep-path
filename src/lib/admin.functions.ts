@@ -57,7 +57,11 @@ const GenInputSchema = z.object({
 
 const QuestionSchema = z.object({
   prompt_text: z.string().min(5).max(2000),
-  type: z.enum(["mcq", "gap_fill", "open_text", "prompt"]),
+  // "gap_fill" is deliberately excluded here: real gap_fill content goes
+  // through the offline content-round pipeline (which enforces a CHECK
+  // constraint requiring exactly one "_____" blank), not this live
+  // single-question tool.
+  type: z.enum(["mcq", "open_text", "prompt"]),
   options: z.array(z.string()).min(2).max(6).optional(),
   correct_answer: z.string().optional(),
   explanation: z.string().min(5).max(800),
@@ -87,7 +91,7 @@ export const generateQuestions = createServerFn({ method: "POST" })
       reading:
         'Write a short professional text (2–5 sentences) inside prompt_text. Type "mcq". Provide 3–4 options and one correct_answer (must match an option verbatim).',
       grammar_vocab:
-        'Write a single-sentence drill with a blank "_____" or a sentence to correct. Type "mcq" or "gap_fill". Provide 3–4 options and a correct_answer.',
+        'Write a single-sentence drill with a blank "_____" or a sentence to correct. Type "mcq". Provide 3–4 options and a correct_answer.',
       writing:
         'Write a realistic professional writing task as the prompt_text (e.g. "Reply to this email..."). Type "prompt". Do NOT include options or correct_answer.',
       speaking:
@@ -107,9 +111,9 @@ Guidance: ${skillGuidance[data.skill]}
 
 For each item, provide:
 - prompt_text: the question, passage, or task
-- type: one of mcq, gap_fill, open_text, prompt
-- options: array of choices (only for mcq / gap_fill)
-- correct_answer: must match one option verbatim (only for mcq / gap_fill)
+- type: one of mcq, open_text, prompt
+- options: array of choices (only for mcq)
+- correct_answer: must match one option verbatim (only for mcq)
 - explanation: a short, helpful explanation (always required)
 
 Vary the items. Do not repeat structures or vocabulary across items.`;
