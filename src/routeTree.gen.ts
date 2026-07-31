@@ -31,7 +31,6 @@ import { Route as AuthenticatedPracticeSpeakingRouteImport } from './routes/_aut
 import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
 import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
-import { Route as AuthenticatedComingSoonSkillRouteImport } from './routes/_authenticated/coming-soon.$skill'
 import { Route as AuthenticatedAdminGenerateRouteImport } from './routes/_authenticated/admin.generate'
 
 const TermsRoute = TermsRouteImport.update({
@@ -149,12 +148,6 @@ const AuthenticatedPracticeGrammarVocabRoute =
     path: '/grammar-vocab',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
-const AuthenticatedComingSoonSkillRoute =
-  AuthenticatedComingSoonSkillRouteImport.update({
-    id: '/coming-soon/$skill',
-    path: '/coming-soon/$skill',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminGenerateRoute =
   AuthenticatedAdminGenerateRouteImport.update({
     id: '/admin/generate',
@@ -177,7 +170,6 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/admin/generate': typeof AuthenticatedAdminGenerateRoute
-  '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -201,7 +193,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
   '/admin/generate': typeof AuthenticatedAdminGenerateRoute
-  '/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -228,7 +219,6 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/admin/generate': typeof AuthenticatedAdminGenerateRoute
-  '/_authenticated/coming-soon/$skill': typeof AuthenticatedComingSoonSkillRoute
   '/_authenticated/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/_authenticated/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -255,7 +245,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/admin/generate'
-    | '/coming-soon/$skill'
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
@@ -279,7 +268,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/admin/generate'
-    | '/coming-soon/$skill'
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
@@ -305,7 +293,6 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/progress'
     | '/_authenticated/admin/generate'
-    | '/_authenticated/coming-soon/$skill'
     | '/_authenticated/practice/grammar-vocab'
     | '/_authenticated/practice/listening'
     | '/_authenticated/practice/reading'
@@ -485,13 +472,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeGrammarVocabRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
-    '/_authenticated/coming-soon/$skill': {
-      id: '/_authenticated/coming-soon/$skill'
-      path: '/coming-soon/$skill'
-      fullPath: '/coming-soon/$skill'
-      preLoaderRoute: typeof AuthenticatedComingSoonSkillRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin/generate': {
       id: '/_authenticated/admin/generate'
       path: '/admin/generate'
@@ -534,7 +514,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedAdminGenerateRoute: typeof AuthenticatedAdminGenerateRoute
-  AuthenticatedComingSoonSkillRoute: typeof AuthenticatedComingSoonSkillRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -545,7 +524,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedAdminGenerateRoute: AuthenticatedAdminGenerateRoute,
-  AuthenticatedComingSoonSkillRoute: AuthenticatedComingSoonSkillRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

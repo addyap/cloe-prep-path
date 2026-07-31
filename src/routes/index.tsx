@@ -171,18 +171,18 @@ function Landing() {
           {[
             {
               n: "1",
-              t: "Computer-based",
-              d: "You take CLOE on a computer at an approved test centre. No paper.",
+              t: "Written section, computer-based",
+              d: "About 50 minutes of listening, reading and grammar on a computer at an approved test centre. The difficulty adapts as you answer.",
             },
             {
               n: "2",
-              t: "Adaptive sections",
-              d: "The difficulty adjusts based on your answers, so each candidate gets a personalised test.",
+              t: "Oral section, live with an examiner",
+              d: "A 20-minute spoken exam with a certified examiner: personal-background questions, a role-play scenario, and a thematic discussion.",
             },
             {
               n: "3",
               t: "Your CEFR result",
-              d: "You receive a level (A1 to C2) for each skill, plus an overall result valid for 2 years.",
+              d: "You receive a CEFR level (A2 to B2) for each skill, plus an overall result.",
             },
           ].map((step) => (
             <div key={step.n} className="rounded-2xl bg-card p-6 shadow-card border border-border">
