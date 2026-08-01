@@ -46,6 +46,16 @@ export function scramble<T>(arr: readonly T[]): T[] {
   return out;
 }
 
+/**
+ * Splits a word-bank passage body on its `{{n}}` blank tokens, keeping the
+ * tokens themselves in the output (capturing group in the split regex) so
+ * callers can alternate plain-text segments and blanks while rendering.
+ * e.g. "Please {{1}} the form." -> ["Please ", "{{1}}", " the form."]
+ */
+export function splitBlanks(body: string): string[] {
+  return body.split(/(\{\{\d+\}\})/);
+}
+
 function normalizeAnswer(s: string): string {
   return s
     .trim()

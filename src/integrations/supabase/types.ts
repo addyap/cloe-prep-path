@@ -116,6 +116,7 @@ export type Database = {
           id: string
           skill: Database["public"]["Enums"]["skill_type"]
           title: string
+          word_bank: Json | null
         }
         Insert: {
           body: string
@@ -125,6 +126,7 @@ export type Database = {
           id?: string
           skill?: Database["public"]["Enums"]["skill_type"]
           title: string
+          word_bank?: Json | null
         }
         Update: {
           body?: string
@@ -134,6 +136,7 @@ export type Database = {
           id?: string
           skill?: Database["public"]["Enums"]["skill_type"]
           title?: string
+          word_bank?: Json | null
         }
         Relationships: []
       }
@@ -248,6 +251,7 @@ export type Database = {
           explanation: string | null
           id: string
           options: Json | null
+          ordinal: number | null
           passage_id: string | null
           prompt_text: string
           skill: Database["public"]["Enums"]["skill_type"]
@@ -262,6 +266,7 @@ export type Database = {
           explanation?: string | null
           id?: string
           options?: Json | null
+          ordinal?: number | null
           passage_id?: string | null
           prompt_text: string
           skill: Database["public"]["Enums"]["skill_type"]
@@ -276,6 +281,7 @@ export type Database = {
           explanation?: string | null
           id?: string
           options?: Json | null
+          ordinal?: number | null
           passage_id?: string | null
           prompt_text?: string
           skill?: Database["public"]["Enums"]["skill_type"]
@@ -387,6 +393,7 @@ export type Database = {
         | "open_text"
         | "prompt"
         | "reconstruction"
+        | "word_bank"
       session_mode: "practice" | "mock" | "skill_drill"
       skill_type:
         | "listening"
@@ -556,6 +563,7 @@ export const Constants = {
         "open_text",
         "prompt",
         "reconstruction",
+        "word_bank",
       ],
       session_mode: ["practice", "mock", "skill_drill"],
       skill_type: [

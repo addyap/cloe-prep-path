@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { Headphones, BookOpen, PenLine, Mic } from "lucide-react";
+import { Headphones, BookOpen, PenLine, Mic, LayoutGrid } from "lucide-react";
 import { SKILL_ROUTES, type SkillSlug } from "@/lib/skills";
 
 export const Route = createFileRoute("/_authenticated/practice/")({ component: PracticePage });
@@ -32,6 +32,15 @@ function PracticePage() {
               <div className="mt-4 font-semibold text-foreground">{s.title}</div>
             </Link>
           ))}
+          <Link
+            to="/practice/word-bank"
+            className="rounded-2xl bg-card border border-border p-5 shadow-card hover:border-accent/50 transition"
+          >
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <LayoutGrid className="h-5 w-5" />
+            </div>
+            <div className="mt-4 font-semibold text-foreground">Word bank</div>
+          </Link>
         </div>
       </div>
     </AppShell>
