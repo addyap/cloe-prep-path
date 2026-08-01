@@ -17,7 +17,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn } from "@/lib/utils";
+import { cn, formatTime } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/speaking")({
   component: SpeakingPractice,
@@ -63,12 +63,6 @@ type Feedback = {
 
 type EvalResult = { transcript: string; feedback: Feedback; overall: number };
 type Mode = "menu" | "practice" | "exam";
-
-function formatTime(s: number) {
-  const m = Math.floor(s / 60);
-  const ss = s % 60;
-  return `${m}:${ss.toString().padStart(2, "0")}`;
-}
 
 function pickPromptForPhase(prompts: Prompt[], phase: Phase, target: Level | null): Prompt | null {
   const pool = prompts.filter((p) => p.context_tag === phase);

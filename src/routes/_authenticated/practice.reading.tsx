@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, shuffle } from "@/lib/utils";
+import { cn, formatTime, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/reading")({
   component: ReadingPractice,
@@ -485,12 +485,6 @@ function ReadingPractice() {
       </div>
     </AppShell>
   );
-}
-
-function formatTime(s: number): string {
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
 function Summary({ results, estimatedLevel }: { results: PassageResult[]; estimatedLevel: Level }) {

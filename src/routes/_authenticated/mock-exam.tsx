@@ -26,7 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
-import { cn, extractSpokenScript, gradeAnswer, shuffle } from "@/lib/utils";
+import { cn, extractSpokenScript, formatTime, gradeAnswer, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
   component: MockExamPage,
@@ -111,12 +111,6 @@ type OralResult = {
 };
 
 type Step = "intro" | "written" | "written_done" | "oral" | "results";
-
-function formatTime(s: number) {
-  const m = Math.floor(s / 60);
-  const ss = s % 60;
-  return `${m}:${ss.toString().padStart(2, "0")}`;
-}
 
 function MockExamPage() {
   const navigate = useNavigate();

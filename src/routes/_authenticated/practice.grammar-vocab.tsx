@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, gradeAnswer, scramble, shuffle } from "@/lib/utils";
+import { cn, formatTime, gradeAnswer, scramble, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/grammar-vocab")({
   component: GrammarVocabPractice,
@@ -575,12 +575,6 @@ function GrammarVocabPractice() {
       </div>
     </AppShell>
   );
-}
-
-function formatTime(s: number) {
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
 function Summary({

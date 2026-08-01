@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicPageShell } from "@/components/public-page-shell";
 
 export const Route = createFileRoute("/terms")({
@@ -62,15 +62,15 @@ function TermsPage() {
           <p className="mt-2">
             Some features may require a paid subscription ("Pro plan"). Where paid plans are
             available, pricing is shown on our{" "}
-            <a href="/pricing" className="underline">
+            <Link to="/pricing" className="underline">
               Pricing
-            </a>{" "}
+            </Link>{" "}
             page and billing is processed by Stripe. Subscriptions renew automatically until you
             cancel; you can cancel at any time from your account and you'll keep access until the
             end of your current billing period. See our{" "}
-            <a href="/refund-policy" className="underline">
+            <Link to="/refund-policy" className="underline">
               Refund Policy
-            </a>{" "}
+            </Link>{" "}
             for details on refunds.
           </p>
         </section>

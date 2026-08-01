@@ -46,6 +46,13 @@ export function scramble<T>(arr: readonly T[]): T[] {
   return out;
 }
 
+/** Formats a duration in seconds as `m:ss` for timer displays. */
+export function formatTime(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
+
 /**
  * Splits a word-bank passage body on its `{{n}}` blank tokens, keeping the
  * tokens themselves in the output (capturing group in the split regex) so
