@@ -109,6 +109,7 @@ export type Database = {
       }
       passages: {
         Row: {
+          audio_url: string | null
           body: string
           cefr_level: Database["public"]["Enums"]["cefr_level"]
           context_tag: Database["public"]["Enums"]["context_tag"]
@@ -119,6 +120,7 @@ export type Database = {
           word_bank: Json | null
         }
         Insert: {
+          audio_url?: string | null
           body: string
           cefr_level: Database["public"]["Enums"]["cefr_level"]
           context_tag?: Database["public"]["Enums"]["context_tag"]
@@ -129,6 +131,7 @@ export type Database = {
           word_bank?: Json | null
         }
         Update: {
+          audio_url?: string | null
           body?: string
           cefr_level?: Database["public"]["Enums"]["cefr_level"]
           context_tag?: Database["public"]["Enums"]["context_tag"]

@@ -60,7 +60,7 @@ type Question = {
   passage_id: string | null;
 };
 
-type Passage = { id: string; title: string; body: string };
+type Passage = { id: string; title: string; body: string; audio_url: string | null };
 
 /**
  * Per-type validity check for a written-bank item — an allowlist, not a
@@ -135,7 +135,7 @@ function MockExamPage() {
             .select(
               "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
             ),
-          supabase.from("passages").select("id, title, body"),
+          supabase.from("passages").select("id, title, body, audio_url"),
           supabase.auth.getUser(),
         ]);
         if (qErr) throw qErr;
@@ -480,9 +480,16 @@ function WrittenAdaptive({
     if (!current) return;
     if (playsUsed >= 1) return; // strict: 1 play in exam
 
-    const hasRealAudio = current.audio_url && !current.audio_url.startsWith("tts:");
+    // A passage-linked listening question has no audio of its own — the
+    // audio (and spoken script, for the TTS fallback) belongs to the
+    // passage it's about, not the question text itself.
+    const passage = current.passage_id ? passages[current.passage_id] : null;
+    const audioSrc = passage ? passage.audio_url : current.audio_url;
+    const fallbackText = passage ? passage.body : extractSpokenScript(current.prompt_text);
+
+    const hasRealAudio = audioSrc && !audioSrc.startsWith("tts:");
     if (hasRealAudio) {
-      const el = new Audio(current.audio_url!);
+      const el = new Audio(audioSrc!);
       audioRef.current = el;
       void el.play();
       setPlaysUsed((n) => n + 1);
@@ -492,16 +499,16 @@ function WrittenAdaptive({
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const text =
-      current.audio_url && current.audio_url.startsWith("tts:")
+      !passage && current.audio_url && current.audio_url.startsWith("tts:")
         ? current.audio_url.slice(4)
-        : extractSpokenScript(current.prompt_text);
+        : fallbackText;
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.95;
     u.lang = "en-US";
     utterRef.current = u;
     window.speechSynthesis.speak(u);
     setPlaysUsed((n) => n + 1);
-  }, [current, playsUsed]);
+  }, [current, playsUsed, passages]);
 
   function submit() {
     if (!current) return;
@@ -587,7 +594,10 @@ function WrittenAdaptive({
         )}
 
         <div className="mt-4 rounded-2xl border border-border bg-card shadow-card p-5">
-          {passage && (
+          {/* A listening passage's transcript must not be shown as readable text — the whole
+              point is to test comprehension from audio, and showing it upfront would hand the
+              answer away before the user even presses play. */}
+          {passage && current.skill !== "listening" && (
             <div className="mb-4 rounded-xl bg-muted/30 border border-border p-4">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 {passage.title}

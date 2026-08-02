@@ -90,3 +90,70 @@ export const generateListeningAudio = createServerFn({ method: "POST" })
 
     return { generated, remaining: remaining ?? 0, errors };
   });
+
+/**
+ * Same idea as generateListeningAudio, but for listening passages
+ * (dialogue/monologue scripts backing a multi-question unit) rather than
+ * single-sentence standalone items. One audio file per passage, generated
+ * from the full passage body — no extractSpokenScript() step needed since
+ * a passage's body IS the spoken script in full, with no separate printed
+ * question appended the way a standalone item's prompt_text has.
+ */
+export const generateListeningPassageAudio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => InputSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden: admin only");
+
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("Missing OPENAI_API_KEY");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: missing, error } = await supabaseAdmin
+      .from("passages")
+      .select("id, body")
+      .eq("skill", "listening")
+      .is("audio_url", null)
+      .limit(data.limit);
+    if (error) throw new Error(error.message);
+    if (!missing || missing.length === 0) return { generated: 0, remaining: 0, errors: [] };
+
+    let generated = 0;
+    const errors: string[] = [];
+
+    await Promise.all(
+      missing.map(async (p, i) => {
+        try {
+          const voice = VOICES[i % VOICES.length];
+          const audio = await synthesizeSpeech(p.body, key, voice);
+          const path = `passage-${p.id}.mp3`;
+          const { error: upErr } = await supabaseAdmin.storage
+            .from(BUCKET)
+            .upload(path, audio, { contentType: "audio/mpeg", upsert: true });
+          if (upErr) throw new Error(upErr.message);
+          const { data: pub } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path);
+          const { error: updErr } = await supabaseAdmin
+            .from("passages")
+            .update({ audio_url: pub.publicUrl })
+            .eq("id", p.id);
+          if (updErr) throw new Error(updErr.message);
+          generated++;
+        } catch (e: unknown) {
+          errors.push(`${p.id}: ${(e as Error).message ?? "unknown error"}`);
+        }
+      }),
+    );
+
+    const { count: remaining } = await supabaseAdmin
+      .from("passages")
+      .select("id", { count: "exact", head: true })
+      .eq("skill", "listening")
+      .is("audio_url", null);
+
+    return { generated, remaining: remaining ?? 0, errors };
+  });

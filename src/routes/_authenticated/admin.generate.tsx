@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { checkIsAdmin, claimFirstAdmin, generateQuestions } from "@/lib/admin.functions";
-import { generateListeningAudio } from "@/lib/audio-gen.functions";
+import { generateListeningAudio, generateListeningPassageAudio } from "@/lib/audio-gen.functions";
 import { Sparkles, ShieldCheck, Loader2, Volume2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/generate")({
@@ -65,11 +65,17 @@ function AdminGenerate() {
   const [audioStatus, setAudioStatus] = useState<{ generated: number; remaining: number } | null>(
     null,
   );
+  const [passageAudioBusy, setPassageAudioBusy] = useState(false);
+  const [passageAudioStatus, setPassageAudioStatus] = useState<{
+    generated: number;
+    remaining: number;
+  } | null>(null);
 
   const isAdminFn = useServerFn(checkIsAdmin);
   const claimFn = useServerFn(claimFirstAdmin);
   const genFn = useServerFn(generateQuestions);
   const audioFn = useServerFn(generateListeningAudio);
+  const passageAudioFn = useServerFn(generateListeningPassageAudio);
 
   useEffect(() => {
     (async () => {
@@ -146,6 +152,31 @@ function AdminGenerate() {
       else toast.error(msg || "Failed to generate audio.");
     } finally {
       setAudioBusy(false);
+    }
+  };
+
+  const generatePassageAudio = async () => {
+    setPassageAudioBusy(true);
+    try {
+      const res = await passageAudioFn({ data: { limit: 30 } });
+      setPassageAudioStatus({ generated: res.generated, remaining: res.remaining });
+      if (res.errors?.length) {
+        toast.error(`${res.generated} generated, ${res.errors.length} failed. Try again.`);
+      } else if (res.generated === 0) {
+        toast.success("All listening passage audio already generated.");
+      } else {
+        toast.success(
+          `Generated ${res.generated} clips. ${res.remaining} still to go — click again to continue.`,
+        );
+      }
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg === "RATE_LIMIT") toast.error("Rate limit hit. Try again in a moment.");
+      else if (msg === "CREDITS_EXHAUSTED")
+        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
+      else toast.error(msg || "Failed to generate audio.");
+    } finally {
+      setPassageAudioBusy(false);
     }
   };
 
@@ -312,6 +343,36 @@ function AdminGenerate() {
           {audioStatus && !audioBusy && (
             <p className="text-xs text-center text-muted-foreground">
               Last run: {audioStatus.generated} generated, {audioStatus.remaining} remaining.
+            </p>
+          )}
+        </section>
+
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-card space-y-3">
+          <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wide">
+            <Volume2 className="h-4 w-4" /> Listening passage audio
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Same idea, but for listening passages (multi-question dialogues/monologues) rather than
+            single-sentence items — one clip per passage, generated from the full script.
+          </p>
+          <Button
+            onClick={generatePassageAudio}
+            disabled={passageAudioBusy}
+            variant="outline"
+            className="w-full"
+          >
+            {passageAudioBusy ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
+              </>
+            ) : (
+              "Generate passage audio (next 30)"
+            )}
+          </Button>
+          {passageAudioStatus && !passageAudioBusy && (
+            <p className="text-xs text-center text-muted-foreground">
+              Last run: {passageAudioStatus.generated} generated, {passageAudioStatus.remaining}{" "}
+              remaining.
             </p>
           )}
         </section>
