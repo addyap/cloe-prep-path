@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
+import { ProFreeBadge } from "@/components/pro-free-badge";
 import { cn, extractSpokenScript, formatTime, gradeAnswer, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mock-exam")({
@@ -306,6 +307,10 @@ function Intro({
               Simulates the two-part CLOE under real conditions.
             </p>
           </div>
+        </div>
+
+        <div className="mt-3">
+          <ProFreeBadge />
         </div>
 
         <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-900 text-sm flex gap-3">
