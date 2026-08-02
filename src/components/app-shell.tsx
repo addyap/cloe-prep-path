@@ -8,6 +8,7 @@ import {
   LogOut,
   GraduationCap,
   Sparkles,
+  Tag,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,6 +84,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             );
           })}
+          <Link
+            to="/pricing"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mt-4 border-t border-sidebar-border pt-4 text-sidebar-foreground/80 hover:bg-sidebar-accent/50"
+          >
+            <Tag className="h-4 w-4" /> Pricing
+          </Link>
           {isAdmin && (
             <Link
               to="/admin/generate"

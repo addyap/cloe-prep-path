@@ -17,6 +17,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
+import { ProFreeBadge } from "@/components/pro-free-badge";
 import { cn, formatTime } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/speaking")({
@@ -145,6 +146,10 @@ function SpeakingPractice() {
                 Mirror the real 15–20 min CLOE oral interview.
               </p>
             </div>
+          </div>
+
+          <div className="mt-3">
+            <ProFreeBadge />
           </div>
 
           <div className="mt-6 rounded-2xl bg-card border border-border p-5 shadow-card">

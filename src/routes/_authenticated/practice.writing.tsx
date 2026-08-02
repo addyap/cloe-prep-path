@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
+import { ProFreeBadge } from "@/components/pro-free-badge";
 import { cn } from "@/lib/utils";
 import { evaluateWriting, type WritingFeedback } from "@/lib/writing-feedback.functions";
 
@@ -180,6 +181,9 @@ function WritingPractice() {
           <p className="text-sm text-muted-foreground mt-2">
             Pick a professional task. You'll write a response, then get AI-generated CEFR feedback.
           </p>
+          <div className="mt-3">
+            <ProFreeBadge />
+          </div>
           <div className="mt-6 grid gap-3">
             {prompts.map((p) => {
               const title = p.prompt_text.split("\n")[0];
