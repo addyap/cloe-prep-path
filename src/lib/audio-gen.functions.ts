@@ -51,6 +51,7 @@ export const generateListeningAudio = createServerFn({ method: "POST" })
       .select("id, prompt_text")
       .eq("skill", "listening")
       .is("audio_url", null)
+      .is("passage_id", null)
       .limit(data.limit);
     if (error) throw new Error(error.message);
     if (!missing || missing.length === 0) return { generated: 0, remaining: 0, errors: [] };
@@ -86,7 +87,8 @@ export const generateListeningAudio = createServerFn({ method: "POST" })
       .from("questions")
       .select("id", { count: "exact", head: true })
       .eq("skill", "listening")
-      .is("audio_url", null);
+      .is("audio_url", null)
+      .is("passage_id", null);
 
     return { generated, remaining: remaining ?? 0, errors };
   });

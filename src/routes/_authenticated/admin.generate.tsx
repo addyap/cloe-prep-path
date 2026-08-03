@@ -62,13 +62,16 @@ function AdminGenerate() {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
 
   const [audioBusy, setAudioBusy] = useState(false);
-  const [audioStatus, setAudioStatus] = useState<{ generated: number; remaining: number } | null>(
-    null,
-  );
+  const [audioStatus, setAudioStatus] = useState<{
+    generated: number;
+    remaining: number;
+    errors: string[];
+  } | null>(null);
   const [passageAudioBusy, setPassageAudioBusy] = useState(false);
   const [passageAudioStatus, setPassageAudioStatus] = useState<{
     generated: number;
     remaining: number;
+    errors: string[];
   } | null>(null);
 
   const isAdminFn = useServerFn(checkIsAdmin);
@@ -134,7 +137,11 @@ function AdminGenerate() {
     setAudioBusy(true);
     try {
       const res = await audioFn({ data: { limit: 30 } });
-      setAudioStatus({ generated: res.generated, remaining: res.remaining });
+      setAudioStatus({
+        generated: res.generated,
+        remaining: res.remaining,
+        errors: res.errors ?? [],
+      });
       if (res.errors?.length) {
         toast.error(`${res.generated} generated, ${res.errors.length} failed. Try again.`);
       } else if (res.generated === 0) {
@@ -159,7 +166,11 @@ function AdminGenerate() {
     setPassageAudioBusy(true);
     try {
       const res = await passageAudioFn({ data: { limit: 30 } });
-      setPassageAudioStatus({ generated: res.generated, remaining: res.remaining });
+      setPassageAudioStatus({
+        generated: res.generated,
+        remaining: res.remaining,
+        errors: res.errors ?? [],
+      });
       if (res.errors?.length) {
         toast.error(`${res.generated} generated, ${res.errors.length} failed. Try again.`);
       } else if (res.generated === 0) {
@@ -341,9 +352,23 @@ function AdminGenerate() {
             )}
           </Button>
           {audioStatus && !audioBusy && (
-            <p className="text-xs text-center text-muted-foreground">
-              Last run: {audioStatus.generated} generated, {audioStatus.remaining} remaining.
-            </p>
+            <>
+              <p className="text-xs text-center text-muted-foreground">
+                Last run: {audioStatus.generated} generated, {audioStatus.remaining} remaining.
+              </p>
+              {audioStatus.errors.length > 0 && (
+                <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive space-y-1">
+                  {audioStatus.errors.slice(0, 5).map((e, i) => (
+                    <p key={i} className="break-words">
+                      {e}
+                    </p>
+                  ))}
+                  {audioStatus.errors.length > 5 && (
+                    <p>…and {audioStatus.errors.length - 5} more.</p>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </section>
 
@@ -370,10 +395,24 @@ function AdminGenerate() {
             )}
           </Button>
           {passageAudioStatus && !passageAudioBusy && (
-            <p className="text-xs text-center text-muted-foreground">
-              Last run: {passageAudioStatus.generated} generated, {passageAudioStatus.remaining}{" "}
-              remaining.
-            </p>
+            <>
+              <p className="text-xs text-center text-muted-foreground">
+                Last run: {passageAudioStatus.generated} generated, {passageAudioStatus.remaining}{" "}
+                remaining.
+              </p>
+              {passageAudioStatus.errors.length > 0 && (
+                <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive space-y-1">
+                  {passageAudioStatus.errors.slice(0, 5).map((e, i) => (
+                    <p key={i} className="break-words">
+                      {e}
+                    </p>
+                  ))}
+                  {passageAudioStatus.errors.length > 5 && (
+                    <p>…and {passageAudioStatus.errors.length - 5} more.</p>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </section>
 
