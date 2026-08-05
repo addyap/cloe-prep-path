@@ -74,6 +74,7 @@ function ReadingPractice() {
   const [timerEnabled, setTimerEnabled] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const startRef = useRef<number | null>(null);
+  const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -289,6 +290,44 @@ function ReadingPractice() {
   if (!loading && pool.length === 0) {
     return (
       <PracticeErrorState message="No reading passages are available right now. Please try again later." />
+    );
+  }
+
+  if (!started) {
+    return (
+      <AppShell>
+        <div className="p-5 md:p-10 max-w-2xl mx-auto">
+          <Link to="/practice" className="text-sm text-muted-foreground hover:text-foreground">
+            ← All practice
+          </Link>
+          <div className="mt-8 flex items-center gap-3">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <BookOpen className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-bold text-primary">Reading practice</h1>
+          </div>
+          <div className="mt-6 space-y-4 text-sm md:text-base text-foreground/90">
+            <p className="font-semibold">After this session you will be able to:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Read and understand professional emails, reports, and business documents in English.</li>
+              <li>Locate key information, infer meaning from context, and distinguish fact from opinion.</li>
+            </ul>
+            <p className="font-semibold mt-4">How it works:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>You will read {SESSION_PASSAGES} passages, each with several linked questions.</li>
+              <li>Use the optional timer to simulate exam conditions.</li>
+              <li>Answer all questions for a passage, then submit to see detailed feedback.</li>
+              <li>Difficulty adapts based on your answers.</li>
+            </ul>
+          </div>
+          <Button
+            onClick={() => setStarted(true)}
+            className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90"
+          >
+            Start reading <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </AppShell>
     );
   }
 

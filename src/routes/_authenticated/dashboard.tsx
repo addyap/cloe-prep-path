@@ -41,17 +41,32 @@ const SKILLS: { slug: SkillSlug; title: string; icon: typeof Headphones; desc: s
     slug: "listening",
     title: "Listening",
     icon: Headphones,
-    desc: "Phone calls, meetings, announcements.",
+    desc: "Understand calls, meetings, and announcements at your level.",
   },
-  { slug: "reading", title: "Reading", icon: BookOpen, desc: "Emails, reports, documents." },
+  {
+    slug: "reading",
+    title: "Reading",
+    icon: BookOpen,
+    desc: "Read emails, reports, and documents with comprehension.",
+  },
   {
     slug: "grammar_vocab",
     title: "Grammar & Vocab",
     icon: PenLine,
-    desc: "Fix errors, build precision.",
+    desc: "Build accuracy in tenses, prepositions, and business vocabulary.",
   },
-  { slug: "writing", title: "Writing", icon: Pencil, desc: "Professional emails and short texts." },
-  { slug: "speaking", title: "Speaking", icon: Mic, desc: "Respond to realistic prompts." },
+  {
+    slug: "writing",
+    title: "Writing",
+    icon: Pencil,
+    desc: "Write clear professional emails and get AI feedback.",
+  },
+  {
+    slug: "speaking",
+    title: "Speaking",
+    icon: Mic,
+    desc: "Practise spoken responses and get scored on fluency.",
+  },
 ];
 
 function Dashboard() {

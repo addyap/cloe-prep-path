@@ -101,6 +101,7 @@ function ListeningPractice() {
   const [plays, setPlays] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [rate, setRate] = useState(1);
+  const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -399,6 +400,44 @@ function ListeningPractice() {
   if (!loading && pool.length === 0) {
     return (
       <PracticeErrorState message="No listening questions are available right now. Please try again later." />
+    );
+  }
+
+  if (!started) {
+    return (
+      <AppShell>
+        <div className="p-5 md:p-10 max-w-2xl mx-auto">
+          <Link to="/practice" className="text-sm text-muted-foreground hover:text-foreground">
+            ← All practice
+          </Link>
+          <div className="mt-8 flex items-center gap-3">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <Headphones className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-bold text-primary">Listening practice</h1>
+          </div>
+          <div className="mt-6 space-y-4 text-sm md:text-base text-foreground/90">
+            <p className="font-semibold">After this session you will be able to:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Understand short phone calls, meetings, and announcements in professional English.</li>
+              <li>Identify key details, speaker intent, and implied meaning at your current CEFR level.</li>
+            </ul>
+            <p className="font-semibold mt-4">How it works:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>You will hear {SESSION_LENGTH} audio clips — a mix of standalone items and longer dialogues.</li>
+              <li>Each clip can be played up to {MAX_PLAYS} times. Use the speed toggle if you need it slower.</li>
+              <li>Choose the best answer for each question, then submit to see feedback.</li>
+              <li>Difficulty adapts based on your answers.</li>
+            </ul>
+          </div>
+          <Button
+            onClick={() => setStarted(true)}
+            className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90"
+          >
+            Start listening <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </AppShell>
     );
   }
 

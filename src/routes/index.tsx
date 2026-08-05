@@ -9,6 +9,8 @@ import {
   Check,
   Clock,
   BarChart3,
+  ShieldCheck,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicFooter } from "@/components/public-page-shell";
@@ -201,6 +203,44 @@ function Landing() {
               <p className="text-sm text-muted-foreground mt-2">{step.d}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-16 rounded-2xl bg-card border border-border p-8 md:p-10">
+          <h3 className="text-xl md:text-2xl font-bold text-primary">Built by a professional trainer</h3>
+          <p className="mt-3 text-muted-foreground max-w-2xl">
+            CLOE Prep is created by Antony Addy, a certified{" "}
+            <span lang="fr">Formateur Professionnel d'Adultes</span> with over 20 years of
+            experience teaching professional English in France.
+          </p>
+          <div className="mt-6 grid sm:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3">
+              <Award className="h-5 w-5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <div className="font-semibold text-sm">Certified trainer</div>
+                <div className="text-xs text-muted-foreground">
+                  FPA-certified, registered with DREETS (NDA 93830738883)
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="h-5 w-5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <div className="font-semibold text-sm">CEFR-aligned content</div>
+                <div className="text-xs text-muted-foreground">
+                  Every question mapped to A1–C2, mirroring the official exam format
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <GraduationCap className="h-5 w-5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <div className="font-semibold text-sm">20+ years in the field</div>
+                <div className="text-xs text-muted-foreground">
+                  Training professionals across the Var and Alpes-Maritimes
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 rounded-3xl bg-primary text-primary-foreground p-8 md:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
