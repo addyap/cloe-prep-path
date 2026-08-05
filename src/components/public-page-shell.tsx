@@ -9,6 +9,7 @@ const FOOTER_LINKS = [
   { to: "/privacy", label: "Privacy Policy", lang: undefined },
   { to: "/terms", label: "Terms of Service", lang: undefined },
   { to: "/refund-policy", label: "Refund Policy", lang: undefined },
+  { to: "/accessibility", label: "Accessibility", lang: undefined },
   { to: "/mentions-legales", label: "Mentions légales", lang: "fr" as const },
 ];
 
