@@ -4,12 +4,13 @@ import { GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FOOTER_LINKS = [
-  { to: "/pricing", label: "Pricing" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/privacy", label: "Privacy Policy" },
-  { to: "/terms", label: "Terms of Service" },
-  { to: "/refund-policy", label: "Refund Policy" },
-] as const;
+  { to: "/pricing", label: "Pricing", lang: undefined },
+  { to: "/faq", label: "FAQ", lang: undefined },
+  { to: "/privacy", label: "Privacy Policy", lang: undefined },
+  { to: "/terms", label: "Terms of Service", lang: undefined },
+  { to: "/refund-policy", label: "Refund Policy", lang: undefined },
+  { to: "/mentions-legales", label: "Mentions légales", lang: "fr" as const },
+];
 
 export function PublicFooter() {
   return (
@@ -29,7 +30,8 @@ export function PublicFooter() {
             <Link
               key={l.to}
               to={l.to}
-              className="hover:text-foreground underline-offset-2 hover:underline"
+              lang={l.lang}
+              className="py-0.5 hover:text-foreground underline-offset-2 hover:underline"
             >
               {l.label}
             </Link>
@@ -44,23 +46,31 @@ export function PublicFooter() {
 export function PublicPageShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Skip to content
+      </a>
       <header className="px-6 md:px-10 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-lg text-foreground">CLOE Prep</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <Link to="/dashboard">
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-              Get started
-            </Button>
+        <nav aria-label="Main" className="flex items-center justify-between w-full">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg text-foreground">CLOE Prep</span>
           </Link>
-        </div>
+          <div className="flex items-center gap-2">
+            <Link to="/dashboard">
+              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                Get started
+              </Button>
+            </Link>
+          </div>
+        </nav>
       </header>
 
-      <main className="flex-1 px-6 md:px-10 py-10 md:py-16">
+      <main id="main-content" className="flex-1 px-6 md:px-10 py-10 md:py-16">
         <div className="max-w-3xl mx-auto w-full">{children}</div>
       </main>
 

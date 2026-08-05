@@ -47,6 +47,11 @@ function PricingPage() {
           Start free. Upgrade when you're ready for AI-graded writing and speaking practice, plus
           full mock exams.
         </p>
+        <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto">
+          Every plan includes unlimited listening, reading, and grammar &amp; vocabulary practice
+          with adaptive difficulty from A1 to C2 — so you can prepare at your own pace with no
+          session limits.
+        </p>
       </div>
 
       <div className="mt-10 grid sm:grid-cols-2 gap-6">
@@ -89,14 +94,13 @@ function PricingPage() {
               </li>
             ))}
           </ul>
-          <Button
-            disabled
-            className="w-full mt-8 bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            Coming soon
-          </Button>
+          <Link to="/dashboard">
+            <Button className="w-full mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
+              Try Pro free
+            </Button>
+          </Link>
           <p className="mt-2 text-xs text-center text-muted-foreground">
-            Pro billing isn't live yet — every feature is free while we finish testing.
+            Pro billing isn't live yet — every feature is free while we finish setup.
           </p>
         </div>
       </div>

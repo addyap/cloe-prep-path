@@ -7,7 +7,7 @@ export const Route = createFileRoute("/refund-policy")({
       { title: "Refund Policy — CLOE Prep" },
       {
         name: "description",
-        content: "Cancellation and refund terms for CLOE Prep Pro subscriptions.",
+        content: "Cancellation and refund terms for CLOE Prep Pro subscriptions — 14-day cooling-off period, how to cancel, and how to request a refund.",
       },
       { property: "og:url", content: "https://cloe.antonyaddy.com/refund-policy" },
     ],

@@ -1,3 +1,21 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -65,8 +83,8 @@
   --muted: oklch(0.95 0.008 215);
   --muted-foreground: oklch(0.5 0.025 220);
 
-  /* Warm coral #E36414 */
-  --accent: oklch(0.67 0.18 45);
+  /* Warm coral — darkened from 0.67 to 0.56 for WCAG AA contrast (≥4.5:1 on white) */
+  --accent: oklch(0.56 0.17 45);
   --accent-foreground: oklch(0.99 0.005 90);
 
   --destructive: oklch(0.58 0.22 27);
@@ -77,11 +95,11 @@
 
   --border: oklch(0.9 0.01 215);
   --input: oklch(0.92 0.01 215);
-  --ring: oklch(0.67 0.18 45);
+  --ring: oklch(0.56 0.17 45);
 
   --sidebar: oklch(0.32 0.05 215);
   --sidebar-foreground: oklch(0.96 0.01 215);
-  --sidebar-primary: oklch(0.67 0.18 45);
+  --sidebar-primary: oklch(0.56 0.17 45);
   --sidebar-primary-foreground: oklch(0.99 0.005 90);
   --sidebar-accent: oklch(0.38 0.055 215);
   --sidebar-accent-foreground: oklch(0.99 0.005 90);

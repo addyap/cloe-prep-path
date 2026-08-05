@@ -32,29 +32,37 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Nav */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Skip to content
+      </a>
       <header className="px-6 md:px-10 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
+        <nav aria-label="Main" className="flex items-center justify-between w-full">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg text-foreground">CLOE Prep</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/pricing"
+              className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Pricing
+            </Link>
+            <Link to="/dashboard">
+              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                Get started
+              </Button>
+            </Link>
           </div>
-          <span className="font-bold text-lg text-foreground">CLOE Prep</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link
-            to="/pricing"
-            className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            Pricing
-          </Link>
-          <Link to="/dashboard">
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-              Get started
-            </Button>
-          </Link>
-        </div>
+        </nav>
       </header>
 
+      <main id="main-content">
       {/* Hero */}
       <section className="px-6 md:px-10 pt-12 md:pt-20 pb-16 md:pb-24 max-w-6xl mx-auto w-full">
         <div className="max-w-3xl">
@@ -212,6 +220,7 @@ function Landing() {
           </Link>
         </div>
       </section>
+      </main>
 
       <PublicFooter />
     </div>

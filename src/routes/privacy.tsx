@@ -7,7 +7,7 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy Policy — CLOE Prep" },
       {
         name: "description",
-        content: "How CLOE Prep collects, uses, and protects your data.",
+        content: "How CLOE Prep collects, uses, and protects your data — what we store, which third parties we share with, and your GDPR rights.",
       },
       { property: "og:url", content: "https://cloe.antonyaddy.com/privacy" },
     ],
@@ -26,8 +26,9 @@ function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-foreground">1. Who we are</h2>
           <p className="mt-2">
-            CLOE Prep is published by Antony Addy, an independent auto-entrepreneur (certified
-            Formateur Professionnel d'Adultes) registered in France.
+            CLOE Prep is published by Antony Addy, an independent{" "}
+            <span lang="fr">auto-entrepreneur</span> (certified{" "}
+            <span lang="fr">Formateur Professionnel d'Adultes</span>) registered in France.
           </p>
           <p className="mt-2">
             Address: 135 rue Henri Vadon, Résidence des Arènes, 83600 Fréjus, France

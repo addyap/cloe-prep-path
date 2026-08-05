@@ -7,7 +7,7 @@ export const Route = createFileRoute("/terms")({
       { title: "Terms of Service — CLOE Prep" },
       {
         name: "description",
-        content: "The terms that govern your use of CLOE Prep.",
+        content: "The terms that govern your use of CLOE Prep — accounts, acceptable use, subscriptions, AI feedback, and intellectual property.",
       },
       { property: "og:url", content: "https://cloe.antonyaddy.com/terms" },
     ],
