@@ -70,6 +70,7 @@ function GrammarVocabPractice() {
   const [draftChips, setDraftChips] = useState<Chip[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [done, setDone] = useState(false);
+  const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
   const [elapsed, setElapsed] = useState(0);
   const startedAt = useRef<number | null>(null);
   const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -138,6 +139,16 @@ function GrammarVocabPractice() {
                 (q.type === "reconstruction" && q.options.length >= 3)),
           );
         setPool(list);
+
+        if (u.user) {
+          const { data: missed } = await supabase
+            .from("attempts")
+            .select("question_id")
+            .eq("user_id", u.user.id)
+            .eq("skill", "grammar_vocab")
+            .eq("is_correct", false);
+          if (missed) setMissedIds(new Set(missed.map((r) => r.question_id)));
+        }
       } catch (err) {
         console.error(err);
         setError("We couldn't load these questions. Please try again.");
@@ -159,11 +170,14 @@ function GrammarVocabPractice() {
       }
       for (const lv of tryLevels) {
         const m = remaining.filter((q) => q.cefr_level === lv);
-        if (m.length) return m[Math.floor(Math.random() * m.length)];
+        if (!m.length) continue;
+        const review = m.filter((q) => missedIds.has(q.id));
+        const pick = review.length ? review : m;
+        return pick[Math.floor(Math.random() * pick.length)];
       }
       return remaining[0];
     },
-    [pool],
+    [pool, missedIds],
   );
 
   // Start first question
@@ -670,6 +684,24 @@ function Summary({
               )}
             </div>
           )}
+
+          <div className="mt-6 rounded-2xl bg-muted/40 p-4">
+            <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+              What's next
+            </div>
+            <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
+              {accuracy < 50 && (
+                <li>Below 50% — review the explanations above, then try a focused drill on fewer sub-topics.</li>
+              )}
+              {accuracy >= 50 && accuracy < 80 && tagStats[0] && tagStats[0].acc < 0.6 && (
+                <li>Drill <span className="font-semibold capitalize">{tagStats[0].tag.replace(/_/g, " ")}</span> on its own to bring up your weakest area.</li>
+              )}
+              {accuracy >= 80 && (
+                <li>Solid accuracy. Try a <Link to="/practice/writing" className="underline font-semibold">writing exercise</Link> to put your grammar into practice.</li>
+              )}
+              <li>Questions you got wrong will appear more often in future sessions — spacing builds long-term memory.</li>
+            </ul>
+          </div>
 
           <div className="mt-8 flex gap-3 justify-center">
             <Button

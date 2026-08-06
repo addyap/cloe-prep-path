@@ -76,6 +76,7 @@ function ReadingPractice() {
   const startRef = useRef<number | null>(null);
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
+  const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
@@ -129,6 +130,16 @@ function ReadingPractice() {
           }))
           .filter((p) => p.questions.length > 0);
         setPool(passages);
+
+        if (u.user) {
+          const { data: missed } = await supabase
+            .from("attempts")
+            .select("question_id")
+            .eq("user_id", u.user.id)
+            .eq("skill", "reading")
+            .eq("is_correct", false);
+          if (missed) setMissedIds(new Set(missed.map((r) => r.question_id)));
+        }
       } catch (err) {
         console.error(err);
         setError("We couldn't load the reading passages. Please try again.");
@@ -142,6 +153,9 @@ function ReadingPractice() {
     (forLevel: Level, askedIds: Set<string>): Passage | null => {
       const remaining = pool.filter((p) => !askedIds.has(p.id));
       if (!remaining.length) return null;
+
+      const hasMissed = (p: Passage) => p.questions.some((q) => missedIds.has(q.id));
+
       const tryLevels: Level[] = [forLevel];
       for (let d = 1; d < LEVELS.length; d++) {
         const i = LEVELS.indexOf(forLevel);
@@ -150,11 +164,14 @@ function ReadingPractice() {
       }
       for (const lv of tryLevels) {
         const m = remaining.filter((p) => p.cefr_level === lv);
-        if (m.length) return m[Math.floor(Math.random() * m.length)];
+        if (!m.length) continue;
+        const review = m.filter(hasMissed);
+        const pick = review.length ? review : m;
+        return pick[Math.floor(Math.random() * pick.length)];
       }
       return remaining[0];
     },
-    [pool],
+    [pool, missedIds],
   );
 
   // Start first passage
@@ -580,6 +597,27 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
               value={weakestTag ? weakestTag.tag.replace("_", " ") : "—"}
               sub={weakestTag ? `${weakestTag.right}/${weakestTag.total} correct` : ""}
             />
+          </div>
+
+          <div className="mt-6 rounded-2xl bg-muted/40 p-4">
+            <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+              What's next
+            </div>
+            <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
+              {accuracy < 50 && (
+                <li>Below 50% — try shorter, simpler passages to build comprehension before stepping up.</li>
+              )}
+              {accuracy >= 50 && accuracy < 80 && weakestTag && (
+                <li>Focus on <span className="font-semibold capitalize">{weakestTag.tag.replace("_", " ")}</span> passages — it was your weakest topic this session.</li>
+              )}
+              {accuracy >= 80 && (
+                <li>Great reading session. Try a <Link to="/practice/grammar-vocab" className="underline font-semibold">grammar drill</Link> to sharpen accuracy in your writing too.</li>
+              )}
+              {wpm !== null && wpm < 150 && (
+                <li>Your reading speed ({wpm} WPM) is below the exam pace — timed practice will help.</li>
+              )}
+              <li>Re-read passages you found difficult — noticing what you missed builds retention.</li>
+            </ul>
           </div>
 
           <div className="mt-8 flex gap-3 justify-center">

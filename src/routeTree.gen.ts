@@ -9,66 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AccessibilityRouteImport } from './routes/accessibility'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedMockExamRouteImport } from './routes/_authenticated/mock-exam'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AccessibilityRouteImport } from './routes/accessibility'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as LegalNoticeRouteImport } from './routes/legal-notice'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
-import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
-import { Route as ApiSpeakingEvaluateRouteImport } from './routes/api/speaking/evaluate'
-import { Route as AuthenticatedPracticeWritingRouteImport } from './routes/_authenticated/practice.writing'
-import { Route as AuthenticatedPracticeWordBankRouteImport } from './routes/_authenticated/practice.word-bank'
-import { Route as AuthenticatedPracticeSpeakingRouteImport } from './routes/_authenticated/practice.speaking'
-import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
-import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
-import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
+import { Route as AuthenticatedMockExamRouteImport } from './routes/_authenticated/mock-exam'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedAdminGenerateRouteImport } from './routes/_authenticated/admin.generate'
+import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
+import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
+import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
+import { Route as AuthenticatedPracticeReadingRouteImport } from './routes/_authenticated/practice.reading'
+import { Route as AuthenticatedPracticeSpeakingRouteImport } from './routes/_authenticated/practice.speaking'
+import { Route as AuthenticatedPracticeWordBankRouteImport } from './routes/_authenticated/practice.word-bank'
+import { Route as AuthenticatedPracticeWritingRouteImport } from './routes/_authenticated/practice.writing'
+import { Route as ApiSpeakingEvaluateRouteImport } from './routes/api/speaking/evaluate'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RefundPolicyRoute = RefundPolicyRouteImport.update({
-  id: '/refund-policy',
-  path: '/refund-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
-  id: '/mentions-legales',
-  path: '/mentions-legales',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessibilityRoute = AccessibilityRouteImport.update({
@@ -76,33 +51,49 @@ const AccessibilityRoute = AccessibilityRouteImport.update({
   path: '/accessibility',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
-  id: '/progress',
-  path: '/progress',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const LegalNoticeRoute = LegalNoticeRouteImport.update({
+  id: '/legal-notice',
+  path: '/legal-notice',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedPracticeRoute = AuthenticatedPracticeRouteImport.update({
-  id: '/practice',
-  path: '/practice',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMockExamRoute = AuthenticatedMockExamRouteImport.update({
@@ -110,55 +101,36 @@ const AuthenticatedMockExamRoute = AuthenticatedMockExamRouteImport.update({
   path: '/mock-exam',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPracticeRoute = AuthenticatedPracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminGenerateRoute =
+  AuthenticatedAdminGenerateRouteImport.update({
+    id: '/admin/generate',
+    path: '/admin/generate',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPracticeIndexRoute =
   AuthenticatedPracticeIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedPracticeRoute,
-  } as any)
-const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
-  id: '/api/stripe/webhook',
-  path: '/api/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSpeakingEvaluateRoute = ApiSpeakingEvaluateRouteImport.update({
-  id: '/api/speaking/evaluate',
-  path: '/api/speaking/evaluate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedPracticeWritingRoute =
-  AuthenticatedPracticeWritingRouteImport.update({
-    id: '/writing',
-    path: '/writing',
-    getParentRoute: () => AuthenticatedPracticeRoute,
-  } as any)
-const AuthenticatedPracticeWordBankRoute =
-  AuthenticatedPracticeWordBankRouteImport.update({
-    id: '/word-bank',
-    path: '/word-bank',
-    getParentRoute: () => AuthenticatedPracticeRoute,
-  } as any)
-const AuthenticatedPracticeSpeakingRoute =
-  AuthenticatedPracticeSpeakingRouteImport.update({
-    id: '/speaking',
-    path: '/speaking',
-    getParentRoute: () => AuthenticatedPracticeRoute,
-  } as any)
-const AuthenticatedPracticeReadingRoute =
-  AuthenticatedPracticeReadingRouteImport.update({
-    id: '/reading',
-    path: '/reading',
-    getParentRoute: () => AuthenticatedPracticeRoute,
-  } as any)
-const AuthenticatedPracticeListeningRoute =
-  AuthenticatedPracticeListeningRouteImport.update({
-    id: '/listening',
-    path: '/listening',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
 const AuthenticatedPracticeGrammarVocabRoute =
@@ -167,18 +139,53 @@ const AuthenticatedPracticeGrammarVocabRoute =
     path: '/grammar-vocab',
     getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
-const AuthenticatedAdminGenerateRoute =
-  AuthenticatedAdminGenerateRouteImport.update({
-    id: '/admin/generate',
-    path: '/admin/generate',
-    getParentRoute: () => AuthenticatedRouteRoute,
+const AuthenticatedPracticeListeningRoute =
+  AuthenticatedPracticeListeningRouteImport.update({
+    id: '/listening',
+    path: '/listening',
+    getParentRoute: () => AuthenticatedPracticeRoute,
   } as any)
+const AuthenticatedPracticeReadingRoute =
+  AuthenticatedPracticeReadingRouteImport.update({
+    id: '/reading',
+    path: '/reading',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
+const AuthenticatedPracticeSpeakingRoute =
+  AuthenticatedPracticeSpeakingRouteImport.update({
+    id: '/speaking',
+    path: '/speaking',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
+const AuthenticatedPracticeWordBankRoute =
+  AuthenticatedPracticeWordBankRouteImport.update({
+    id: '/word-bank',
+    path: '/word-bank',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
+const AuthenticatedPracticeWritingRoute =
+  AuthenticatedPracticeWritingRouteImport.update({
+    id: '/writing',
+    path: '/writing',
+    getParentRoute: () => AuthenticatedPracticeRoute,
+  } as any)
+const ApiSpeakingEvaluateRoute = ApiSpeakingEvaluateRouteImport.update({
+  id: '/api/speaking/evaluate',
+  path: '/api/speaking/evaluate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
+  '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
+  '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
+  '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/faq'
+    | '/legal-notice'
     | '/mentions-legales'
     | '/pricing'
     | '/privacy'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/faq'
+    | '/legal-notice'
     | '/mentions-legales'
     | '/pricing'
     | '/privacy'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/faq'
+    | '/legal-notice'
     | '/mentions-legales'
     | '/pricing'
     | '/privacy'
@@ -346,6 +358,7 @@ export interface RootRouteChildren {
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
   FaqRoute: typeof FaqRoute
+  LegalNoticeRoute: typeof LegalNoticeRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -357,60 +370,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refund-policy': {
-      id: '/refund-policy'
-      path: '/refund-policy'
-      fullPath: '/refund-policy'
-      preLoaderRoute: typeof RefundPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mentions-legales': {
-      id: '/mentions-legales'
-      path: '/mentions-legales'
-      fullPath: '/mentions-legales'
-      preLoaderRoute: typeof MentionsLegalesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/accessibility': {
-      id: '/accessibility'
-      path: '/accessibility'
-      fullPath: '/accessibility'
-      preLoaderRoute: typeof AccessibilityRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -420,39 +384,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/accessibility': {
+      id: '/accessibility'
+      path: '/accessibility'
+      fullPath: '/accessibility'
+      preLoaderRoute: typeof AccessibilityRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/progress': {
-      id: '/_authenticated/progress'
-      path: '/progress'
-      fullPath: '/progress'
-      preLoaderRoute: typeof AuthenticatedProgressRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/practice': {
-      id: '/_authenticated/practice'
-      path: '/practice'
-      fullPath: '/practice'
-      preLoaderRoute: typeof AuthenticatedPracticeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/legal-notice': {
+      id: '/legal-notice'
+      path: '/legal-notice'
+      fullPath: '/legal-notice'
+      preLoaderRoute: typeof LegalNoticeRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mock-exam': {
@@ -462,11 +461,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMockExamRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/practice': {
+      id: '/_authenticated/practice'
+      path: '/practice'
+      fullPath: '/practice'
+      preLoaderRoute: typeof AuthenticatedPracticeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/progress': {
+      id: '/_authenticated/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof AuthenticatedProgressRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/generate': {
+      id: '/_authenticated/admin/generate'
+      path: '/admin/generate'
+      fullPath: '/admin/generate'
+      preLoaderRoute: typeof AuthenticatedAdminGenerateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/practice/': {
@@ -476,46 +503,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeIndexRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
-    '/api/stripe/webhook': {
-      id: '/api/stripe/webhook'
-      path: '/api/stripe/webhook'
-      fullPath: '/api/stripe/webhook'
-      preLoaderRoute: typeof ApiStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/speaking/evaluate': {
-      id: '/api/speaking/evaluate'
-      path: '/api/speaking/evaluate'
-      fullPath: '/api/speaking/evaluate'
-      preLoaderRoute: typeof ApiSpeakingEvaluateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/practice/writing': {
-      id: '/_authenticated/practice/writing'
-      path: '/writing'
-      fullPath: '/practice/writing'
-      preLoaderRoute: typeof AuthenticatedPracticeWritingRouteImport
-      parentRoute: typeof AuthenticatedPracticeRoute
-    }
-    '/_authenticated/practice/word-bank': {
-      id: '/_authenticated/practice/word-bank'
-      path: '/word-bank'
-      fullPath: '/practice/word-bank'
-      preLoaderRoute: typeof AuthenticatedPracticeWordBankRouteImport
-      parentRoute: typeof AuthenticatedPracticeRoute
-    }
-    '/_authenticated/practice/speaking': {
-      id: '/_authenticated/practice/speaking'
-      path: '/speaking'
-      fullPath: '/practice/speaking'
-      preLoaderRoute: typeof AuthenticatedPracticeSpeakingRouteImport
-      parentRoute: typeof AuthenticatedPracticeRoute
-    }
-    '/_authenticated/practice/reading': {
-      id: '/_authenticated/practice/reading'
-      path: '/reading'
-      fullPath: '/practice/reading'
-      preLoaderRoute: typeof AuthenticatedPracticeReadingRouteImport
+    '/_authenticated/practice/grammar-vocab': {
+      id: '/_authenticated/practice/grammar-vocab'
+      path: '/grammar-vocab'
+      fullPath: '/practice/grammar-vocab'
+      preLoaderRoute: typeof AuthenticatedPracticeGrammarVocabRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
     '/_authenticated/practice/listening': {
@@ -525,19 +517,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPracticeListeningRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
-    '/_authenticated/practice/grammar-vocab': {
-      id: '/_authenticated/practice/grammar-vocab'
-      path: '/grammar-vocab'
-      fullPath: '/practice/grammar-vocab'
-      preLoaderRoute: typeof AuthenticatedPracticeGrammarVocabRouteImport
+    '/_authenticated/practice/reading': {
+      id: '/_authenticated/practice/reading'
+      path: '/reading'
+      fullPath: '/practice/reading'
+      preLoaderRoute: typeof AuthenticatedPracticeReadingRouteImport
       parentRoute: typeof AuthenticatedPracticeRoute
     }
-    '/_authenticated/admin/generate': {
-      id: '/_authenticated/admin/generate'
-      path: '/admin/generate'
-      fullPath: '/admin/generate'
-      preLoaderRoute: typeof AuthenticatedAdminGenerateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_authenticated/practice/speaking': {
+      id: '/_authenticated/practice/speaking'
+      path: '/speaking'
+      fullPath: '/practice/speaking'
+      preLoaderRoute: typeof AuthenticatedPracticeSpeakingRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
+    '/_authenticated/practice/word-bank': {
+      id: '/_authenticated/practice/word-bank'
+      path: '/word-bank'
+      fullPath: '/practice/word-bank'
+      preLoaderRoute: typeof AuthenticatedPracticeWordBankRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
+    '/_authenticated/practice/writing': {
+      id: '/_authenticated/practice/writing'
+      path: '/writing'
+      fullPath: '/practice/writing'
+      preLoaderRoute: typeof AuthenticatedPracticeWritingRouteImport
+      parentRoute: typeof AuthenticatedPracticeRoute
+    }
+    '/api/speaking/evaluate': {
+      id: '/api/speaking/evaluate'
+      path: '/api/speaking/evaluate'
+      fullPath: '/api/speaking/evaluate'
+      preLoaderRoute: typeof ApiSpeakingEvaluateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -597,6 +617,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
   FaqRoute: FaqRoute,
+  LegalNoticeRoute: LegalNoticeRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -608,13 +629,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -103,6 +103,7 @@ function ListeningPractice() {
   const [rate, setRate] = useState(1);
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
+  const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
@@ -176,6 +177,16 @@ function ListeningPractice() {
           .filter((p) => p.questions.length > 0);
 
         setPool([...singleUnits, ...passageUnits]);
+
+        if (u.user) {
+          const { data: missed } = await supabase
+            .from("attempts")
+            .select("question_id")
+            .eq("user_id", u.user.id)
+            .eq("skill", "listening")
+            .eq("is_correct", false);
+          if (missed) setMissedIds(new Set(missed.map((r) => r.question_id)));
+        }
       } catch (err) {
         console.error(err);
         setError("We couldn't load the listening questions. Please try again.");
@@ -189,6 +200,12 @@ function ListeningPractice() {
     (forLevel: Level, askedIds: Set<string>): SessionUnit | null => {
       const remaining = pool.filter((u) => !askedIds.has(u.id));
       if (remaining.length === 0) return null;
+
+      const isMissed = (u: SessionUnit) =>
+        u.kind === "single"
+          ? missedIds.has(u.id)
+          : u.questions.some((q) => missedIds.has(q.id));
+
       const tryLevels: Level[] = [forLevel];
       for (let d = 1; d < LEVELS.length; d++) {
         const idx = LEVELS.indexOf(forLevel);
@@ -197,11 +214,14 @@ function ListeningPractice() {
       }
       for (const lv of tryLevels) {
         const match = remaining.filter((u) => u.cefr_level === lv);
-        if (match.length) return match[Math.floor(Math.random() * match.length)];
+        if (!match.length) continue;
+        const review = match.filter(isMissed);
+        const pick = review.length ? review : match;
+        return pick[Math.floor(Math.random() * pick.length)];
       }
       return remaining[0];
     },
-    [pool],
+    [pool, missedIds],
   );
 
   // Start first unit once pool ready
@@ -827,6 +847,24 @@ function Summary({ results, estimatedLevel }: { results: UnitResult[]; estimated
               </div>
             </div>
           )}
+
+          <div className="mt-6 rounded-2xl bg-muted/40 p-4">
+            <div className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
+              What's next
+            </div>
+            <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
+              {accuracy < 50 && (
+                <li>Your accuracy is below 50% — try practising at a lower level to build confidence, then come back.</li>
+              )}
+              {accuracy >= 50 && accuracy < 80 && weakest && (
+                <li>Focus on <span className="font-semibold capitalize">{weakest.tag.replace("_", " ")}</span> — it was your weakest context this session.</li>
+              )}
+              {accuracy >= 80 && (
+                <li>Strong session. Try a <Link to="/practice/reading" className="underline font-semibold">reading drill</Link> to round out your comprehension skills.</li>
+              )}
+              <li>Short, frequent sessions beat long cramming — aim for 10–15 minutes daily.</li>
+            </ul>
+          </div>
 
           <div className="mt-8 flex gap-3 justify-center">
             <Button
