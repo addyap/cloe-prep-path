@@ -82,10 +82,12 @@ function PricingPage() {
           </div>
           <div className="text-sm font-semibold uppercase tracking-wide text-accent">Pro</div>
           <div className="mt-2 text-4xl font-extrabold text-foreground">
-            {PRO_PRICE_DISPLAY}
-            <span className="text-base font-medium text-muted-foreground">/month</span>
+            Free
+            <span className="text-base font-medium text-muted-foreground"> during beta</span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">Cancel anytime.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Planned price: {PRO_PRICE_DISPLAY}/month once billing goes live.
+          </p>
           <ul className="mt-6 space-y-2.5">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm">
@@ -100,7 +102,7 @@ function PricingPage() {
             </Button>
           </Link>
           <p className="mt-2 text-xs text-center text-muted-foreground">
-            Pro billing isn't live yet — every feature is free while we finish setup.
+            Every Pro feature is free while we're in beta — no card needed.
           </p>
         </div>
       </div>
