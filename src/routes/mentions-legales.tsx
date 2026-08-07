@@ -41,6 +41,9 @@ function MentionsLegalesPage() {
               <strong>SIRET&nbsp;:</strong> 48317889300028
             </li>
             <li>
+              <strong>TVA&nbsp;:</strong> TVA non applicable, art. 293 B du CGI
+            </li>
+            <li>
               <strong>Adresse&nbsp;:</strong> 135 rue Henri Vadon, Résidence des Arènes, 83600 Fréjus,
               France
             </li>
