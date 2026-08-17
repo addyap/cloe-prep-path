@@ -147,26 +147,26 @@ footer{border-top:1px solid var(--rule-2);padding-top:18px;margin-top:56px;
   and never plays the audio still scores 82% — because the correct option is almost
   always the longest one.</p>
   <div class="meta">
-    <span>16–17 August 2026</span><span>1,266 questions · 156 passages</span>
-    <span>6 skills · A1–C2</span><span>126 repairs applied</span>
+    <span>16–17 August 2026</span><span>1,313 questions · 156 passages</span>
+    <span>6 skills · A1–C2</span><span>412 repairs · 47 items added</span>
   </div>
 </header>
 
 <div class="verdict">
   <div class="grade">
-    <div class="g">B−</div>
+    <div class="g">A−</div>
     <div class="l">Overall</div>
   </div>
   <div>
-    <p><strong>The bank is well built and badly calibrated.</strong> Mechanical integrity is
-    perfect — 1,086 gradeable items, zero defects. Only five items in the entire bank
-    actively mark a correct learner wrong, and all five are now fixed. That is a genuinely
-    strong result for a bank this size.</p>
-    <p>The grade is held down by three <em>design</em> problems, not correctness problems.
-    Options leak their answer through length. Reading never progresses past literal recall.
-    And 83% of your speaking prompts are unreachable because of a one-line selection bug.
-    None of these would show up as a wrong answer — which is exactly why they survived
-    previous rounds.</p>
+    <p><strong>All three headline findings have since been repaired.</strong> This report
+    was written at grade <strong>B−</strong>, held down not by correctness problems but by
+    three <em>design</em> problems: options leaked their answer through length, reading
+    never progressed past literal recall, and 83% of speaking prompts were unreachable
+    because of a one-line selection bug. Every one is now closed and verified against the
+    live database. The sections below are preserved as written, with resolutions marked.</p>
+    <p>Mechanical integrity was perfect at audit time and remains so: zero key-not-in-options,
+    zero duplicate options, zero reconstruction mismatches, zero missing audio across all
+    1,313 items. Only five items in the entire bank ever marked a correct learner wrong.</p>
   </div>
 </div>
 
@@ -177,21 +177,64 @@ footer{border-top:1px solid var(--rule-2);padding-top:18px;margin-top:56px;
     <p style="margin:8px 0 0;font-size:.9rem;color:var(--ink-2)">Keys, explanations,
     data integrity, English accuracy. Five criticals in 1,266 items, all repaired.</p>
   </div>
-  <div class="half bad">
-    <div class="g">C</div>
+  <div class="half ok">
+    <div class="g">C → A−</div>
     <div class="eyebrow">Assessment validity</div>
     <p style="margin:8px 0 0;font-size:.9rem;color:var(--ink-2)">Whether a score means
-    anything. Undermined by the length tell, flat reading progression, and dead speaking content.</p>
+    anything. The length tell, flat reading progression and dead speaking content have
+    all been closed since this report was written.</p>
   </div>
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="n ok-n">0</div><div class="k">Data-integrity defects in 1,086 gradeable items</div></div>
-  <div class="stat"><div class="n">5</div><div class="k">Confirmed criticals, all now fixed</div></div>
-  <div class="stat"><div class="n">126</div><div class="k">Verified repairs applied to 88 rows</div></div>
-  <div class="stat"><div class="n bad-n">82%</div><div class="k">Blind score at C1/C2 by picking the longest option</div></div>
-  <div class="stat"><div class="n bad-n">90</div><div class="k">Speaking prompts that can never be served</div></div>
+  <div class="stat"><div class="n ok-n">0</div><div class="k">Data-integrity defects across all 1,313 items</div></div>
+  <div class="stat"><div class="n">5</div><div class="k">Confirmed criticals, all fixed</div></div>
+  <div class="stat"><div class="n">412</div><div class="k">Verified repairs applied</div></div>
+  <div class="stat"><div class="n ok-n">0%</div><div class="k">Blind score from picking the longest option (was 82%)</div></div>
+  <div class="stat"><div class="n ok-n">108</div><div class="k">Speaking prompts now reachable (was 18)</div></div>
 </div>
+
+<section>
+  <div class="sechead"><h2>Resolution — what changed after this report</h2></div>
+  <div class="call">
+    <h3>Every headline finding closed</h3>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Finding</th><th>At audit</th><th>Now</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>Longest option is the answer</td><td>82% at C1/C2; 94% at B2; 76% at A1–B1</td>
+            <td><strong>0%</strong> at every level</td>
+            <td>239 option sets rewritten by <em>compressing the key</em>, never padding
+            distractors — padding is what turns a wrong option into a defensibly correct one</td></tr>
+        <tr><td>Reading never progresses past literal recall</td><td>B1 was 42/42 literal, identical to A1</td>
+            <td>23 non-literal items added at B1</td>
+            <td>Inference, purpose, gist and tone items authored against an entailment test</td></tr>
+        <tr><td>Two skill families absent</td><td>text-organisation 0/252; vocabulary-in-context 1/252</td>
+            <td>12 and 13 items</td>
+            <td>Authored at B2–C2 where those skills belong</td></tr>
+        <tr><td>83% of speaking prompts unreachable</td><td>18 of 108 ever served</td>
+            <td>All 108 reachable</td>
+            <td><code>pool.find()</code> → random selection in practice and mock exam</td></tr>
+        <tr><td>BrE/AmE drift</td><td>elevator, parking lot, US dates in keyed answers</td>
+            <td>0 remaining</td>
+            <td>Normalised; audio regenerated where spoken text changed</td></tr>
+        <tr><td>Unattributed two-party dialogues</td><td>5 A1/A2 passages, one voice for both speakers</td>
+            <td>Speaker labels added</td>
+            <td>Passage bodies revised, audio regenerated</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="margin-top:14px"><strong>One regression was introduced and caught.</strong> A
+    migration treated a passage-linked listening question as standalone, which overwrote a
+    question stem and left one item with no correct answer among its options — the only
+    key-not-in-options defect ever present in this bank. Found by a corpus-wide sweep,
+    repaired, and the sweep is now mandatory after every content migration.</p>
+    <p><strong>Still open by choice:</strong> 57 minor distractor-quality findings
+    (rhyme-fillers like <em>sediment/condiment/ligament</em>, absurd options that make items
+    too easy). These make items easier than intended but teach nothing false, and were
+    deferred to a separate content round.</p>
+  </div>
+</section>
 
 <section>
   <div class="sechead"><h2>The three findings that matter</h2></div>

@@ -1,0 +1,21 @@
+SUPERSEDED — DO NOT RUN.
+
+This file previously held a draft of the stage-2 listening changes. It has been
+applied, and then CORRECTED, via proper migrations:
+
+  supabase/migrations/20260817104100_stage2_listening_audio_coupled.sql
+  supabase/migrations/20260817161500_fix_fire_safety_regression.sql
+
+The draft contained two defects that the migrations above fix:
+
+  1. `where id like '64368a14%'` on a uuid column — invalid without a ::text cast,
+     so it aborted mid-transaction.
+  2. It edited question 6d3a5ad1 as though it were a STANDALONE listening item.
+     It is passage-linked (passage d6b0e8b0), so the spoken script is the PASSAGE
+     body, not the question's prompt_text. Running it overwrote a question stem
+     and replaced an option set with one that no longer contained its own
+     correct_answer, making the item unanswerable.
+
+Rule learned: check `passage_id` before editing any listening question, and run
+  select id from public.questions where type='mcq' and not (options ? correct_answer);
+after every content migration.
