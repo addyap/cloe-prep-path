@@ -69,8 +69,8 @@ function pickPromptForPhase(prompts: Prompt[], phase: Phase, target: Level | nul
   const pool = prompts.filter((p) => p.context_tag === phase);
   if (!pool.length) return null;
   if (target) {
-    const exact = pool.find((p) => p.cefr_level === target);
-    if (exact) return exact;
+    const exact = pool.filter((p) => p.cefr_level === target);
+    if (exact.length) return exact[Math.floor(Math.random() * exact.length)];
   }
   return pool[Math.floor(Math.random() * pool.length)];
 }

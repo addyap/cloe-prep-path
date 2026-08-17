@@ -699,14 +699,15 @@ function WrittenBreak({ written, onContinue }: { written: Answered[]; onContinue
 function pickOralForPhase(prompts: Question[], phase: Phase, target: Level): Question | null {
   const pool = prompts.filter((p) => p.context_tag === phase);
   if (!pool.length) return null;
-  const exact = pool.find((p) => p.cefr_level === target);
-  if (exact) return exact;
-  pool.sort(
-    (a, b) =>
-      Math.abs(LEVEL_TO_NUM[a.cefr_level] - LEVEL_TO_NUM[target]) -
-      Math.abs(LEVEL_TO_NUM[b.cefr_level] - LEVEL_TO_NUM[target]),
+  const exact = pool.filter((p) => p.cefr_level === target);
+  if (exact.length) return exact[Math.floor(Math.random() * exact.length)];
+  const minDist = Math.min(
+    ...pool.map((p) => Math.abs(LEVEL_TO_NUM[p.cefr_level] - LEVEL_TO_NUM[target])),
   );
-  return pool[0];
+  const nearest = pool.filter(
+    (p) => Math.abs(LEVEL_TO_NUM[p.cefr_level] - LEVEL_TO_NUM[target]) === minDist,
+  );
+  return nearest[Math.floor(Math.random() * nearest.length)];
 }
 
 function OralRunner({
