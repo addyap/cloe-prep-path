@@ -1,0 +1,522 @@
+<title>CLOE Content Audit</title>
+<style>
+:root{
+  --paper:#FBFAF8; --surface:#FFFFFF; --sunk:#F3F1ED;
+  --ink:#1A1D23; --ink-2:#4A5260; --ink-3:#727C8C;
+  --rule:#E0DCD4; --rule-2:#CFC9BF;
+  --accent:#2C3A80; --accent-soft:#E8EAF4;
+  --crit:#9E2A38; --crit-bg:#F7E9EA;
+  --major:#9A6114; --major-bg:#F8EFE0;
+  --minor:#5A6472; --minor-bg:#EDEFF2;
+  --good:#1B6353; --good-bg:#E4F0EC;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#131519; --surface:#1A1D23; --sunk:#20242B;
+  --ink:#ECEAE5; --ink-2:#B3B9C4; --ink-3:#848C99;
+  --rule:#2C313A; --rule-2:#3C424D;
+  --accent:#9DAAE8; --accent-soft:#232945;
+  --crit:#E8929C; --crit-bg:#361E22;
+  --major:#E0AE6A; --major-bg:#33271583;
+  --minor:#9AA3B1; --minor-bg:#23272E;
+  --good:#78C8B2; --good-bg:#16302A;
+}}
+:root[data-theme="dark"]{
+  --paper:#131519; --surface:#1A1D23; --sunk:#20242B;
+  --ink:#ECEAE5; --ink-2:#B3B9C4; --ink-3:#848C99;
+  --rule:#2C313A; --rule-2:#3C424D;
+  --accent:#9DAAE8; --accent-soft:#232945;
+  --crit:#E8929C; --crit-bg:#361E22;
+  --major:#E0AE6A; --major-bg:#332715;
+  --minor:#9AA3B1; --minor-bg:#23272E;
+  --good:#78C8B2; --good-bg:#16302A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 96px}
+h1,h2,h3{text-wrap:balance;font-family:var(--serif);font-weight:600;letter-spacing:-.01em}
+h2{font-size:1.55rem;margin:0 0 4px}
+h3{font-size:1.1rem;margin:0 0 8px}
+p{margin:0 0 14px;max-width:68ch}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.86em;background:var(--sunk);
+  padding:1px 5px;border-radius:3px;border:1px solid var(--rule)}
+.eyebrow{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--ink-3);font-weight:600}
+
+/* masthead */
+header.mast{border-bottom:2px solid var(--ink);padding:44px 0 20px;margin-bottom:34px}
+header.mast h1{font-size:2.7rem;margin:6px 0 12px;line-height:1.08}
+.standfirst{font-size:1.1rem;color:var(--ink-2);max-width:64ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:20px;
+  font-size:.8rem;color:var(--ink-3);font-family:var(--mono)}
+
+/* verdict */
+.verdict{display:grid;grid-template-columns:minmax(0,150px) 1fr;gap:28px;
+  background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  padding:26px;margin-bottom:14px}
+.grade{text-align:center;border-right:1px solid var(--rule);padding-right:22px}
+.grade .g{font-family:var(--serif);font-size:4rem;line-height:1;color:var(--accent)}
+.grade .l{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink-3);margin-top:8px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0 34px}
+.half{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:18px 20px}
+.half .g{font-family:var(--serif);font-size:2rem;line-height:1;margin-bottom:4px}
+.half.ok .g{color:var(--good)} .half.bad .g{color:var(--major)}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:4px;overflow:hidden;margin:0 0 38px}
+.stat{background:var(--surface);padding:16px 18px}
+.stat .n{font-family:var(--mono);font-size:1.65rem;font-variant-numeric:tabular-nums;
+  line-height:1.1;letter-spacing:-.02em}
+.stat .k{font-size:.72rem;color:var(--ink-3);margin-top:5px;line-height:1.35}
+
+section{margin:0 0 46px;scroll-margin-top:20px}
+.sechead{border-bottom:1px solid var(--rule-2);padding-bottom:8px;margin-bottom:20px}
+
+/* callout */
+.call{border-left:3px solid var(--crit);background:var(--crit-bg);
+  padding:18px 22px;border-radius:0 4px 4px 0;margin:0 0 20px}
+.call.good{border-left-color:var(--good);background:var(--good-bg)}
+.call.note{border-left-color:var(--accent);background:var(--accent-soft)}
+.call h3{margin-bottom:6px}
+.call p:last-child{margin-bottom:0}
+
+/* tables */
+.scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink-3);padding:11px 14px;border-bottom:1px solid var(--rule-2);
+  background:var(--sunk);white-space:nowrap;font-weight:600}
+td{padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.bad-n{color:var(--crit);font-weight:600}
+.ok-n{color:var(--good);font-weight:600}
+
+.pill{display:inline-block;font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;
+  font-weight:700;padding:2px 7px;border-radius:2px;white-space:nowrap}
+.p-crit{background:var(--crit-bg);color:var(--crit);box-shadow:inset 0 0 0 1px var(--crit)}
+.p-major{background:var(--major-bg);color:var(--major);box-shadow:inset 0 0 0 1px var(--major)}
+.p-minor{background:var(--minor-bg);color:var(--minor);box-shadow:inset 0 0 0 1px var(--minor)}
+.p-fixed{background:var(--good-bg);color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.p-flag{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+
+.item{font-family:var(--mono);font-size:.8rem;color:var(--ink-2);
+  background:var(--sunk);padding:2px 5px;border-radius:3px;display:inline-block}
+
+/* funnel */
+.funnel{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin-bottom:18px}
+.fstep{flex:1 1 130px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:4px;padding:14px 16px}
+.fstep .n{font-family:var(--mono);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.fstep .k{font-size:.7rem;color:var(--ink-3);margin-top:4px;line-height:1.35}
+
+/* bar */
+.bar{height:7px;background:var(--sunk);border-radius:4px;overflow:hidden;
+  min-width:70px;display:block}
+.bar i{display:block;height:100%;background:var(--crit)}
+.bar.g i{background:var(--good)}
+
+ul{padding-left:20px;max-width:68ch}
+li{margin-bottom:7px}
+footer{border-top:1px solid var(--rule-2);padding-top:18px;margin-top:56px;
+  font-size:.78rem;color:var(--ink-3)}
+@media(max-width:640px){
+  header.mast h1{font-size:2rem}
+  .verdict{grid-template-columns:1fr}
+  .grade{border-right:none;border-bottom:1px solid var(--rule);
+    padding-right:0;padding-bottom:16px}
+  .split{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Pedagogical audit · CLOE prep path</div>
+  <h1>The content is sound. The assessment is beatable.</h1>
+  <p class="standfirst">Every answer key in the bank is defensible and the data has no
+  structural defects at all. But at C1 and C2 a candidate who never reads the passage
+  and never plays the audio still scores 82% — because the correct option is almost
+  always the longest one.</p>
+  <div class="meta">
+    <span>16–17 August 2026</span><span>1,266 questions · 156 passages</span>
+    <span>6 skills · A1–C2</span><span>126 repairs applied</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <div class="grade">
+    <div class="g">B−</div>
+    <div class="l">Overall</div>
+  </div>
+  <div>
+    <p><strong>The bank is well built and badly calibrated.</strong> Mechanical integrity is
+    perfect — 1,086 gradeable items, zero defects. Only five items in the entire bank
+    actively mark a correct learner wrong, and all five are now fixed. That is a genuinely
+    strong result for a bank this size.</p>
+    <p>The grade is held down by three <em>design</em> problems, not correctness problems.
+    Options leak their answer through length. Reading never progresses past literal recall.
+    And 83% of your speaking prompts are unreachable because of a one-line selection bug.
+    None of these would show up as a wrong answer — which is exactly why they survived
+    previous rounds.</p>
+  </div>
+</div>
+
+<div class="split">
+  <div class="half ok">
+    <div class="g">A−</div>
+    <div class="eyebrow">Item correctness</div>
+    <p style="margin:8px 0 0;font-size:.9rem;color:var(--ink-2)">Keys, explanations,
+    data integrity, English accuracy. Five criticals in 1,266 items, all repaired.</p>
+  </div>
+  <div class="half bad">
+    <div class="g">C</div>
+    <div class="eyebrow">Assessment validity</div>
+    <p style="margin:8px 0 0;font-size:.9rem;color:var(--ink-2)">Whether a score means
+    anything. Undermined by the length tell, flat reading progression, and dead speaking content.</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="n ok-n">0</div><div class="k">Data-integrity defects in 1,086 gradeable items</div></div>
+  <div class="stat"><div class="n">5</div><div class="k">Confirmed criticals, all now fixed</div></div>
+  <div class="stat"><div class="n">126</div><div class="k">Verified repairs applied to 88 rows</div></div>
+  <div class="stat"><div class="n bad-n">82%</div><div class="k">Blind score at C1/C2 by picking the longest option</div></div>
+  <div class="stat"><div class="n bad-n">90</div><div class="k">Speaking prompts that can never be served</div></div>
+</div>
+
+<section>
+  <div class="sechead"><h2>The three findings that matter</h2></div>
+
+  <div class="call">
+    <h3>1. The correct answer is usually the longest one</h3>
+    <p>This is the most serious defect found, and it is not a content error — it is a
+    pattern across hundreds of items. Ignore the passage, ignore the audio, always pick the
+    longest option:</p>
+    <div class="scroll" style="margin:14px 0">
+      <table>
+        <thead><tr><th>Level</th><th class="num">Listening</th><th class="num">Reading</th>
+        <th class="num">Grammar/vocab</th><th class="num">All</th><th style="width:32%">Blind score vs. 25% chance</th></tr></thead>
+        <tbody>
+          <tr><td>A1</td><td class="num">16%</td><td class="num">27%</td><td class="num">34%</td><td class="num">25%</td><td><span class="bar g"><i style="width:25%"></i></span></td></tr>
+          <tr><td>A2</td><td class="num">44%</td><td class="num">37%</td><td class="num">34%</td><td class="num">39%</td><td><span class="bar g"><i style="width:39%"></i></span></td></tr>
+          <tr><td>B1</td><td class="num">44%</td><td class="num">47%</td><td class="num">25%</td><td class="num">39%</td><td><span class="bar g"><i style="width:39%"></i></span></td></tr>
+          <tr><td>B2</td><td class="num">74%</td><td class="num">65%</td><td class="num">42%</td><td class="num">61%</td><td><span class="bar"><i style="width:61%"></i></span></td></tr>
+          <tr><td>C1</td><td class="num">71%</td><td class="num bad-n">90%</td><td class="num">49%</td><td class="num">69%</td><td><span class="bar"><i style="width:69%"></i></span></td></tr>
+          <tr><td>C2</td><td class="num bad-n">85%</td><td class="num">86%</td><td class="num">51%</td><td class="num">74%</td><td><span class="bar"><i style="width:74%"></i></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The pattern <em>scales with level</em>: the higher the band, the more the answer
+    gives itself away. On C1 reading it reaches 90%. The cause is a house item-writing
+    habit — the key is written as a careful, hedged, both-sides statement while the
+    distractors are short absolutes. A test-wise candidate beats your upper levels without
+    any English at all. <strong>Deferred by your decision:</strong> levelling option
+    lengths across ~194 C1/C2 items is a content round, not a repair.</p>
+  </div>
+
+  <div class="call">
+    <h3>2. 83% of your speaking prompts are unreachable</h3>
+    <p>You have 108 speaking prompts. Learners can only ever see 18 of them.
+    <code>pickPromptForPhase</code> in <code>practice.speaking.tsx:68</code> selects with
+    <code>pool.find(p =&gt; p.cefr_level === target)</code> — the <em>first</em> array match,
+    not a random one. With exactly 6 prompts per (level, phase) group, five in every six are
+    dead. <code>pickOralForPhase</code> in the mock exam has the same bug.</p>
+    <p>The query has no <code>ORDER BY</code>, so <em>which</em> prompt survives is arbitrary
+    Postgres row order and can change silently whenever rows are updated. Speaking is the only
+    skill affected — listening, reading and grammar all randomise over a pool with an
+    exclusion set, and writing shows the learner every prompt. This is a code fix, not a
+    content fix, so it is flagged rather than applied.</p>
+  </div>
+
+  <div class="call">
+    <h3>3. Reading steps up once, then goes backwards</h3>
+    <p>A1 through B1 is 100% literal-detail retrieval — zero inference, gist, purpose or
+    tone at any of those three levels, so B1 is no harder than A1 except in vocabulary. A
+    real step up happens at B2. Then it stops: B2 and C1 have <em>identical</em> skill
+    splits, and C2 <em>regresses</em> to become the most literal band in the whole
+    corpus.</p>
+    <div class="scroll" style="margin:14px 0">
+      <table>
+        <thead><tr><th>Cognitive skill tested</th><th class="num">A1–B1</th><th class="num">B2</th><th class="num">C1</th><th class="num">C2</th></tr></thead>
+        <tbody>
+          <tr><td>Literal detail</td><td class="num">100%</td><td class="num">59%</td><td class="num">59%</td><td class="num bad-n">74%</td></tr>
+          <tr><td>Inference</td><td class="num">0</td><td class="num">24%</td><td class="num">24%</td><td class="num">14%</td></tr>
+          <tr><td>Purpose / function</td><td class="num">0</td><td class="num">14%</td><td class="num">0</td><td class="num">5%</td></tr>
+          <tr><td>Tone / attitude</td><td class="num">0</td><td class="num">2%</td><td class="num">10%</td><td class="num">2%</td></tr>
+          <tr><td>Gist / main idea</td><td class="num">0</td><td class="num">0</td><td class="num">7%</td><td class="num">2%</td></tr>
+          <tr><td>Vocabulary in context</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">2%</td></tr>
+          <tr><td><strong>Text organisation</strong></td><td class="num bad-n">0</td><td class="num bad-n">0</td><td class="num bad-n">0</td><td class="num bad-n">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Two skill families are structurally absent from all 252 reading items: text
+    organisation is never tested once, and vocabulary-in-context exactly once.
+    <strong>Deferred by your decision</strong> — closing this means authoring new items.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Two alarms from the previous session that were false</h2></div>
+  <div class="call good">
+    <h3>Listening audio is fully generated</h3>
+    <p>The earlier session reported that 162 listening questions and 102 passages had no
+    audio and were falling back to robotic browser speech, with an action item for you to
+    log into production and re-run the generator ten times. That was wrong. Every standalone
+    listening question (168/168) and every listening passage (54/54) has a real generated
+    audio file, and there are <strong>zero</strong> browser-TTS fallback rows. The 162
+    "missing" are passage-linked questions, which are never meant to carry their own audio —
+    <code>mock-exam.tsx:492</code> resolves <code>passage ? passage.audio_url :
+    current.audio_url</code>. The "102 passages" figure counted reading and grammar passages,
+    which are read, not heard. <strong>No admin action is needed.</strong></p>
+  </div>
+  <div class="call good">
+    <h3>The writing word-count format is not broken</h3>
+    <p>A critical was predicted on the theory that paraphrased word-count ranges would break
+    the live word counter. The regex at <code>practice.writing.tsx:45</code> is
+    <code>/\((\d+)\s*[–-]\s*(\d+)\s*words?\)/i</code> — the character class accepts both
+    en-dash and hyphen, and <strong>all 72 writing prompts match it</strong>. The reviewer
+    reported it could not manufacture a finding honestly. The invariant was re-checked after
+    every repair: still 72/72.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>How findings were filtered</h2></div>
+  <div class="funnel">
+    <div class="fstep"><div class="n">379</div><div class="k">Raw findings from 12 reviewers</div></div>
+    <div class="fstep"><div class="n">107</div><div class="k">Criticals &amp; majors sent to a refuter</div></div>
+    <div class="fstep"><div class="n ok-n">56</div><div class="k">Survived as real defects</div></div>
+    <div class="fstep"><div class="n">37</div><div class="k">Downgraded in severity</div></div>
+    <div class="fstep"><div class="n">14</div><div class="k">Refuted outright</div></div>
+  </div>
+  <p>Every critical and major was handed to an independent verifier whose brief was to
+  <em>refute</em> it. Roughly half did not survive contact. The clearest example: word_bank
+  "second answer" findings mostly evaporated once
+  <code>practice.word-bank.tsx:184</code> was read properly — placed chips are removed from
+  the tray, so single use is enforced by the UI and any alternative assignment that strands
+  another blank is literally unproducible. Eight findings died on that one fact.</p>
+
+  <div class="call note">
+    <h3>The verifiers were more valuable for catching bad fixes than bad findings</h3>
+    <p>Fifteen reviewer-proposed repairs would have reintroduced or created a defect, and were
+    rejected or rewritten. A passage rewrite that would have destroyed the evidence for a
+    <em>sibling</em> question. A replacement whose key was an unsupported inference — worse
+    than the guessable item it replaced. A replacement distractor (<code>irrevocable</code>)
+    that collided with its own item's key. An explanation teaching
+    <em>"He will soon come back"</em> when the item's actual answer is
+    <em>"...come back from lunch soon"</em>.</p>
+    <p>A sixteenth was caught by simulating the whole fix set before writing any SQL: a
+    quoted <em>fragment</em> used as a whole-prompt replacement would have dropped a
+    <code>(NN–NN words)</code> range and broken the live word counter — the very defect this
+    audit was checking for. Writing and speaking repairs were switched to token-level edits
+    as a result.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>The five criticals — all fixed</h2></div>
+  <p>Every one is the same shape: a learner writing correct English was marked wrong. All
+  five are in grammar/vocabulary MCQ, which has no accept-list — grading is exact string
+  match — so each needed the item rewritten, not merely re-keyed.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Item</th><th>Level</th><th>What was wrong</th><th>Repair</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="item">55d57a5c</span></td><td>A2</td>
+          <td>Keyed <code>on Main Street</code> (American). <code>in Main Street</code> is
+          standard British and was marked wrong — on a site whose declared standard is British.
+          The explanation taught the American convention as the only one.</td>
+          <td>Added a house number so <code>at 25 Main Street</code> is correct in every
+          variety; explanation now names both conventions.</td>
+          <td><span class="pill p-fixed">Fixed</span></td></tr>
+        <tr><td><span class="item">8294f46d</span></td><td>C2</td>
+          <td><code>previous to</code> is a dictionary-attested preposition, so the distractor
+          was genuinely correct; the explanation falsely called it non-standard.</td>
+          <td>Distractor replaced with a non-existent form; explanation now acknowledges
+          <code>previous to</code> as real.</td>
+          <td><span class="pill p-fixed">Fixed</span></td></tr>
+        <tr><td><span class="item">69ac63c4</span></td><td>C1</td>
+          <td>Backshift in reported speech is <em>optional</em> when the situation still holds,
+          so <code>where I live</code> was correct. A sibling item already handles this
+          properly — this one was the outlier.</td>
+          <td>Stem now states the speaker has moved, forcing backshift; mirrors the sibling
+          item's construction.</td>
+          <td><span class="pill p-fixed">Fixed</span></td></tr>
+        <tr><td><span class="item">e5c00d35</span></td><td>C1</td>
+          <td>Both <code>negotiated</code> and <code>were negotiating</code> were fully valid;
+          nothing in the stem forced the past perfect continuous.</td>
+          <td>Stem anchored with "By the time... and were visibly exhausted". The reviewer's
+          own fix was rejected for leaving a defensible second answer.</td>
+          <td><span class="pill p-fixed">Fixed</span></td></tr>
+        <tr><td><span class="item">363e7188</span></td><td>B2</td>
+          <td>Distractor <code>traffic</code> makes an ordinary business sentence — a learner
+          with good English was punished. The other distractors (<code>recipe</code>,
+          <code>rainfall</code>) were absurd, making <code>traffic</code> the only real
+          competitor.</td>
+          <td>Stem now specifies money earned from sales; all three distractors replaced with
+          real business nouns.</td>
+          <td><span class="pill p-fixed">Fixed</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>What else was repaired</h2></div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Area</th><th class="num">Updates</th><th>What changed</th><th>Severity</th></tr></thead>
+      <tbody>
+        <tr><td>Grammar/vocab — MCQ</td><td class="num">34</td>
+          <td>Five criticals above, plus five items whose <strong>explanations taught a
+          factually false rule</strong>: that "already" requires the present perfect (it
+          doesn't), that "take a decision" is wrong (standard British), that "find a balance"
+          and "win a deal" aren't English (both are). Two of these volunteered a false rule
+          about a word that wasn't even an option.</td>
+          <td><span class="pill p-crit">Critical</span> <span class="pill p-major">Major</span></td></tr>
+        <tr><td>Grammar/vocab — gap fill</td><td class="num">26</td>
+          <td>Accept-lists were systematically under-inclusive, rejecting genuinely correct
+          answers (<code>got</code>, <code>trial</code>, <code>nonetheless</code>,
+          <code>resulted in</code>, transitive <code>brush up</code>). 23 lists extended with
+          hardened, verified alternatives.</td>
+          <td><span class="pill p-major">Major</span></td></tr>
+        <tr><td>Listening</td><td class="num">21</td>
+          <td>Seven items answerable without ever playing the audio, including one whose own
+          explanation conceded a distractor was partly right. Stems and options only — every
+          spoken script verified byte-identical so audio cannot desync.</td>
+          <td><span class="pill p-major">Major</span></td></tr>
+        <tr><td>Writing</td><td class="num">23</td>
+          <td>British-English corrections: <code>Mr.</code>/<code>Ms.</code>/<code>Mrs.</code>
+          full stops removed, US month-first dates reordered, dollars changed to euros for a
+          European audience, <code>Wifi</code> → <code>Wi-Fi</code>, spelling normalised to
+          <code>-ise</code>.</td>
+          <td><span class="pill p-minor">Minor</span></td></tr>
+        <tr><td>Reading</td><td class="num">14</td>
+          <td><code>afterward</code> → <code>afterwards</code>, <code>toward</code> →
+          <code>towards</code>, courtesy-title full stops, and a raw <code>--</code> that was
+          rendering to learners inside an answer option.</td>
+          <td><span class="pill p-minor">Minor</span></td></tr>
+        <tr><td>Grammar/vocab — word bank</td><td class="num">5</td>
+          <td>A genuine two-way collision in "A Busy Monday at the Office" where two pool words
+          both fitted; a phrasal verb used with the wrong aspect
+          (<code>get through to</code> implies success, so "three times before he answered" was
+          self-contradictory); and a dangling participle presented to B2 learners as a model of
+          formal register.</td>
+          <td><span class="pill p-major">Major</span></td></tr>
+        <tr><td>Speaking</td><td class="num">2</td>
+          <td>One role-play too thin to fill its 120-second slot, rewritten at level; British
+          spelling fix.</td>
+          <td><span class="pill p-minor">Minor</span></td></tr>
+        <tr><td>Reconstruction</td><td class="num">1</td>
+          <td>An explanation written for a content author, not a learner — it cited a noun that
+          doesn't appear in the exercise and used grammatical metalanguage far above A1.</td>
+          <td><span class="pill p-minor">Minor</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Held back, waiting on you</h2></div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Item</th><th>Why it's held</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>5 unattributed dialogues</strong> + one <code>elevator</code> →
+          <code>lift</code></td>
+          <td>These change spoken scripts. Audio is pre-rendered, so applying them without
+          regenerating would leave learners hearing text that no longer matches what's written —
+          worse than the defect being fixed. A sweep of all 54 listening passages found five
+          two-party dialogues read by a single voice with no speaker labels, all at A1/A2;
+          B1 and above are clean. SQL is written and waiting at
+          <code>audit-reports/STAGE2-listening-audio-coupled.sql</code> with the run order.</td>
+          <td><span class="pill p-flag">Your call</span></td></tr>
+        <tr><td><strong>Option-length levelling</strong></td>
+          <td>~194 C1/C2 items. The single highest-leverage fix in the bank, but it is
+          authoring, not repair.</td>
+          <td><span class="pill p-flag">Deferred</span></td></tr>
+        <tr><td><strong>Speaking selection bug</strong></td>
+          <td>A code change in two files, outside the scope of a content repair. Fixing it
+          instantly triples your effective speaking bank.</td>
+          <td><span class="pill p-flag">Recommended</span></td></tr>
+        <tr><td><strong>Reading inference items</strong></td>
+          <td>Closing the flat progression means authoring roughly 40 new B1 items and adding
+          text-organisation items at every level.</td>
+          <td><span class="pill p-flag">Deferred</span></td></tr>
+        <tr><td><strong>~40 weak distractors</strong></td>
+          <td>Rhyme-fillers like <code>sediment / condiment / ligament</code> for
+          <code>dividend</code>. Not wrong, just trivially eliminable.</td>
+          <td><span class="pill p-flag">Deferred</span></td></tr>
+        <tr><td><code>pass out</code> in a gap-fill accept-list</td>
+          <td>Accepted for "distribute", but in British English it primarily means
+          <em>to faint</em>. A wrong entry rather than a missing one — found by a verifier, not
+          a reviewer.</td>
+          <td><span class="pill p-flag">Recommended</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>Coverage</h2></div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Skill</th><th>Type</th><th class="num">Items</th><th>Reviewed</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Listening</td><td>MCQ</td><td class="num">330</td><td>All, split A1–A2 / B1–B2 / C1–C2</td><td>54 passages, all with generated audio</td></tr>
+        <tr><td>Reading</td><td>MCQ</td><td class="num">252</td><td>All, split A1–B1 / B2–C2</td><td>84 passages; cognitively flat</td></tr>
+        <tr><td>Grammar/vocab</td><td>MCQ</td><td class="num">288</td><td>All, split A1–B1 / B2–C2</td><td>All five criticals live here</td></tr>
+        <tr><td>Grammar/vocab</td><td>Gap fill</td><td class="num">72</td><td>All</td><td>Only type with a working accept-list</td></tr>
+        <tr><td>Grammar/vocab</td><td>Word bank</td><td class="num">108</td><td>All, split A1–B1 / B2–C2</td><td>18 passages; single use UI-enforced</td></tr>
+        <tr><td>Grammar/vocab</td><td>Reconstruction</td><td class="num">36</td><td>All</td><td>Join invariant holds on all 36</td></tr>
+        <tr><td>Writing</td><td>Prompt</td><td class="num">72</td><td>All</td><td>72/72 parse the word-count range</td></tr>
+        <tr><td>Speaking</td><td>Prompt</td><td class="num">108</td><td>All</td><td>Only 18 reachable by learners</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:14px">Nothing was sampled. CEFR spread is even (205–217 items per
+  level). Content is English-only throughout, which is intentional.</p>
+</section>
+
+<section>
+  <div class="sechead"><h2>Method</h2></div>
+  <p><strong>Mechanical sweep.</strong> All 1,086 gradeable items checked programmatically
+  for keys missing from options, duplicate options, gap-fill canonical answers missing from
+  their accept-list, missing blank markers, and the reconstruction join invariant. Zero
+  defects — re-verified independently this session rather than taken on trust. A further
+  referential check of all 108 word_bank items (answer present in pool, ordinal matching a
+  real blank, question count matching blank count) also came back clean.</p>
+  <p><strong>Review.</strong> Twelve reviewers, one per skill and level band, each reading
+  actual items against their passages. Two that died on session limits in the previous run
+  were re-run here.</p>
+  <p><strong>Verification.</strong> All 107 criticals and majors given to independent
+  verifiers briefed to refute them and to re-test every proposed fix against the defect it
+  removes.</p>
+  <p><strong>Repair.</strong> Written to a resumable manifest first, then applied as a single
+  transactional migration. The complete fix set was simulated in memory and all seven
+  invariants re-checked <em>before</em> any SQL was generated — which is how the word-counter
+  regression was caught. Invariants re-confirmed against the live database afterwards.</p>
+  <p><strong>Gate.</strong> <code>bun run build</code> passes. <code>bun run lint</code>
+  reports 979 pre-existing errors — all Prettier formatting in source files this audit never
+  touched (no source file was modified; the repairs are database rows plus two new files).
+  Lint was already red before this session.</p>
+  <p><strong>Not covered.</strong> No learner-outcome data was available, so difficulty
+  claims rest on item analysis rather than response statistics. Audio was not listened to;
+  its presence and format were verified, not its quality.</p>
+</section>
+
+<footer>
+  CLOE prep path · pedagogical audit, 16–17 August 2026 · 1,266 questions and 156 passages
+  reviewed in full · repair manifest at <code>audit-reports/repair-manifest-2026-08-16.md</code>
+</footer>
+
+</div>
