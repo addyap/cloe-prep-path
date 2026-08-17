@@ -166,7 +166,9 @@ footer{border-top:1px solid var(--rule-2);padding-top:18px;margin-top:56px;
     live database. The sections below are preserved as written, with resolutions marked.</p>
     <p>Mechanical integrity was perfect at audit time and remains so: zero key-not-in-options,
     zero duplicate options, zero reconstruction mismatches, zero missing audio across all
-    1,313 items. Only five items in the entire bank ever marked a correct learner wrong.</p>
+    1,313 items. Six items in the entire bank ever marked a correct learner wrong — the five
+    found in the original pass, plus one uncovered later during the distractor repair, where
+    a wrong answer turned out to be perfectly correct English. All six are fixed.</p>
   </div>
 </div>
 
@@ -229,10 +231,48 @@ footer{border-top:1px solid var(--rule-2);padding-top:18px;margin-top:56px;
     question stem and left one item with no correct answer among its options — the only
     key-not-in-options defect ever present in this bank. Found by a corpus-wide sweep,
     repaired, and the sweep is now mandatory after every content migration.</p>
-    <p><strong>Still open by choice:</strong> 57 minor distractor-quality findings
-    (rhyme-fillers like <em>sediment/condiment/ligament</em>, absurd options that make items
-    too easy). These make items easier than intended but teach nothing false, and were
-    deferred to a separate content round.</p>
+    <p><strong>Distractor quality — also now closed.</strong> 35 items had distractors so
+    weak the item tested nothing: rhyme-fillers (<em>dividend</em> against
+    <em>sediment/condiment/ligament</em>), absurd nouns, mutually eliminable synonym pairs
+    (offering both <em>until</em> and <em>till</em>, so both die at once and a 4-way item
+    becomes a 2-way one), and two <em>article tells</em> — “I work in an _____” where only
+    the key begins with a vowel, making the item answerable with zero English vocabulary.
+    All repaired with errors a French-speaking learner would actually make. This work also
+    turned up a <strong>previously unflagged critical</strong>: in one item the distractor
+    “holiday” made the sentence fully correct — a genuine second answer, not a weak option.
+    Nine question stems still carrying American forms were fixed in the same pass.</p>
+    <p><strong>Nothing from the audit remains open.</strong> The one number that still looks
+    wrong is deliberate: <code>grammar_vocab</code> reads 29/34 on “the visibly-longest option
+    is the answer”, because those are register items (“Which email is appropriate?”) where the
+    key is the formal option and formal English is intrinsically wordier, plus tense items
+    where the correct form cannot be shorter (<em>will have been working</em> vs
+    <em>will work</em>). Levelling them would destroy the construct being tested.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><h2>The limit of this audit</h2></div>
+  <div class="call">
+    <h3>Everything above is judgement from inspection, not evidence from learners</h3>
+    <p>No learner response was ever examined, because almost none exist — 79 attempts from
+    12 users at the time of writing. So this audit can say an item is well-formed,
+    unambiguous and correctly keyed. It <em>cannot</em> say whether the item actually
+    separates a strong learner from a weak one, which is ultimately the only thing that
+    matters in a test.</p>
+    <p>Two claims in particular rest on nothing but the original author's judgement:
+    <strong>the CEFR labels</strong>, which have never been checked against how anyone
+    performs, and <strong>the level estimate</strong> the app writes onto every profile and
+    reports after a mock exam. If the labels drift, every learner is told something wrong
+    about themselves, and no amount of content review would reveal it. The AI grading of the
+    72 writing and 108 speaking prompts is likewise entirely unaudited.</p>
+    <p><strong>What closes this gap:</strong> the <code>attempts</code> table already logs
+    everything required, so nothing needs building — only volume. Three queries are committed
+    at <code>analysis/</code> that turn responses into item evidence: facility and
+    discrimination per item, whether difficulty actually rises with CEFR label, and which
+    wrong answers anyone picks. The alarm worth watching is <strong>negative
+    discrimination</strong> — an item your best learners get wrong more often than your worst.
+    That has almost no innocent explanation, and it catches automatically the same defect
+    class this audit had to hunt by hand across 1,313 items.</p>
   </div>
 </section>
 
