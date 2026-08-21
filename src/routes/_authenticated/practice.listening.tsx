@@ -17,7 +17,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
+import { cn, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/listening")({
   component: ListeningPractice,
@@ -106,7 +106,6 @@ function ListeningPractice() {
   const [done, setDone] = useState(false);
   const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -246,59 +245,7 @@ function ListeningPractice() {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
     setIsPlaying(false);
-  }
-
-  // Device-voice fallback for clips whose studio audio hasn't been generated yet,
-  // or whose file fails to load. Speaking before the browser has loaded its voices
-  // is silent in Chrome, so wait for `voiceschanged` (with a timeout safety net).
-  function speakFallback(spokenText: string, countPlay: () => void) {
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      setIsPlaying(false);
-      setAudioNote("Audio can't be played in this browser — please read the transcript below.");
-      return;
-    }
-    const synth = window.speechSynthesis;
-    const speak = () => {
-      synth.cancel();
-      const u = new SpeechSynthesisUtterance(spokenText);
-      u.rate = rate;
-      u.lang = "en-GB";
-      const voices = synth.getVoices();
-      const enVoice =
-        voices.find((v) => v.lang?.toLowerCase().startsWith("en-gb")) ??
-        voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
-      if (enVoice) u.voice = enVoice;
-      u.onend = () => setIsPlaying(false);
-      u.onerror = () => {
-        setIsPlaying(false);
-        setAudioNote("Audio couldn't play — please read the transcript below.");
-      };
-      utteranceRef.current = u;
-      synth.speak(u);
-      setIsPlaying(true);
-      setAudioNote(
-        "Studio audio isn't ready for this clip yet — using your device's built-in voice.",
-      );
-      countPlay();
-    };
-    if (synth.getVoices().length > 0) {
-      speak();
-      return;
-    }
-    let ran = false;
-    const go = () => {
-      if (ran) return;
-      ran = true;
-      synth.removeEventListener("voiceschanged", go);
-      speak();
-    };
-    synth.addEventListener("voiceschanged", go);
-    synth.getVoices(); // nudge browsers that populate voices lazily
-    setTimeout(go, 750); // safety net if `voiceschanged` never fires (Safari)
   }
 
   function playAudio() {
@@ -307,47 +254,41 @@ function ListeningPractice() {
     stopAudio();
     setAudioNote(null);
     const audioUrl = current.audio_url;
-    const spokenText =
-      current.kind === "single" ? extractSpokenScript(current.prompt_text) : current.body;
-    // Only count a play once something actually starts, so silence never burns a play.
-    const countPlay = () => setPlays((p) => p + 1);
-
-    if (audioUrl) {
-      if (!audioRef.current || audioRef.current.src !== audioUrl) {
-        audioRef.current = new Audio(audioUrl);
-      }
-      const el = audioRef.current;
-      el.playbackRate = rate;
-      el.onended = () => setIsPlaying(false);
-      el.onpause = () => setIsPlaying(false);
-      let settled = false;
-      const fallback = () => {
-        if (settled) return;
-        settled = true;
-        speakFallback(spokenText, countPlay);
-      };
-      el.onerror = fallback;
-      el.play().then(
-        () => {
-          if (settled) return;
-          settled = true;
-          setIsPlaying(true);
-          countPlay();
-        },
-        fallback, // rejected: missing file, decode error, or autoplay block
-      );
+    if (!audioUrl) {
+      setAudioNote("This clip has no audio yet — please read the transcript below.");
       return;
     }
 
-    speakFallback(spokenText, countPlay);
+    // Always a fresh element: reusing one and calling pause() then play() races
+    // to an AbortError. There is deliberately NO text-to-speech fallback — the
+    // studio MP3 plays, or we surface a retry. The browser's TTS is the robotic
+    // voice, and it must never stand in for the real audio.
+    const el = new Audio(audioUrl);
+    audioRef.current = el;
+    el.playbackRate = rate;
+    el.onended = () => setIsPlaying(false);
+    el.onpause = () => setIsPlaying(false);
+    el.onerror = () => {
+      setIsPlaying(false);
+      setAudioNote("Couldn't load the audio — check your connection and press play to retry.");
+    };
+    el.play().then(
+      () => {
+        setIsPlaying(true);
+        setPlays((p) => p + 1); // count a play only once it actually starts
+      },
+      (err: DOMException) => {
+        // A superseded play (AbortError) is harmless; anything else is real.
+        if (err?.name === "AbortError") return;
+        setIsPlaying(false);
+        setAudioNote("Couldn't play the audio — press play to try again.");
+      },
+    );
   }
 
   function pauseAudio() {
     if (audioRef.current && !audioRef.current.paused) {
       audioRef.current.pause();
-    }
-    if (typeof window !== "undefined" && window.speechSynthesis?.speaking) {
-      window.speechSynthesis.pause();
     }
     setIsPlaying(false);
   }
