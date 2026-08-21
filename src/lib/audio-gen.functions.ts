@@ -63,6 +63,64 @@ async function synthesizeSpeech(
   return res.arrayBuffer();
 }
 
+// Base64-encode without relying on Node's Buffer (not guaranteed in the edge
+// runtime). btoa needs a binary string, built in chunks to avoid arg-count limits.
+function toBase64(buf: ArrayBuffer): string {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+// Every voice valid for gpt-4o-mini-tts, best-quality first. Exposed for the
+// admin voice previewer so a voice can be auditioned without re-voicing the bank.
+export const PREVIEW_VOICES = [
+  "marin",
+  "cedar",
+  "coral",
+  "ash",
+  "sage",
+  "verse",
+  "ballad",
+  "nova",
+  "onyx",
+  "echo",
+  "shimmer",
+  "alloy",
+  "fable",
+] as const;
+
+const PreviewSchema = z.object({
+  voice: z.string().min(1).max(20),
+  text: z.string().min(1).max(400),
+  dialogue: z.boolean().default(false),
+});
+
+/** Synthesize one short sample and return it as a data: URL, so the admin can
+ *  hear a candidate voice instantly without regenerating any stored clip. */
+export const previewVoice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => PreviewSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden: admin only");
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("Missing OPENAI_API_KEY");
+    const audio = await synthesizeSpeech(
+      data.text,
+      key,
+      data.voice,
+      data.dialogue ? DIALOGUE_INSTRUCTIONS : NARRATOR_INSTRUCTIONS,
+    );
+    return { dataUrl: `data:audio/mpeg;base64,${toBase64(audio)}` };
+  });
+
 type Turn = { speaker: string; text: string };
 
 /**

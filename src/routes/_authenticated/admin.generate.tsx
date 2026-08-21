@@ -15,8 +15,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { checkIsAdmin, claimFirstAdmin, generateQuestions } from "@/lib/admin.functions";
-import { generateListeningAudio, generateListeningPassageAudio } from "@/lib/audio-gen.functions";
-import { Sparkles, ShieldCheck, Loader2, Volume2 } from "lucide-react";
+import {
+  generateListeningAudio,
+  generateListeningPassageAudio,
+  previewVoice,
+  PREVIEW_VOICES,
+} from "@/lib/audio-gen.functions";
+import { Sparkles, ShieldCheck, Loader2, Volume2, Play } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/generate")({
   component: AdminGenerate,
@@ -62,6 +67,11 @@ function AdminGenerate() {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
 
   const [revoiceAll, setRevoiceAll] = useState(false);
+  const SAMPLE_TEXT =
+    "Good morning everyone. The meeting will start at ten o'clock in the main room. Please bring your reports.";
+  const [previewVoiceName, setPreviewVoiceName] = useState<string>(PREVIEW_VOICES[0]);
+  const [previewText, setPreviewText] = useState<string>(SAMPLE_TEXT);
+  const [previewBusy, setPreviewBusy] = useState(false);
   const [audioBusy, setAudioBusy] = useState(false);
   const [audioStatus, setAudioStatus] = useState<{
     generated: number;
@@ -80,6 +90,7 @@ function AdminGenerate() {
   const genFn = useServerFn(generateQuestions);
   const audioFn = useServerFn(generateListeningAudio);
   const passageAudioFn = useServerFn(generateListeningPassageAudio);
+  const previewFn = useServerFn(previewVoice);
 
   useEffect(() => {
     (async () => {
@@ -131,6 +142,24 @@ function AdminGenerate() {
       else toast.error(msg || "Failed to generate questions.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const playPreview = async () => {
+    setPreviewBusy(true);
+    try {
+      const res = await previewFn({
+        data: { voice: previewVoiceName, text: previewText.trim().slice(0, 400) },
+      });
+      const audio = new Audio(res.dataUrl);
+      await audio.play();
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg === "CREDITS_EXHAUSTED")
+        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
+      else toast.error(msg || "Couldn't play the sample.");
+    } finally {
+      setPreviewBusy(false);
     }
   };
 
@@ -332,6 +361,60 @@ function AdminGenerate() {
               Last run: {lastInserted} inserted.
             </p>
           )}
+        </section>
+
+        <section className="rounded-3xl border border-border bg-card p-6 shadow-card space-y-3">
+          <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wide">
+            <Play className="h-4 w-4" /> Voice preview
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Hear a voice instantly — no re-voicing needed. Pick one, press Play, and compare. When
+            you find the natural one, tell me its name and I'll lock it in, then you re-voice once.
+          </p>
+          <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+            <div>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Voice</Label>
+              <Select value={previewVoiceName} onValueChange={setPreviewVoiceName}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PREVIEW_VOICES.map((v) => (
+                    <SelectItem key={v} value={v}>
+                      {v}
+                      {(v === "marin" || v === "cedar") && " — best quality"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              onClick={playPreview}
+              disabled={previewBusy}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              {previewBusy ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading…
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" /> Play sample
+                </>
+              )}
+            </Button>
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+              Sample text
+            </Label>
+            <Input
+              value={previewText}
+              onChange={(e) => setPreviewText(e.target.value)}
+              className="mt-1"
+              maxLength={400}
+            />
+          </div>
         </section>
 
         <section className="rounded-3xl border border-border bg-card p-6 shadow-card space-y-3">
