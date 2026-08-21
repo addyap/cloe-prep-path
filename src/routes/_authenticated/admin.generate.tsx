@@ -61,6 +61,7 @@ function AdminGenerate() {
   const [preview, setPreview] = useState<PreviewItem[]>([]);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
 
+  const [revoiceAll, setRevoiceAll] = useState(false);
   const [audioBusy, setAudioBusy] = useState(false);
   const [audioStatus, setAudioStatus] = useState<{
     generated: number;
@@ -136,7 +137,7 @@ function AdminGenerate() {
   const generateAudio = async () => {
     setAudioBusy(true);
     try {
-      const res = await audioFn({ data: { limit: 30 } });
+      const res = await audioFn({ data: { limit: 30, regenerateAll: revoiceAll } });
       setAudioStatus({
         generated: res.generated,
         remaining: res.remaining,
@@ -165,7 +166,7 @@ function AdminGenerate() {
   const generatePassageAudio = async () => {
     setPassageAudioBusy(true);
     try {
-      const res = await passageAudioFn({ data: { limit: 30 } });
+      const res = await passageAudioFn({ data: { limit: 30, regenerateAll: revoiceAll } });
       setPassageAudioStatus({
         generated: res.generated,
         remaining: res.remaining,
@@ -339,16 +340,31 @@ function AdminGenerate() {
           </div>
           <p className="text-sm text-muted-foreground">
             Listening items with no generated audio fall back to the browser's built-in
-            text-to-speech, which sounds robotic. Generate real audio (OpenAI TTS) in batches of 15
-            — click again to keep going until nothing's left.
+            text-to-speech, which sounds robotic. Generate natural-voice audio (OpenAI TTS) in
+            batches of 30 — click again to keep going until nothing's left.
           </p>
+          <label className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={revoiceAll}
+              onChange={(e) => setRevoiceAll(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-accent"
+            />
+            <span>
+              <span className="font-medium text-foreground">Re-voice everything</span> — also
+              replace clips made with the old robotic voices, not just fill in missing ones. Use
+              this once to upgrade the whole bank to the natural voice.
+            </span>
+          </label>
           <Button onClick={generateAudio} disabled={audioBusy} variant="outline" className="w-full">
             {audioBusy ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
               </>
+            ) : revoiceAll ? (
+              "Re-voice item audio (next 30)"
             ) : (
-              "Generate audio (next 30)"
+              "Generate item audio (next 30)"
             )}
           </Button>
           {audioStatus && !audioBusy && (
@@ -378,7 +394,10 @@ function AdminGenerate() {
           </div>
           <p className="text-sm text-muted-foreground">
             Same idea, but for listening passages (multi-question dialogues/monologues) rather than
-            single-sentence items — one clip per passage, generated from the full script.
+            single-sentence items — one clip per passage. Genuine two-party dialogues get a distinct
+            natural voice per speaker; narration is read by a single narrator. The{" "}
+            <span className="font-medium text-foreground">Re-voice everything</span> toggle above
+            applies here too.
           </p>
           <Button
             onClick={generatePassageAudio}
@@ -390,6 +409,8 @@ function AdminGenerate() {
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
               </>
+            ) : revoiceAll ? (
+              "Re-voice passage audio (next 30)"
             ) : (
               "Generate passage audio (next 30)"
             )}
