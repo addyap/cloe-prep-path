@@ -101,6 +101,7 @@ function ListeningPractice() {
   const [plays, setPlays] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [rate, setRate] = useState(1);
+  const [audioNote, setAudioNote] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
@@ -251,13 +252,66 @@ function ListeningPractice() {
     setIsPlaying(false);
   }
 
+  // Device-voice fallback for clips whose studio audio hasn't been generated yet,
+  // or whose file fails to load. Speaking before the browser has loaded its voices
+  // is silent in Chrome, so wait for `voiceschanged` (with a timeout safety net).
+  function speakFallback(spokenText: string, countPlay: () => void) {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      setIsPlaying(false);
+      setAudioNote("Audio can't be played in this browser — please read the transcript below.");
+      return;
+    }
+    const synth = window.speechSynthesis;
+    const speak = () => {
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(spokenText);
+      u.rate = rate;
+      u.lang = "en-GB";
+      const voices = synth.getVoices();
+      const enVoice =
+        voices.find((v) => v.lang?.toLowerCase().startsWith("en-gb")) ??
+        voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+      if (enVoice) u.voice = enVoice;
+      u.onend = () => setIsPlaying(false);
+      u.onerror = () => {
+        setIsPlaying(false);
+        setAudioNote("Audio couldn't play — please read the transcript below.");
+      };
+      utteranceRef.current = u;
+      synth.speak(u);
+      setIsPlaying(true);
+      setAudioNote(
+        "Studio audio isn't ready for this clip yet — using your device's built-in voice.",
+      );
+      countPlay();
+    };
+    if (synth.getVoices().length > 0) {
+      speak();
+      return;
+    }
+    let ran = false;
+    const go = () => {
+      if (ran) return;
+      ran = true;
+      synth.removeEventListener("voiceschanged", go);
+      speak();
+    };
+    synth.addEventListener("voiceschanged", go);
+    synth.getVoices(); // nudge browsers that populate voices lazily
+    setTimeout(go, 750); // safety net if `voiceschanged` never fires (Safari)
+  }
+
   function playAudio() {
     if (!current) return;
     if (plays >= MAX_PLAYS) return;
     stopAudio();
-    const audioUrl = current.kind === "single" ? current.audio_url : current.audio_url;
+    setAudioNote(null);
+    const audioUrl = current.audio_url;
     const spokenText =
       current.kind === "single" ? extractSpokenScript(current.prompt_text) : current.body;
+    // Only count a play once something actually starts, so silence never burns a play.
+    const countPlay = () => setPlays((p) => p + 1);
+
     if (audioUrl) {
       if (!audioRef.current || audioRef.current.src !== audioUrl) {
         audioRef.current = new Audio(audioUrl);
@@ -266,18 +320,26 @@ function ListeningPractice() {
       el.playbackRate = rate;
       el.onended = () => setIsPlaying(false);
       el.onpause = () => setIsPlaying(false);
-      void el.play();
-      setIsPlaying(true);
-    } else if (typeof window !== "undefined" && window.speechSynthesis) {
-      const u = new SpeechSynthesisUtterance(spokenText);
-      u.rate = rate;
-      u.lang = "en-US";
-      u.onend = () => setIsPlaying(false);
-      utteranceRef.current = u;
-      window.speechSynthesis.speak(u);
-      setIsPlaying(true);
+      let settled = false;
+      const fallback = () => {
+        if (settled) return;
+        settled = true;
+        speakFallback(spokenText, countPlay);
+      };
+      el.onerror = fallback;
+      el.play().then(
+        () => {
+          if (settled) return;
+          settled = true;
+          setIsPlaying(true);
+          countPlay();
+        },
+        fallback, // rejected: missing file, decode error, or autoplay block
+      );
+      return;
     }
-    setPlays((p) => p + 1);
+
+    speakFallback(spokenText, countPlay);
   }
 
   function pauseAudio() {
@@ -536,6 +598,15 @@ function ListeningPractice() {
               </strong>
             </div>
           </div>
+          {audioNote && (
+            <p
+              className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground"
+              role="status"
+            >
+              <Headphones className="h-3.5 w-3.5 mt-px shrink-0" aria-hidden />
+              {audioNote}
+            </p>
+          )}
           {submitted && (
             <p className="mt-4 text-sm text-muted-foreground italic border-l-2 border-border pl-3 whitespace-pre-line">
               {current.kind === "single" ? current.prompt_text : current.body}
