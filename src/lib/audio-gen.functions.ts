@@ -9,22 +9,32 @@ const BUCKET = "listening-audio";
 // URL fragment (browsers strip fragments before fetching, so playback is
 // unaffected), which lets "re-voice all" batch through only the clips that
 // haven't been regenerated with the current recipe yet.
-const AUDIO_VERSION = "v2";
+const AUDIO_VERSION = "v3";
 const VERSION_TAG = `#${AUDIO_VERSION}`;
 
-// Natural-sounding voices only — the old rotation included flat voices that
-// learners described as robotic. Standalone items rotate through these (so a
-// listening session still has voice variety) and each dialogue speaker gets a
-// distinct one.
-const NATURAL_VOICES = ["nova", "onyx", "shimmer", "echo", "fable", "alloy"] as const;
-const NARRATOR_VOICE = "nova";
+// marin and cedar are OpenAI's newest, highest-quality voices (their own
+// recommendation for best naturalness); the rest are the expressive set. All are
+// far more human than the classic voices (nova, onyx, echo, …) learners called
+// robotic. Standalone items rotate through these (so a session has voice variety)
+// and each dialogue speaker gets a distinct one; the order gives adjacent
+// speakers a clear contrast (marin/cedar read female/male).
+const NATURAL_VOICES = ["marin", "cedar", "coral", "ash", "sage", "verse"] as const;
+const NARRATOR_VOICE = "marin";
 
+// gpt-4o-mini-tts follows detailed, specific style direction — vague adjectives
+// barely move it, so these spell out accent, affect, pacing and rhythm.
 const NARRATOR_INSTRUCTIONS =
-  "Speak in clear, natural British English at a calm, measured pace, like a professional exam " +
-  "narrator. Sound warm and human — never robotic, flat, or monotone.";
+  "Voice: a warm, natural British English speaker (Received Pronunciation), like a friendly " +
+  "professional narrating an audio lesson. Affect: relaxed, human and engaging. Pacing: natural " +
+  "and unhurried, with realistic sentence rhythm — gentle pauses at commas and full stops, and " +
+  "natural intonation that rises and falls. Sound like a real person talking to a learner, never " +
+  "robotic, clipped, flat or monotone.";
 const DIALOGUE_INSTRUCTIONS =
-  "Speak in natural, conversational British English with realistic intonation and emotion, as a " +
-  "real person would in this situation. Never robotic or flat.";
+  "Voice: a natural British English speaker (Received Pronunciation) in a real, everyday " +
+  "conversation. Affect: warm, expressive and conversational, with genuine emotion that fits the " +
+  "moment — polite, curious, apologetic, helpful as appropriate. Pacing: natural spoken rhythm " +
+  "with lifelike intonation and small pauses. Sound like a real person speaking, never robotic, " +
+  "flat or monotone.";
 
 async function synthesizeSpeech(
   text: string,
