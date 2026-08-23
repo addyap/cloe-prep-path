@@ -8,6 +8,16 @@ export function FooterDisclaimer() {
           Réseau CEL, or any official CLOE certification body. All trademarks are the property of
           their respective owners.
         </p>
+        <p className="mt-3">
+          Part of{' '}
+          <a
+            href="https://www.antonyaddy.com/ressources-en-ligne"
+            className="font-medium text-foreground underline underline-offset-2 hover:no-underline"
+          >
+            Fluentory by Antony Addy
+          </a>{' '}
+          — free tools for grammar, listening, speaking and exam prep, built by a certified trainer.
+        </p>
       </div>
     </footer>
   );
