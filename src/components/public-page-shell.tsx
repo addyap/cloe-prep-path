@@ -39,6 +39,16 @@ export function PublicFooter() {
           ))}
         </div>
         <p>© {new Date().getFullYear()} CLOE Prep.</p>
+        <p>
+          Part of{" "}
+          <a
+            href="https://www.antonyaddy.com/ressources-en-ligne"
+            className="font-medium text-foreground underline underline-offset-2 hover:no-underline"
+          >
+            Fluentory by Antony Addy
+          </a>{" "}
+          — free tools for grammar, listening, speaking and exam prep, built by a certified trainer.
+        </p>
       </div>
     </footer>
   );
