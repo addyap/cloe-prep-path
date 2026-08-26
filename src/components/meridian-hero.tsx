@@ -295,12 +295,12 @@ export function MeridianHero() {
             Start climbing
             <span className="mh-arr transition-transform group-hover:translate-x-1.5">&rarr;</span>
           </Link>
-          <Link
-            to="/dashboard"
+          <a
+            href="#what-is-cloe"
             className="inline-flex items-center rounded-full border border-white/25 bg-white/5 px-6 py-3.5 font-semibold text-[#f4efe6] hover:border-white/60 hover:bg-white/10 transition"
           >
-            Watch a level
-          </Link>
+            Explore the skills
+          </a>
         </div>
       </div>
 

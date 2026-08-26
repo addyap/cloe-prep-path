@@ -189,6 +189,9 @@
 .mh-cta { transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s, filter .3s; }
 .mh-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 48px -12px rgba(224,120,60,.95); }
 
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 @media (prefers-reduced-motion: reduce) {
   .mh-rise { opacity: 1; transform: none; filter: none; animation: none; }
   .mh-rail { animation: none; }
