@@ -5,8 +5,6 @@ import {
   PenLine,
   Mic,
   GraduationCap,
-  ArrowRight,
-  Check,
   Clock,
   BarChart3,
   ShieldCheck,
@@ -14,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicFooter } from "@/components/public-page-shell";
+import { MeridianHero } from "@/components/meridian-hero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,73 +39,9 @@ function Landing() {
       >
         Skip to content
       </a>
-      <header className="px-6 md:px-10 py-5 flex items-center justify-between">
-        <nav aria-label="Main" className="flex items-center justify-between w-full">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-foreground">CLOE Prep</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/pricing"
-              className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              Pricing
-            </Link>
-            <Link to="/dashboard">
-              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-                Get started
-              </Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <MeridianHero />
 
       <main id="main-content">
-      {/* Hero */}
-      <section className="px-6 md:px-10 pt-12 md:pt-20 pb-16 md:pb-24 max-w-6xl mx-auto w-full">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-semibold mb-6">
-            <span className="h-2 w-2 rounded-full bg-accent" /> Built for CLOE candidates
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-primary">
-            Pass CLOE with confidence.
-          </h1>
-          <p className="mt-5 text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Targeted, adaptive practice for the CLOE English certification. Train all four skills,
-            track your CEFR level from A1 to C2, and walk into exam day ready.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/dashboard">
-              <Button
-                size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 px-6 text-base"
-              >
-                Start practising <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <a href="#what-is-cloe">
-              <Button size="lg" variant="outline" className="h-12 px-6 text-base">
-                Learn about the exam
-              </Button>
-            </a>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-success" /> Adaptive A1 → C2
-            </span>
-            <span className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-success" /> Professional contexts
-            </span>
-            <span className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-success" /> Mock exams
-            </span>
-          </div>
-        </div>
-      </section>
-
       {/* 4 skills */}
       <section id="what-is-cloe" className="px-6 md:px-10 py-16 bg-card border-y border-border">
         <div className="max-w-6xl mx-auto">
