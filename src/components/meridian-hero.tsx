@@ -240,7 +240,7 @@ export function MeridianHero() {
   return (
     <div
       ref={stageRef}
-      className="mh-stage relative isolate overflow-hidden h-[100svh] min-h-[600px] max-h-[880px] text-[#f4efe6]"
+      className="mh-stage relative isolate overflow-hidden h-[82svh] min-h-[520px] max-h-[740px] text-[#f4efe6]"
     >
       <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
       <div className="mh-grain" aria-hidden />
@@ -266,7 +266,7 @@ export function MeridianHero() {
       </div>
 
       {/* hero copy */}
-      <div className="mh-copy absolute z-10 left-5 sm:left-8 md:left-14 bottom-[clamp(64px,13vh,120px)] max-w-[min(640px,84vw)]">
+      <div className="mh-copy absolute z-10 left-5 sm:left-8 md:left-14 bottom-[clamp(44px,8vh,84px)] max-w-[min(640px,84vw)]">
         <p
           className="mh-rise mh-d1 flex items-center gap-3 text-[12px] uppercase tracking-[0.28em] text-[#eaa16f] mb-4"
           style={{ fontFamily: MONO }}
@@ -305,7 +305,7 @@ export function MeridianHero() {
       </div>
 
       {/* skill legend — hover to isolate a strand */}
-      <div className="mh-rise mh-d3 absolute z-10 right-5 sm:right-8 md:right-14 bottom-[clamp(64px,13vh,120px)] hidden md:flex flex-col items-end gap-2.5 text-right">
+      <div className="mh-rise mh-d3 absolute z-10 right-5 sm:right-8 md:right-14 bottom-[clamp(44px,8vh,84px)] hidden md:flex flex-col items-end gap-2.5 text-right">
         <span className="mb-1 text-[10.5px] uppercase tracking-[0.2em] text-white/40" style={{ fontFamily: MONO }}>
           The four strands
         </span>
