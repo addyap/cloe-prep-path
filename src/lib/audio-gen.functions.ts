@@ -103,7 +103,7 @@ const PreviewSchema = z.object({
  *  hear a candidate voice instantly without regenerating any stored clip. */
 export const previewVoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => PreviewSchema.parse(d))
+  .validator((d: unknown) => PreviewSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -190,7 +190,7 @@ const STALE_OR = `audio_url.is.null,audio_url.not.ilike.*${VERSION_TAG}`;
 
 export const generateListeningAudio = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => InputSchema.parse(d))
+  .validator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
@@ -261,7 +261,7 @@ export const generateListeningAudio = createServerFn({ method: "POST" })
  */
 export const generateListeningPassageAudio = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => InputSchema.parse(d))
+  .validator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,

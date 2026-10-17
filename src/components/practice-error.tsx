@@ -38,7 +38,7 @@ export function PracticeErrorState({ message }: { message?: string }) {
 }
 
 /** Route-level errorComponent for practice/mock-exam routes — used via createFileRoute({ errorComponent: ... }). */
-export function PracticeRouteError({ error }: { error: Error }) {
+export function PracticeRouteError({ error }: { error: unknown }) {
   console.error(error);
   return <PracticeErrorState />;
 }

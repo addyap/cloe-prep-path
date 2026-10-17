@@ -42,7 +42,7 @@ const InputSchema = z.object({
 
 export const evaluateWriting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => InputSchema.parse(d))
+  .validator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data, context }) => {
     if (ENFORCE_ENTITLEMENTS) {
       const { data: subRow } = await context.supabase
