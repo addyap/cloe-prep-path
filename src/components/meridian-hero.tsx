@@ -243,7 +243,16 @@ export function MeridianHero() {
       className="mh-stage relative isolate overflow-hidden h-[82svh] min-h-[520px] max-h-[740px] text-[#f4efe6]"
     >
       <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
-      <div className="mh-grain" aria-hidden />
+      {/* 140px fractal-noise tile, repeated over the stage */}
+      <svg className="mh-grain" aria-hidden focusable="false">
+        <filter id="mh-noise">
+          <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves={2} />
+        </filter>
+        <pattern id="mh-grain-tile" width="140" height="140" patternUnits="userSpaceOnUse">
+          <rect width="140" height="140" filter="url(#mh-noise)" opacity=".55" />
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#mh-grain-tile)" />
+      </svg>
       <div className="mh-vign" aria-hidden />
 
       {/* stage nav */}

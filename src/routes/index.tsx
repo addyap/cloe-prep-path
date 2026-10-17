@@ -178,6 +178,25 @@ function Landing() {
           </div>
         </div>
 
+        {/* A human trainer, for learners whose employer or CPF funds their preparation */}
+        <div className="mt-12 rounded-2xl bg-card border border-border p-6 md:p-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-2xl">
+            <h3 className="text-lg md:text-xl font-bold text-primary">
+              Preparing for CLOE through your employer or CPF?
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Antony runs CLOE coaching for professionals: one-to-one or for teams, remotely or in
+              person.
+            </p>
+          </div>
+          <a
+            href="https://www.antonyaddy.com/contact?sujet=anglais"
+            className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Talk to Antony →
+          </a>
+        </div>
+
         <div className="mt-12 rounded-3xl bg-primary text-primary-foreground p-8 md:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h3 className="text-2xl md:text-3xl font-bold">Ready to start?</h3>
