@@ -81,7 +81,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      <div className="md:w-1/2 bg-primary text-primary-foreground p-8 md:p-12 flex flex-col justify-between">
+      <aside className="md:w-1/2 bg-primary text-primary-foreground p-8 md:p-12 flex flex-col justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-9 w-9 rounded-xl bg-accent flex items-center justify-center">
             <GraduationCap className="h-5 w-5 text-accent-foreground" />
@@ -97,9 +97,9 @@ function AuthPage() {
         <div className="hidden md:block text-xs text-primary-foreground/60">
           Independent study tool. Not affiliated with the official CLOE certification.
         </div>
-      </div>
+      </aside>
 
-      <div className="md:w-1/2 flex items-center justify-center p-6 md:p-12 bg-background">
+      <main className="md:w-1/2 flex items-center justify-center p-6 md:p-12 bg-background">
         <div className="w-full max-w-md">
           <h1 className="text-2xl font-bold text-foreground">Welcome</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -208,7 +208,7 @@ function AuthPage() {
             Continue with Google
           </Button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

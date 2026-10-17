@@ -24,7 +24,7 @@ const SKILLS = [
 
 export function MeridianHero() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const stageRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<HTMLElement | null>(null);
   // pointer bias (-1..1) and per-strand hover brightness targets, held in refs
   // so the animation loop never triggers React re-renders.
   const pointer = useRef({ x: 0, y: 0 });
@@ -238,7 +238,7 @@ export function MeridianHero() {
   };
 
   return (
-    <div
+    <header
       ref={stageRef}
       className="mh-stage relative isolate overflow-hidden h-[82svh] min-h-[520px] max-h-[740px] text-[#f4efe6]"
     >
@@ -349,6 +349,6 @@ export function MeridianHero() {
         Scroll
         <span className="mh-rail" />
       </div>
-    </div>
+    </header>
   );
 }
