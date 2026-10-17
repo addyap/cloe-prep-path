@@ -70,7 +70,7 @@ const GenOutputSchema = z.object({ questions: z.array(QuestionSchema).min(1).max
 
 export const generateQuestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => GenInputSchema.parse(d))
+  .validator((d: unknown) => GenInputSchema.parse(d))
   .handler(async ({ data, context }) => {
     // Authorize: must be admin
     const { data: isAdmin } = await context.supabase.rpc("has_role", {

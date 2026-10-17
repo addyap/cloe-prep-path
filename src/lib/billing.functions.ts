@@ -50,7 +50,7 @@ const CheckoutInput = z.object({
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => CheckoutInput.parse(d))
+  .validator((d: unknown) => CheckoutInput.parse(d))
   .handler(async ({ data, context }) => {
     const price = process.env.STRIPE_PRICE_PRO;
     if (!price) throw new Error("BILLING_NOT_CONFIGURED");
