@@ -90,6 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Independent prep app for the CLOE English certification.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "CLOE Prep" },
       { property: "og:image", content: "https://cloe.antonyaddy.com/og-image.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -103,6 +104,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: "https://cloe.antonyaddy.com/",
           description:
             "Independent prep app for the CLOE English certification. Adaptive practice across listening, reading, grammar & vocabulary, writing and speaking.",
+          // The one Antony Addy identity, defined in full on www.antonyaddy.com.
+          author: {
+            "@type": "Person",
+            "@id": "https://www.antonyaddy.com/#antony-addy",
+            name: "Antony Addy",
+            url: "https://www.antonyaddy.com",
+          },
+          publisher: {
+            "@type": "ProfessionalService",
+            "@id": "https://www.antonyaddy.com/#business",
+            name: "Antony Addy",
+            url: "https://www.antonyaddy.com",
+          },
         },
       },
     ],
