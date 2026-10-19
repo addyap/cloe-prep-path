@@ -18,17 +18,16 @@ const FAQS: Array<{ q: string; a: React.ReactNode; plainAnswer: string }> = [
     q: "What's free, and what needs a Pro plan?",
     a: (
       <>
-        Everything is free right now, including writing practice, the speaking simulator, full mock
-        exams, and AI-generated feedback — Pro billing isn't live yet, so there's nothing to pay for
-        while we finish testing. See{" "}
+        Everything is free during launch, including writing practice, the speaking simulator, full
+        mock exams, and AI-generated feedback — there's nothing to pay for. See{" "}
         <Link to="/pricing" className="underline">
           Pricing
-        </Link>{" "}
-        for what's planned once it launches.
+        </Link>
+        .
       </>
     ),
     plainAnswer:
-      "Everything is free right now, including writing practice, the speaking simulator, full mock exams, and AI-generated feedback — Pro billing isn't live yet, so there's nothing to pay for while we finish testing.",
+      "Everything is free during launch, including writing practice, the speaking simulator, full mock exams, and AI-generated feedback — there's nothing to pay for.",
   },
   {
     q: "How does the AI feedback work?",
@@ -38,9 +37,9 @@ const FAQS: Array<{ q: string; a: React.ReactNode; plainAnswer: string }> = [
   },
   {
     q: "Will I have to pay eventually?",
-    a: "Not for what you're already using. If a paid Pro plan launches, it won't retroactively lock features you already have access to for free — see our Refund Policy for how billing would work once it's live.",
+    a: "CLOE Prep is free during launch. If paid plans are introduced later, they'll be announced on this site before they apply — see our Refund Policy for how billing would work.",
     plainAnswer:
-      "Not for what you're already using. If a paid Pro plan launches, it won't retroactively lock features you already have access to for free.",
+      "CLOE Prep is free during launch. If paid plans are introduced later, they'll be announced on this site before they apply.",
   },
   {
     q: "Is my data safe?",
