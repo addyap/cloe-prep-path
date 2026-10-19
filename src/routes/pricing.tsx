@@ -10,7 +10,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "CLOE Prep is free during beta — every feature unlocked, no card required. Practice for the CLOE English certification.",
+          "CLOE Prep is free during launch — every feature unlocked, no card required. Practice for the CLOE English certification.",
       },
       { property: "og:url", content: "https://cloe.antonyaddy.com/pricing" },
     ],
@@ -18,11 +18,6 @@ export const Route = createFileRoute("/pricing")({
   }),
   component: PricingPage,
 });
-
-// Placeholder monthly price for the Pro plan — update once billing is configured
-// in Stripe (this is display-only right now; ENFORCE_ENTITLEMENTS in
-// src/lib/entitlements.ts is off, so nothing is actually gated yet).
-const PRO_PRICE_DISPLAY = "€7.99";
 
 // Listed in full rather than "Everything in Free" — there is no Free card on
 // this page to refer back to, so the list has to stand on its own.
@@ -41,10 +36,10 @@ function PricingPage() {
   return (
     <PublicPageShell>
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-primary">Simple pricing</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-primary">Free during launch</h1>
         <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          Every feature is free while we're in beta — including AI-graded writing and speaking
-          practice and full mock exams. No card required.
+          Every feature is free during launch — including AI-graded writing and speaking practice
+          and full mock exams. No card required.
         </p>
         <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto">
           That includes unlimited listening, reading, and grammar &amp; vocabulary practice with
@@ -61,11 +56,8 @@ function PricingPage() {
           <div className="text-sm font-semibold uppercase tracking-wide text-accent">Pro</div>
           <div className="mt-2 text-4xl font-extrabold text-foreground">
             Free
-            <span className="text-base font-medium text-muted-foreground"> during beta</span>
+            <span className="text-base font-medium text-muted-foreground"> during launch</span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Planned price: {PRO_PRICE_DISPLAY}/month once billing goes live.
-          </p>
           <ul className="mt-6 space-y-2.5">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm">
@@ -76,11 +68,11 @@ function PricingPage() {
           </ul>
           <Link to="/dashboard">
             <Button className="w-full mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
-              Try Pro free
+              Get started
             </Button>
           </Link>
           <p className="mt-2 text-xs text-center text-muted-foreground">
-            Every Pro feature is free while we're in beta — no card needed.
+            Every Pro feature is free during launch — no card needed.
           </p>
         </div>
       </div>

@@ -16,7 +16,7 @@ export function FooterDisclaimer() {
           >
             Fluentory by Antony Addy
           </a>{' '}
-          — free tools for grammar, listening, speaking and exam prep, built by a certified trainer.
+          — tools for grammar, listening, speaking and exam prep, built by a certified trainer.
         </p>
       </div>
     </footer>
