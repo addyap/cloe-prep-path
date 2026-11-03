@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Flag } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -15,9 +14,10 @@ import {
 } from "@/components/ui/dialog";
 
 /** Small "Report an issue" affordance for a practice question — lets a
- *  learner flag a wrong/ambiguous item straight from the session. Writes to
- *  question_reports (insert-only RLS; reviewed via the Supabase CLI, no
- *  admin UI needed for this). */
+ *  learner flag a wrong/ambiguous item straight from the session. The site has
+ *  no server database, so the report opens as a pre-filled email. */
+const REPORT_EMAIL = "formations@antonyaddy.com";
+
 export function ReportIssueDialog({
   questionId,
   userAnswer,
@@ -29,26 +29,19 @@ export function ReportIssueDialog({
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  async function submit() {
+  function submit() {
     setSubmitting(true);
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) {
-      toast.error("You need to be signed in to report an issue.");
-      setSubmitting(false);
-      return;
-    }
-    const { error } = await supabase.from("question_reports").insert({
-      question_id: questionId,
-      user_id: u.user.id,
-      user_answer: userAnswer ?? null,
-      reason: reason.trim() || null,
-    });
+    const body = [
+      `Question: ${questionId}`,
+      `My answer: ${userAnswer ?? "(none)"}`,
+      "",
+      reason.trim() || "(no details)",
+    ].join("\n");
+    window.location.href = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(
+      "CLOE Prep: question issue",
+    )}&body=${encodeURIComponent(body)}`;
     setSubmitting(false);
-    if (error) {
-      toast.error("Couldn't send your report. Please try again.");
-      return;
-    }
-    toast.success("Thanks — this question has been flagged for review.");
+    toast.success("Thanks — your email app should open with the report ready to send.");
     setReason("");
     setOpen(false);
   }

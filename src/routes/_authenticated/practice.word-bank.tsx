@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { LayoutGrid, Check, X, ArrowRight, Loader2, Trophy } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -91,21 +91,17 @@ function WordBankPractice() {
   useEffect(() => {
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u } = await db.auth.getUser();
         const [profileRes, passRes, qRes] = await Promise.all([
           u.user
-            ? supabase
+            ? db
                 .from("profiles")
                 .select("current_estimated_level")
                 .eq("id", u.user.id)
                 .maybeSingle()
             : Promise.resolve({ data: null } as const),
-          supabase
-            .from("passages")
-            .select("*")
-            .eq("skill", "grammar_vocab")
-            .not("word_bank", "is", null),
-          supabase
+          db.from("passages").select("*").eq("skill", "grammar_vocab").not("word_bank", "is", null),
+          db
             .from("questions")
             .select("*")
             .eq("skill", "grammar_vocab")
@@ -218,9 +214,9 @@ function WordBankPractice() {
       correct: gradeAnswer("word_bank", filled[b.ordinal], b.correct_answer),
     }));
     setResults((r) => [...r, { passage: current, answers: graded }]);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("attempts").insert(
+      await db.from("attempts").insert(
         graded.map((g) => ({
           user_id: u.user!.id,
           question_id: g.blank.id,

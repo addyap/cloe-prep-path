@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, ClipboardCheck, TrendingUp, Sparkles } from "lucide-react";
 
@@ -33,9 +33,9 @@ export function OnboardingTour() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) return;
-      const { data } = await supabase
+      const { data } = await db
         .from("profiles")
         .select("onboarding_completed")
         .eq("id", u.user.id)
@@ -50,9 +50,9 @@ export function OnboardingTour() {
 
   const close = async () => {
     setOpen(false);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("profiles").update({ onboarding_completed: true }).eq("id", u.user.id);
+      await db.from("profiles").update({ onboarding_completed: true }).eq("id", u.user.id);
     }
   };
 

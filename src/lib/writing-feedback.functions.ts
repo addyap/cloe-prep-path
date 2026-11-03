@@ -1,14 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { createOpenAiProvider } from "@/lib/ai-gateway.server";
-import {
-  ENFORCE_ENTITLEMENTS,
-  hasFeature,
-  resolvePlan,
-  type SubscriptionRow,
-} from "@/lib/entitlements";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 
@@ -40,20 +33,11 @@ const InputSchema = z.object({
   user_text: z.string().min(1).max(8000),
 });
 
+/** Marks a writing task with AI. The learner's browser saves the attempt
+ *  (src/lib/attempts.ts); nothing is stored on the server. */
 export const evaluateWriting = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .validator((d: unknown) => InputSchema.parse(d))
-  .handler(async ({ data, context }) => {
-    if (ENFORCE_ENTITLEMENTS) {
-      const { data: subRow } = await context.supabase
-        .from("subscriptions")
-        .select("plan, status, current_period_end")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-      const plan = resolvePlan((subRow ?? null) as SubscriptionRow | null);
-      if (!hasFeature(plan, "ai_writing_feedback")) throw new Error("UPGRADE_REQUIRED");
-    }
-
+  .handler(async ({ data }) => {
     const key = process.env.OPENAI_API_KEY;
     if (!key) throw new Error("Missing OPENAI_API_KEY");
 
@@ -113,22 +97,5 @@ Evaluate the response against the task and the target level. Return:
         100,
     );
 
-    const { data: attempt, error } = await context.supabase
-      .from("attempts")
-      .insert({
-        user_id: context.userId,
-        question_id: data.question_id,
-        skill: "writing",
-        cefr_level: feedback.estimated_level,
-        user_answer: data.user_text,
-        is_correct: null,
-        score: overall / 100,
-        feedback: feedback as never,
-      })
-      .select("id")
-      .single();
-
-    if (error) throw new Error(error.message);
-
-    return { attempt_id: attempt.id, feedback, overall };
+    return { feedback, overall };
   });
