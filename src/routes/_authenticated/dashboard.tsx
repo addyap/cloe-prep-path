@@ -11,7 +11,7 @@ import {
   Flame,
   Pencil,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { SKILL_ROUTES, type SkillSlug } from "@/lib/skills";
 import { AppShell } from "@/components/app-shell";
 import { CefrProgress, type CefrLevel } from "@/components/cefr-progress";
@@ -83,23 +83,20 @@ function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) return;
       const [profileRes, attemptsRes, sessionsRes, badgesRes] = await Promise.all([
-        supabase
+        db
           .from("profiles")
           .select("full_name, current_estimated_level, target_cefr_level, daily_goal_minutes")
           .eq("id", u.user.id)
           .maybeSingle(),
-        supabase
-          .from("attempts")
-          .select("created_at, cefr_level, is_correct")
-          .eq("user_id", u.user.id),
-        supabase
+        db.from("attempts").select("created_at, cefr_level, is_correct").eq("user_id", u.user.id),
+        db
           .from("practice_sessions")
           .select("started_at, completed_at, mode")
           .eq("user_id", u.user.id),
-        supabase.from("badges").select("code").eq("user_id", u.user.id),
+        db.from("badges").select("code").eq("user_id", u.user.id),
       ]);
 
       const profile = profileRes.data;
@@ -121,9 +118,7 @@ function Dashboard() {
       const newlyEarned = evaluateBadges(att, ses, activity);
       const toAward = newlyEarned.filter((c) => !already.has(c));
       if (toAward.length > 0) {
-        await supabase
-          .from("badges")
-          .insert(toAward.map((code) => ({ user_id: u.user!.id, code })));
+        await db.from("badges").insert(toAward.map((code) => ({ user_id: u.user!.id, code })));
         for (const code of toAward) {
           already.add(code);
           toast.success(`🏆 Badge unlocked: ${code.replaceAll("_", " ")}`);
@@ -139,10 +134,10 @@ function Dashboard() {
   const today = todayMinutes(activity);
 
   const saveGoal = async () => {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (!u.user) return;
     const n = Math.max(5, Math.min(120, Number(tempGoal) || 15));
-    const { error } = await supabase
+    const { error } = await db
       .from("profiles")
       .update({ daily_goal_minutes: n })
       .eq("id", u.user.id);

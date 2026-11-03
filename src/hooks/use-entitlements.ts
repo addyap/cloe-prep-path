@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import {
   ENFORCE_ENTITLEMENTS,
   hasFeature,
@@ -26,12 +26,12 @@ export function useEntitlements(): {
     if (!ENFORCE_ENTITLEMENTS) return;
     let cancelled = false;
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) {
         if (!cancelled) setLoading(false);
         return;
       }
-      const { data } = await supabase
+      const { data } = await db
         .from("subscriptions")
         .select("plan, status, current_period_end")
         .eq("user_id", u.user.id)

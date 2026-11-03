@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -91,9 +91,9 @@ function Onboarding() {
     } else {
       const estimated = estimate(next);
       setSaving(true);
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) return;
-      const { error } = await supabase
+      const { error } = await db
         .from("profiles")
         .update({ target_cefr_level: target, current_estimated_level: estimated })
         .eq("id", u.user.id);

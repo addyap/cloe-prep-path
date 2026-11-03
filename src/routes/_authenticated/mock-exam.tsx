@@ -22,7 +22,8 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
+import { saveSpeakingAttempt } from "@/lib/attempts";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -131,13 +132,13 @@ function MockExamPage() {
     (async () => {
       try {
         const [{ data: qs, error: qErr }, { data: ps }, userRes] = await Promise.all([
-          supabase
+          db
             .from("questions")
             .select(
               "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
             ),
-          supabase.from("passages").select("id, title, body, audio_url"),
-          supabase.auth.getUser(),
+          db.from("passages").select("id, title, body, audio_url"),
+          db.auth.getUser(),
         ]);
         if (qErr) throw qErr;
         const all = ((qs ?? []) as Question[]).map((q) => ({
@@ -160,7 +161,7 @@ function MockExamPage() {
         });
         setPassages(pmap);
         if (userRes.data.user) {
-          const { data: prof } = await supabase
+          const { data: prof } = await db
             .from("profiles")
             .select("current_estimated_level")
             .eq("id", userRes.data.user.id)
@@ -180,7 +181,7 @@ function MockExamPage() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: oralErr } = await supabase
+        const { data, error: oralErr } = await db
           .from("questions")
           .select(
             "id, skill, cefr_level, context_tag, type, prompt_text, audio_url, options, correct_answer, passage_id",
@@ -198,9 +199,9 @@ function MockExamPage() {
   }, []);
 
   async function startSession() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (!u.user) return;
-    const { data, error: insErr } = await supabase
+    const { data, error: insErr } = await db
       .from("practice_sessions")
       .insert({ user_id: u.user.id, mode: "mock" })
       .select("id")
@@ -212,15 +213,15 @@ function MockExamPage() {
   async function finalize(allWritten: Answered[], allOral: OralResult[]) {
     const summary = buildSummary(allWritten, allOral);
     if (sessionId) {
-      await supabase
+      await db
         .from("practice_sessions")
         .update({ completed_at: new Date().toISOString(), summary: summary as never })
         .eq("id", sessionId);
     }
     // Update user's current_estimated_level
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase
+      await db
         .from("profiles")
         .update({ current_estimated_level: summary.overall_level })
         .eq("id", u.user.id);
@@ -853,19 +854,14 @@ function OralPhase({
     setSubmitting(true);
     setError(null);
     try {
-      const { data: sess } = await supabase.auth.getSession();
-      const token = sess.session?.access_token;
-      if (!token) throw new Error("Not signed in.");
       const form = new FormData();
       form.append("audio", blob, `recording.${blob.type.includes("mp4") ? "mp4" : "webm"}`);
       form.append("question_id", prompt.id);
       form.append("prompt_text", prompt.prompt_text);
       form.append("target_level", targetLevel);
       form.append("phase", phase);
-      form.append("save", "true");
       const res = await fetch("/api/speaking/evaluate", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: form,
       });
       if (!res.ok) {
@@ -877,6 +873,7 @@ function OralPhase({
         feedback: SpeakingFeedback;
         overall: number;
       };
+      await saveSpeakingAttempt(prompt.id, data, phase);
       onSubmitted({
         phase,
         prompt,

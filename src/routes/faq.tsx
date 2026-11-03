@@ -10,9 +10,9 @@ const FAQS: Array<{ q: string; a: React.ReactNode; plainAnswer: string }> = [
   },
   {
     q: "Do I need to create an account?",
-    a: 'No — click "Get started" and you\'re straight into the app as a guest. You can create a full account (email, magic link, or Google) later if you want your progress to persist across devices.',
+    a: 'No — click "Get started" and you\'re straight into the app. There are no accounts: your progress is saved in your browser on this device, so use the same browser to pick up where you left off.',
     plainAnswer:
-      'No — click "Get started" and you\'re straight into the app as a guest. You can create a full account (email, magic link, or Google) later if you want your progress to persist across devices.',
+      'No — click "Get started" and you\'re straight into the app. There are no accounts: your progress is saved in your browser on this device, so use the same browser to pick up where you left off.',
   },
   {
     q: "What's free, and what needs a Pro plan?",

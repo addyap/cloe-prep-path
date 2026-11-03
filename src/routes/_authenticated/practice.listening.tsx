@@ -12,7 +12,7 @@ import {
   Loader2,
   Trophy,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -110,22 +110,18 @@ function ListeningPractice() {
   useEffect(() => {
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u } = await db.auth.getUser();
         const [profileRes, singlesRes, passagesRes, passageQsRes] = await Promise.all([
           u.user
-            ? supabase
+            ? db
                 .from("profiles")
                 .select("current_estimated_level")
                 .eq("id", u.user.id)
                 .maybeSingle()
             : Promise.resolve({ data: null } as const),
-          supabase.from("questions").select("*").eq("skill", "listening").is("passage_id", null),
-          supabase.from("passages").select("*").eq("skill", "listening"),
-          supabase
-            .from("questions")
-            .select("*")
-            .eq("skill", "listening")
-            .not("passage_id", "is", null),
+          db.from("questions").select("*").eq("skill", "listening").is("passage_id", null),
+          db.from("passages").select("*").eq("skill", "listening"),
+          db.from("questions").select("*").eq("skill", "listening").not("passage_id", "is", null),
         ]);
         if (singlesRes.error) throw singlesRes.error;
         if (passagesRes.error) throw passagesRes.error;
@@ -179,7 +175,7 @@ function ListeningPractice() {
         setPool([...singleUnits, ...passageUnits]);
 
         if (u.user) {
-          const { data: missed } = await supabase
+          const { data: missed } = await db
             .from("attempts")
             .select("question_id")
             .eq("user_id", u.user.id)
@@ -202,9 +198,7 @@ function ListeningPractice() {
       if (remaining.length === 0) return null;
 
       const isMissed = (u: SessionUnit) =>
-        u.kind === "single"
-          ? missedIds.has(u.id)
-          : u.questions.some((q) => missedIds.has(q.id));
+        u.kind === "single" ? missedIds.has(u.id) : u.questions.some((q) => missedIds.has(q.id));
 
       const tryLevels: Level[] = [forLevel];
       for (let d = 1; d < LEVELS.length; d++) {
@@ -338,9 +332,9 @@ function ListeningPractice() {
 
     setResults((r) => [...r, { unit: current, answers, correctCount, totalCount }]);
 
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("attempts").insert(
+      await db.from("attempts").insert(
         attemptRows.map((a) => ({
           user_id: u.user!.id,
           question_id: a.question_id,
@@ -442,13 +436,24 @@ function ListeningPractice() {
           <div className="mt-6 space-y-4 text-sm md:text-base text-foreground/90">
             <p className="font-semibold">After this session you will be able to:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Understand short phone calls, meetings, and announcements in professional English.</li>
-              <li>Identify key details, speaker intent, and implied meaning at your current CEFR level.</li>
+              <li>
+                Understand short phone calls, meetings, and announcements in professional English.
+              </li>
+              <li>
+                Identify key details, speaker intent, and implied meaning at your current CEFR
+                level.
+              </li>
             </ul>
             <p className="font-semibold mt-4">How it works:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>You will hear {SESSION_LENGTH} audio clips — a mix of standalone items and longer dialogues.</li>
-              <li>Each clip can be played up to {MAX_PLAYS} times. Use the speed toggle if you need it slower.</li>
+              <li>
+                You will hear {SESSION_LENGTH} audio clips — a mix of standalone items and longer
+                dialogues.
+              </li>
+              <li>
+                Each clip can be played up to {MAX_PLAYS} times. Use the speed toggle if you need it
+                slower.
+              </li>
               <li>Choose the best answer for each question, then submit to see feedback.</li>
               <li>Difficulty adapts based on your answers.</li>
             </ul>
@@ -866,13 +871,26 @@ function Summary({ results, estimatedLevel }: { results: UnitResult[]; estimated
             </div>
             <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
               {accuracy < 50 && (
-                <li>Your accuracy is below 50% — try practising at a lower level to build confidence, then come back.</li>
+                <li>
+                  Your accuracy is below 50% — try practising at a lower level to build confidence,
+                  then come back.
+                </li>
               )}
               {accuracy >= 50 && accuracy < 80 && weakest && (
-                <li>Focus on <span className="font-semibold capitalize">{weakest.tag.replace("_", " ")}</span> — it was your weakest context this session.</li>
+                <li>
+                  Focus on{" "}
+                  <span className="font-semibold capitalize">{weakest.tag.replace("_", " ")}</span>{" "}
+                  — it was your weakest context this session.
+                </li>
               )}
               {accuracy >= 80 && (
-                <li>Strong session. Try a <Link to="/practice/reading" className="underline font-semibold">reading drill</Link> to round out your comprehension skills.</li>
+                <li>
+                  Strong session. Try a{" "}
+                  <Link to="/practice/reading" className="underline font-semibold">
+                    reading drill
+                  </Link>{" "}
+                  to round out your comprehension skills.
+                </li>
               )}
               <li>Short, frequent sessions beat long cramming — aim for 10–15 minutes daily.</li>
             </ul>

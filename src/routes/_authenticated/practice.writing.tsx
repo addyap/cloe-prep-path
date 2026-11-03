@@ -12,7 +12,7 @@ import {
   ArrowRight,
   AlertCircle,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,7 @@ import { ReportIssueDialog } from "@/components/report-issue-dialog";
 import { ProFreeBadge } from "@/components/pro-free-badge";
 import { cn } from "@/lib/utils";
 import { evaluateWriting, type WritingFeedback } from "@/lib/writing-feedback.functions";
+import { saveWritingAttempt } from "@/lib/attempts";
 
 export const Route = createFileRoute("/_authenticated/practice/writing")({
   component: WritingPractice,
@@ -64,7 +65,7 @@ function WritingPractice() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: qError } = await supabase
+        const { data, error: qError } = await db
           .from("questions")
           .select("id,cefr_level,context_tag,prompt_text")
           .eq("skill", "writing")
@@ -126,6 +127,7 @@ function WritingPractice() {
           user_text: text.trim(),
         },
       });
+      await saveWritingAttempt(current.id, text.trim(), res);
       setFeedback(res.feedback);
       setOverall(res.overall);
     } catch (e: unknown) {

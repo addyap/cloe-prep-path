@@ -1,0 +1,6 @@
+# Python packages for scripts/kokoro-speak.py. Installed by `bun run audio:setup`.
+kokoro==0.9.4
+soundfile==0.14.0
+# The English model Kokoro uses to read text. Installed here because Kokoro
+# would otherwise try to download it mid-recording, which fails in a uv venv.
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

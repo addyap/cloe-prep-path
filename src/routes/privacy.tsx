@@ -7,7 +7,8 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy Policy — CLOE Prep" },
       {
         name: "description",
-        content: "How CLOE Prep collects, uses, and protects your data — what we store, which third parties we share with, and your GDPR rights.",
+        content:
+          "How CLOE Prep collects, uses, and protects your data — what we store, which third parties we share with, and your GDPR rights.",
       },
       { property: "og:url", content: "https://cloe.antonyaddy.com/privacy" },
     ],
@@ -42,15 +43,13 @@ function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-foreground">2. What we collect</h2>
           <p className="mt-2">
-            You can use CLOE Prep as a guest (an anonymous account with no email) or by creating a
-            full account with email/password, a magic link, or Google sign-in. Depending on how you
-            use the app, we collect:
+            CLOE Prep has no accounts and no sign-in. Depending on how you use the app, the
+            following is created:
           </p>
           <ul className="mt-2 list-disc pl-5 space-y-1">
-            <li>Your email address, if you create a full account.</li>
             <li>
               Your practice activity: answers, scores, CEFR level estimates, and session history, so
-              we can track your progress and adapt difficulty.
+              the app can track your progress and adapt difficulty. This stays in your browser.
             </li>
             <li>
               Text you submit for AI-graded writing feedback, and the transcript of anything you say
@@ -69,15 +68,16 @@ function PrivacyPage() {
           <p className="mt-2">We share the minimum data necessary with:</p>
           <ul className="mt-2 list-disc pl-5 space-y-1">
             <li>
-              <strong>Supabase</strong> — hosts our database, authentication, and file storage
-              (including generated listening audio clips).
+              <strong>Your own browser</strong> — your profile, answers and progress are saved only
+              in your browser on your device (local storage). There is no account and no server
+              database: we never receive them, and clearing your browser data or using &ldquo;Reset
+              my progress&rdquo; deletes them.
             </li>
             <li>
               <strong>OpenAI</strong> — grades your writing submissions, transcribes your speaking
-              recordings, and evaluates the transcript, to produce your CEFR feedback. Your spoken
-              audio is sent to OpenAI for transcription only and is not stored by us afterward —
-              only the resulting text transcript is saved to your account. Text you submit for
-              grading is retained as part of your practice history.
+              recordings, and evaluates the transcript, to produce your CEFR feedback. Your writing
+              or recording is sent to OpenAI only when you ask for feedback, and we do not store it
+              on any server; the feedback and transcript are saved in your browser.
             </li>
             <li>
               <strong>Vercel</strong> — hosts the website itself.
@@ -92,18 +92,18 @@ function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-foreground">4. Why we process your data</h2>
           <p className="mt-2">
-            To provide the service you asked for (practice sessions, AI feedback, progress
-            tracking), to maintain your account, and — if you subscribe — to bill you. We do not
-            sell your data or use it for advertising.
+            To provide the service you asked for (practice sessions, AI feedback, progress tracking)
+            and — if you subscribe — to bill you. We do not sell your data or use it for
+            advertising.
           </p>
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-foreground">5. How long we keep it</h2>
           <p className="mt-2">
-            We keep your account and practice history for as long as your account is active. If you
-            delete your account, we delete your personal data within a reasonable period, except
-            where we're required to keep records (e.g. billing records) for legal reasons.
+            Your practice history stays in your browser until you clear your browser data or press
+            &ldquo;Reset my progress&rdquo; on your profile. We keep billing records, if you ever
+            subscribe, for as long as the law requires.
           </p>
         </section>
 

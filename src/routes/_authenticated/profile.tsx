@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,20 +21,15 @@ const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [target, setTarget] = useState<CefrLevel | "">("");
   const [saving, setSaving] = useState(false);
-  // Anonymous (no-login) visitors have no email and nothing to sign out of.
-  const [isAnonymous, setIsAnonymous] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) return;
-      setIsAnonymous(u.user.is_anonymous ?? false);
-      setEmail(u.user.email ?? "");
-      const { data } = await supabase
+      const { data } = await db
         .from("profiles")
         .select("full_name, target_cefr_level")
         .eq("id", u.user.id)
@@ -46,9 +41,9 @@ function ProfilePage() {
 
   const save = async () => {
     setSaving(true);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (!u.user) return;
-    const { error } = await supabase
+    const { error } = await db
       .from("profiles")
       .update({
         full_name: fullName,
@@ -60,8 +55,10 @@ function ProfilePage() {
     toast.success("Profile updated.");
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  // Progress lives in this browser only, so "signing out" means starting over.
+  const resetProgress = async () => {
+    if (!window.confirm("Delete all your progress on this device and start again?")) return;
+    await db.auth.signOut();
     navigate({ to: "/" });
   };
 
@@ -70,12 +67,10 @@ function ProfilePage() {
       <div className="p-5 md:p-10 max-w-2xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">Profile</h1>
         <div className="mt-6 rounded-3xl bg-card border border-border p-6 md:p-8 shadow-card space-y-4">
-          {!isAnonymous && (
-            <div>
-              <Label>Email</Label>
-              <Input value={email} disabled />
-            </div>
-          )}
+          <p className="text-sm text-muted-foreground">
+            Your progress is saved in this browser, on this device. There's no account to sign in
+            to.
+          </p>
           <div>
             <Label htmlFor="fn">Full name</Label>
             <Input id="fn" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -103,11 +98,9 @@ function ProfilePage() {
             >
               Save changes
             </Button>
-            {!isAnonymous && (
-              <Button variant="outline" onClick={signOut}>
-                Sign out
-              </Button>
-            )}
+            <Button variant="outline" onClick={resetProgress}>
+              Reset my progress
+            </Button>
           </div>
         </div>
       </div>

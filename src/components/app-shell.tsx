@@ -5,15 +5,11 @@ import {
   ClipboardCheck,
   TrendingUp,
   User,
-  LogOut,
   GraduationCap,
-  Sparkles,
   Tag,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { FooterDisclaimer } from "@/components/footer-disclaimer";
 
 const NAV = [
@@ -26,32 +22,6 @@ const NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [isAdmin, setIsAdmin] = useState(false);
-  // Visitors browse via a silent anonymous account (no login). There's nothing
-  // to "sign out" of, and signing out would just reset their progress, so the
-  // control is only shown to real (non-anonymous) accounts.
-  const [isAnonymous, setIsAnonymous] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      setIsAnonymous(u.user.is_anonymous ?? false);
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", u.user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      setIsAdmin(!!data);
-    })();
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
-
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop sidebar */}
@@ -90,31 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <Tag className="h-4 w-4" /> Pricing
           </Link>
-          {isAdmin && (
-            <Link
-              to="/admin/generate"
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mt-4 border-t border-sidebar-border pt-4",
-                pathname.startsWith("/admin")
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50",
-              )}
-            >
-              <Sparkles className="h-4 w-4" /> Generate
-            </Link>
-          )}
         </nav>
-        {!isAnonymous && (
-          <div className="p-3 border-t border-sidebar-border">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-4 w-4 mr-2" /> Sign out
-            </Button>
-          </div>
-        )}
       </aside>
 
       {/* Main */}
