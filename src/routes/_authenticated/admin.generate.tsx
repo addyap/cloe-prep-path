@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { checkIsAdmin, claimFirstAdmin, generateQuestions } from "@/lib/admin.functions";
 import {
-  generateListeningAudio,
-  generateListeningPassageAudio,
-  previewVoice,
-  PREVIEW_VOICES,
+  getListeningAudioBatch,
+  saveListeningAudio,
+  createListeningAudioUpload,
 } from "@/lib/audio-gen.functions";
+import { generateBrowserAudioBatch } from "@/lib/browser-audio-batch";
+import { PREVIEW_VOICES } from "@/lib/audio-config";
+import type { KokoroVoice } from "@/lib/audio-config";
 import { Sparkles, ShieldCheck, Loader2, Volume2, Play } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/generate")({
@@ -69,9 +71,21 @@ function AdminGenerate() {
   const [revoiceAll, setRevoiceAll] = useState(false);
   const SAMPLE_TEXT =
     "Good morning everyone. The meeting will start at ten o'clock in the main room. Please bring your reports.";
-  const [previewVoiceName, setPreviewVoiceName] = useState<string>(PREVIEW_VOICES[0]);
+  const [previewVoiceName, setPreviewVoiceName] = useState<KokoroVoice>(PREVIEW_VOICES[0]);
   const [previewText, setPreviewText] = useState<string>(SAMPLE_TEXT);
   const [previewBusy, setPreviewBusy] = useState(false);
+  const [synthesisNote, setSynthesisNote] = useState("");
+  const previewAudio = useRef<HTMLAudioElement | null>(null);
+  const previewUrl = useRef<string | null>(null);
+  const previewRequest = useRef(0);
+  useEffect(
+    () => () => {
+      previewRequest.current++;
+      previewAudio.current?.pause();
+      if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+    },
+    [],
+  );
   const [audioBusy, setAudioBusy] = useState(false);
   const [audioStatus, setAudioStatus] = useState<{
     generated: number;
@@ -88,9 +102,9 @@ function AdminGenerate() {
   const isAdminFn = useServerFn(checkIsAdmin);
   const claimFn = useServerFn(claimFirstAdmin);
   const genFn = useServerFn(generateQuestions);
-  const audioFn = useServerFn(generateListeningAudio);
-  const passageAudioFn = useServerFn(generateListeningPassageAudio);
-  const previewFn = useServerFn(previewVoice);
+  const audioQueueFn = useServerFn(getListeningAudioBatch);
+  const saveAudioFn = useServerFn(saveListeningAudio);
+  const prepareAudioFn = useServerFn(createListeningAudioUpload);
 
   useEffect(() => {
     (async () => {
@@ -147,26 +161,40 @@ function AdminGenerate() {
 
   const playPreview = async () => {
     setPreviewBusy(true);
+    const request = ++previewRequest.current;
+    previewAudio.current?.pause();
     try {
-      const res = await previewFn({
-        data: { voice: previewVoiceName, text: previewText.trim().slice(0, 400) },
-      });
-      const audio = new Audio(res.dataUrl);
+      const { synthesizeBrowserSpeech } = await import("@/lib/kokoro-browser");
+      const blob = await synthesizeBrowserSpeech(
+        previewText.trim().slice(0, 400),
+        previewVoiceName,
+        setSynthesisNote,
+      );
+      if (request !== previewRequest.current) return;
+      if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+      previewUrl.current = URL.createObjectURL(blob);
+      const audio = new Audio(previewUrl.current);
+      previewAudio.current = audio;
       await audio.play();
     } catch (e) {
       const msg = (e as Error).message;
-      if (msg === "CREDITS_EXHAUSTED")
-        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
-      else toast.error(msg || "Couldn't play the sample.");
+      if (request === previewRequest.current) toast.error(msg || "Couldn't play the sample.");
     } finally {
-      setPreviewBusy(false);
+      if (request === previewRequest.current) setPreviewBusy(false);
     }
   };
 
   const generateAudio = async () => {
     setAudioBusy(true);
     try {
-      const res = await audioFn({ data: { limit: 30, regenerateAll: revoiceAll } });
+      const res = await generateBrowserAudioBatch(
+        "question",
+        revoiceAll,
+        audioQueueFn,
+        saveAudioFn,
+        prepareAudioFn,
+        setSynthesisNote,
+      );
       setAudioStatus({
         generated: res.generated,
         remaining: res.remaining,
@@ -183,10 +211,7 @@ function AdminGenerate() {
       }
     } catch (e) {
       const msg = (e as Error).message;
-      if (msg === "RATE_LIMIT") toast.error("Rate limit hit. Try again in a moment.");
-      else if (msg === "CREDITS_EXHAUSTED")
-        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
-      else toast.error(msg || "Failed to generate audio.");
+      toast.error(msg || "Failed to generate audio.");
     } finally {
       setAudioBusy(false);
     }
@@ -195,7 +220,14 @@ function AdminGenerate() {
   const generatePassageAudio = async () => {
     setPassageAudioBusy(true);
     try {
-      const res = await passageAudioFn({ data: { limit: 30, regenerateAll: revoiceAll } });
+      const res = await generateBrowserAudioBatch(
+        "passage",
+        revoiceAll,
+        audioQueueFn,
+        saveAudioFn,
+        prepareAudioFn,
+        setSynthesisNote,
+      );
       setPassageAudioStatus({
         generated: res.generated,
         remaining: res.remaining,
@@ -212,10 +244,7 @@ function AdminGenerate() {
       }
     } catch (e) {
       const msg = (e as Error).message;
-      if (msg === "RATE_LIMIT") toast.error("Rate limit hit. Try again in a moment.");
-      else if (msg === "CREDITS_EXHAUSTED")
-        toast.error("AI credits exhausted. Add credits to your OpenAI account.");
-      else toast.error(msg || "Failed to generate audio.");
+      toast.error(msg || "Failed to generate audio.");
     } finally {
       setPassageAudioBusy(false);
     }
@@ -363,18 +392,26 @@ function AdminGenerate() {
           )}
         </section>
 
+        {(previewBusy || audioBusy || passageAudioBusy) && synthesisNote && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {synthesisNote}
+          </p>
+        )}
         <section className="rounded-3xl border border-border bg-card p-6 shadow-card space-y-3">
           <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wide">
             <Play className="h-4 w-4" /> Voice preview
           </div>
           <p className="text-sm text-muted-foreground">
-            Hear a voice instantly — no re-voicing needed. Pick one, press Play, and compare. When
-            you find the natural one, tell me its name and I'll lock it in, then you re-voice once.
+            Compare Kokoro voices with a short sample. Lessons use Emma for narration and a distinct
+            voice for each dialogue speaker. Previewing does not change lesson voices.
           </p>
           <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-end">
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Voice</Label>
-              <Select value={previewVoiceName} onValueChange={setPreviewVoiceName}>
+              <Select
+                value={previewVoiceName}
+                onValueChange={(value) => setPreviewVoiceName(value as KokoroVoice)}
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -382,7 +419,7 @@ function AdminGenerate() {
                   {PREVIEW_VOICES.map((v) => (
                     <SelectItem key={v} value={v}>
                       {v}
-                      {(v === "marin" || v === "cedar") && " — best quality"}
+                      {v.startsWith("b") ? " — British English" : " — American English"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -390,7 +427,7 @@ function AdminGenerate() {
             </div>
             <Button
               onClick={playPreview}
-              disabled={previewBusy}
+              disabled={previewBusy || audioBusy || passageAudioBusy || !previewText.trim()}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               {previewBusy ? (
@@ -422,9 +459,9 @@ function AdminGenerate() {
             <Volume2 className="h-4 w-4" /> Listening audio
           </div>
           <p className="text-sm text-muted-foreground">
-            Listening items with no generated audio fall back to the browser's built-in
-            text-to-speech, which sounds robotic. Generate natural-voice audio (OpenAI TTS) in
-            batches of 30 — click again to keep going until nothing's left.
+            Generate Kokoro audio in your browser and save clips for everyone to play. No speech API
+            key is needed. The first use downloads the voice model. Keep this page open while
+            generating each batch of two.
           </p>
           <label className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-sm cursor-pointer">
             <input
@@ -435,19 +472,24 @@ function AdminGenerate() {
             />
             <span>
               <span className="font-medium text-foreground">Re-voice everything</span> — also
-              replace clips made with the old robotic voices, not just fill in missing ones. Use
-              this once to upgrade the whole bank to the natural voice.
+              replace older clips with Kokoro, including existing recordings. Clips already upgraded
+              to this Kokoro version are skipped.
             </span>
           </label>
-          <Button onClick={generateAudio} disabled={audioBusy} variant="outline" className="w-full">
+          <Button
+            onClick={generateAudio}
+            disabled={audioBusy || passageAudioBusy || previewBusy}
+            variant="outline"
+            className="w-full"
+          >
             {audioBusy ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
               </>
             ) : revoiceAll ? (
-              "Re-voice item audio (next 30)"
+              "Re-voice item audio (next 2)"
             ) : (
-              "Generate item audio (next 30)"
+              "Generate item audio (next 2)"
             )}
           </Button>
           {audioStatus && !audioBusy && (
@@ -484,7 +526,7 @@ function AdminGenerate() {
           </p>
           <Button
             onClick={generatePassageAudio}
-            disabled={passageAudioBusy}
+            disabled={audioBusy || passageAudioBusy || previewBusy}
             variant="outline"
             className="w-full"
           >
@@ -493,9 +535,9 @@ function AdminGenerate() {
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating audio…
               </>
             ) : revoiceAll ? (
-              "Re-voice passage audio (next 30)"
+              "Re-voice passage audio (next 2)"
             ) : (
-              "Generate passage audio (next 30)"
+              "Generate passage audio (next 2)"
             )}
           </Button>
           {passageAudioStatus && !passageAudioBusy && (
