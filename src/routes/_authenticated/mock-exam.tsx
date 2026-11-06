@@ -22,6 +22,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import { useListeningAudio } from "@/hooks/use-listening-audio";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -430,10 +431,10 @@ function WrittenAdaptive({
   const [current, setCurrent] = useState<Question | null>(null);
   const [selection, setSelection] = useState<string>("");
   const [elapsed, setElapsed] = useState(0);
-  const [playsUsed, setPlaysUsed] = useState(0);
   const [warning, setWarning] = useState<string | null>(null);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playback = useListeningAudio(current?.id, 1);
+  const playsUsed = playback.plays;
+  const audioLoading = playback.status === "loading";
 
   // Round-robin skill selection
   const nextSkill = useMemo<WrittenSkill>(() => {
@@ -443,11 +444,8 @@ function WrittenAdaptive({
   // Pick first / next question
   useEffect(() => {
     if (current) return;
-    audioRef.current?.pause();
-    if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
     const q = pickNext(bank, used, theta, nextSkill);
     setCurrent(q);
-    setPlaysUsed(0);
     setSelection("");
   }, [current, bank, used, theta, nextSkill]);
 
@@ -476,44 +474,24 @@ function WrittenAdaptive({
     return () => {
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("beforeunload", onBeforeUnload);
-      if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
-      audioRef.current?.pause();
     };
   }, []);
 
-  const playAudio = useCallback(() => {
+  function playAudio() {
     if (!current) return;
-    if (playsUsed >= 1) return; // strict: 1 play in exam
-
-    // A passage-linked listening question has no audio of its own — the
-    // audio (and spoken script, for the TTS fallback) belongs to the
-    // passage it's about, not the question text itself.
+    // Resolve passage audio by its ID, never read the printed question aloud.
     const passage = current.passage_id ? passages[current.passage_id] : null;
-    const audioSrc = passage ? passage.audio_url : current.audio_url;
-    const fallbackText = passage ? passage.body : extractSpokenScript(current.prompt_text);
-
-    const hasRealAudio = audioSrc && !audioSrc.startsWith("tts:");
-    if (hasRealAudio) {
-      const el = new Audio(audioSrc!);
-      audioRef.current = el;
-      void el.play();
-      setPlaysUsed((n) => n + 1);
-      return;
-    }
-
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const text =
-      !passage && current.audio_url && current.audio_url.startsWith("tts:")
+    const target = current.passage_id
+      ? { kind: "passage" as const, id: current.passage_id }
+      : { kind: "question" as const, id: current.id };
+    if (current.passage_id && !passage) return;
+    const script = passage
+      ? passage.body
+      : current.audio_url?.startsWith("tts:")
         ? current.audio_url.slice(4)
-        : fallbackText;
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.95;
-    u.lang = "en-US";
-    utterRef.current = u;
-    window.speechSynthesis.speak(u);
-    setPlaysUsed((n) => n + 1);
-  }, [current, playsUsed, passages]);
+        : extractSpokenScript(current.prompt_text);
+    void playback.play(target, passage ? passage.audio_url : current.audio_url, script);
+  }
 
   function submit() {
     if (!current) return;
@@ -537,8 +515,8 @@ function WrittenAdaptive({
     setHistory(nextHistory);
     setUsed(nextUsed);
     setTheta(nextTheta);
+    playback.stop();
     setCurrent(null);
-    if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
 
     // Stop conditions
     if (nextHistory.length >= WRITTEN_MAX_ITEMS || isStable(nextHistory)) {
@@ -613,11 +591,30 @@ function WrittenAdaptive({
 
           {current.skill === "listening" && (
             <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3">
-              <Button onClick={playAudio} disabled={playsUsed >= 1} variant="outline" size="sm">
+              <Button
+                onClick={playAudio}
+                disabled={audioLoading || playsUsed >= 1}
+                variant="outline"
+                size="sm"
+              >
                 <Volume2 className="h-4 w-4 mr-2" />{" "}
-                {playsUsed === 0 ? "Play audio (1 play only)" : "Already played"}
+                {audioLoading
+                  ? "Preparing audio…"
+                  : playsUsed === 0
+                    ? "Play audio (1 play only)"
+                    : "Already played"}
               </Button>
               <span className="text-xs text-muted-foreground">Exam rules: audio plays once.</span>
+              {audioLoading && (
+                <p role="status" className="text-xs text-muted-foreground">
+                  {playback.loadingNote}
+                </p>
+              )}
+              {playback.error && (
+                <p role="status" className="text-xs text-destructive">
+                  {playback.error}
+                </p>
+              )}
             </div>
           )}
 

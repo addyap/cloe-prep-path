@@ -16,9 +16,11 @@ dist-ssr
 .nitro
 *.local
 
-# Wrangler / Cloudflare
-.wrangler/
-.dev.vars
+# Local server credentials
+.env.local
+.env.*.local
+.vercel
+public/kokoro-runtime/
 
 # Supabase CLI local cache
 supabase/.temp/
