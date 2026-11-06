@@ -49,6 +49,7 @@ export function PublicFooter() {
           </a>{" "}
           — tools for grammar, listening, speaking and exam prep, built by a certified trainer.
         </p>
+        <p>Website by <a href="https://thevitrine.fr/en/" target="_blank" rel="noopener" className="underline underline-offset-2 hover:no-underline">The Vitrine</a></p>
       </div>
     </footer>
   );
