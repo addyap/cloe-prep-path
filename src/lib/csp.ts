@@ -23,12 +23,12 @@ export function currentNonce(): string | undefined {
 export function contentSecurityPolicy(nonce: string) {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' https://va.vercel-scripts.com`,
+    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://www.antonyaddy.com",
     "font-src 'self'",
     "media-src 'self' data: blob:",
-    "connect-src 'self' https://va.vercel-scripts.com",
+    "connect-src 'self' https://va.vercel-scripts.com https://huggingface.co https://*.huggingface.co https://*.hf.co",
     "manifest-src 'self'",
     "worker-src 'self'",
     "base-uri 'self'",

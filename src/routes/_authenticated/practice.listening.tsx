@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   Play,
   Pause,
@@ -17,7 +17,8 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
 import { ReportIssueDialog } from "@/components/report-issue-dialog";
-import { cn, shuffle } from "@/lib/utils";
+import { useListeningAudio } from "@/hooks/use-listening-audio";
+import { cn, extractSpokenScript, shuffle } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/practice/listening")({
   component: ListeningPractice,
@@ -98,14 +99,16 @@ function ListeningPractice() {
   const [current, setCurrent] = useState<SessionUnit | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [plays, setPlays] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [rate, setRate] = useState(1);
-  const [audioNote, setAudioNote] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   const [missedIds, setMissedIds] = useState<Set<string>>(new Set());
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playback = useListeningAudio(current?.id, MAX_PLAYS, rate);
+  const plays = playback.plays;
+  const isPlaying = playback.status === "playing";
+  const audioLoading = playback.status === "loading";
+  const audioNote = playback.error;
+  const stopAudio = playback.stop;
 
   useEffect(() => {
     (async () => {
@@ -229,63 +232,20 @@ function ListeningPractice() {
     setCurrent(next);
   }, [loading, current, done, level, asked, pickNext]);
 
-  // Stop audio when unit changes / unmount
-  useEffect(() => {
-    return () => stopAudio();
-  }, [current?.id]);
-
-  function stopAudio() {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    setIsPlaying(false);
-  }
-
   function playAudio() {
     if (!current) return;
-    if (plays >= MAX_PLAYS) return;
-    stopAudio();
-    setAudioNote(null);
-    const audioUrl = current.audio_url;
-    if (!audioUrl) {
-      setAudioNote("This clip has no audio yet — please read the transcript below.");
-      return;
-    }
-
-    // Always a fresh element: reusing one and calling pause() then play() races
-    // to an AbortError. There is deliberately NO text-to-speech fallback — the
-    // studio MP3 plays, or we surface a retry. The browser's TTS is the robotic
-    // voice, and it must never stand in for the real audio.
-    const el = new Audio(audioUrl);
-    audioRef.current = el;
-    el.playbackRate = rate;
-    el.onended = () => setIsPlaying(false);
-    el.onpause = () => setIsPlaying(false);
-    el.onerror = () => {
-      setIsPlaying(false);
-      setAudioNote("Couldn't load the audio — check your connection and press play to retry.");
-    };
-    el.play().then(
-      () => {
-        setIsPlaying(true);
-        setPlays((p) => p + 1); // count a play only once it actually starts
-      },
-      (err: DOMException) => {
-        // A superseded play (AbortError) is harmless; anything else is real.
-        if (err?.name === "AbortError") return;
-        setIsPlaying(false);
-        setAudioNote("Couldn't play the audio — press play to try again.");
-      },
+    void playback.play(
+      { kind: current.kind === "single" ? "question" : "passage", id: current.id },
+      current.audio_url,
+      current.kind === "passage"
+        ? current.body
+        : current.audio_url?.startsWith("tts:")
+          ? current.audio_url.slice(4)
+          : extractSpokenScript(current.prompt_text),
     );
   }
 
-  function pauseAudio() {
-    if (audioRef.current && !audioRef.current.paused) {
-      audioRef.current.pause();
-    }
-    setIsPlaying(false);
-  }
+  const pauseAudio = stopAudio;
 
   async function submit() {
     if (!current || submitted) return;
@@ -382,7 +342,6 @@ function ListeningPractice() {
     setAsked(newAsked);
     setAnswers({});
     setSubmitted(false);
-    setPlays(0);
     if (results.length >= SESSION_LENGTH || newAsked.size >= pool.length) {
       setDone(true);
       setCurrent(null);
@@ -503,11 +462,17 @@ function ListeningPractice() {
             <Button
               size="lg"
               onClick={isPlaying ? pauseAudio : playAudio}
-              disabled={!isPlaying && plays >= MAX_PLAYS}
+              disabled={audioLoading || (!isPlaying && plays >= MAX_PLAYS)}
               className="bg-accent text-accent-foreground hover:bg-accent/90 h-14 w-14 rounded-full p-0"
-              aria-label={isPlaying ? "Pause" : "Play"}
+              aria-label={audioLoading ? "Preparing audio" : isPlaying ? "Pause" : "Play"}
             >
-              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
+              {audioLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : isPlaying ? (
+                <Pause className="h-6 w-6" />
+              ) : (
+                <Play className="h-6 w-6 ml-0.5" />
+              )}
             </Button>
             <Button
               variant="outline"
@@ -515,7 +480,7 @@ function ListeningPractice() {
                 stopAudio();
                 playAudio();
               }}
-              disabled={plays >= MAX_PLAYS}
+              disabled={audioLoading || plays >= MAX_PLAYS}
               className="gap-1.5"
             >
               <RotateCcw className="h-4 w-4" /> Replay
@@ -544,6 +509,11 @@ function ListeningPractice() {
               </strong>
             </div>
           </div>
+          {audioLoading && (
+            <p role="status" className="mt-3 text-xs text-muted-foreground">
+              {playback.loadingNote}
+            </p>
+          )}
           {audioNote && (
             <p
               className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground"

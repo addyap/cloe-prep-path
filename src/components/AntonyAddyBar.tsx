@@ -23,7 +23,7 @@ const AntonyAddyBar = () => (
         </a>
       </li>
       <li>
-        <a href="https://www.antonyaddy.com/sites-web/en">Websites</a>
+        <a href="https://thevitrine.fr/en/#work">Websites</a>
       </li>
       <li>
         <a href="https://www.antonyaddy.com/ia/en">AI</a>
