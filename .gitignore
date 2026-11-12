@@ -39,3 +39,7 @@ BOOTSTRAP_NEW_DB.sql
 *.njsproj
 *.sln
 *.sw?
+
+# Kokoro voice model (npm run audio:setup)
+.venv-kokoro
+.wrangler

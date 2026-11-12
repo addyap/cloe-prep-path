@@ -4,6 +4,7 @@ import { joinWav, pcmToWav } from "../src/lib/wav";
 import { ListeningPlayer } from "../src/lib/listening-player";
 import type { PlayerState } from "../src/lib/listening-player";
 import { INITIAL_PLAYER_STATE } from "../src/lib/listening-player";
+import { isPlayableAudio, needsKokoroAudio } from "../src/lib/audio-config";
 
 import { wav } from "./wav-fixture";
 
@@ -189,5 +190,19 @@ describe("practice and exam playback", () => {
     expect(h.audios[0].pause).toHaveBeenCalled();
     expect(h.state().plays).toBe(0);
     expect(h.state().status).toBe("idle");
+  });
+});
+
+describe("pre-recorded clips", () => {
+  test("play the site's own recordings without generating speech", () => {
+    const url = "/audio/q-008c3dd7-3205-49aa-b428-a73dce1ee56b.mp3?v=a523c49b";
+    expect(isPlayableAudio(url)).toBe(true);
+    expect(needsKokoroAudio(url)).toBe(false);
+  });
+
+  test("still generate speech for missing clips and tts: placeholders", () => {
+    expect(needsKokoroAudio(null)).toBe(true);
+    expect(needsKokoroAudio("tts:Hello there")).toBe(true);
+    expect(isPlayableAudio("//elsewhere.example/clip.mp3")).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { CefrProgress, type CefrLevel } from "@/components/cefr-progress";
 import { Button } from "@/components/ui/button";
 import {
@@ -75,29 +75,35 @@ function ProgressPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await db.auth.getUser();
       if (!u.user) return;
-      const [profileRes, attemptsRes, sessionsRes] = await Promise.all([
-        supabase
+      const [profileRes, attemptsRes, sessionsRes, questionsRes] = await Promise.all([
+        db
           .from("profiles")
           .select("current_estimated_level, target_cefr_level")
           .eq("id", u.user.id)
           .maybeSingle(),
-        supabase
+        db
           .from("attempts")
-          .select(
-            "id, created_at, skill, cefr_level, is_correct, score, question_id, questions(context_tag)",
-          )
+          .select("id, created_at, skill, cefr_level, is_correct, score, question_id")
           .eq("user_id", u.user.id)
           .order("created_at", { ascending: true }),
-        supabase
+        db
           .from("practice_sessions")
           .select("started_at, completed_at, skill")
           .eq("user_id", u.user.id),
+        db.from("questions").select("id, context_tag"),
       ]);
+      // Each attempt with its question's context, as the old database join gave it.
+      const contextOf = new Map((questionsRes.data ?? []).map((q) => [q.id, q.context_tag]));
       setCurrent((profileRes.data?.current_estimated_level as CefrLevel) ?? null);
       setTarget((profileRes.data?.target_cefr_level as CefrLevel) ?? null);
-      setAttempts((attemptsRes.data as Attempt[]) ?? []);
+      setAttempts(
+        (attemptsRes.data ?? []).map((a) => ({
+          ...a,
+          questions: { context_tag: contextOf.get(a.question_id) ?? null },
+        })) as Attempt[],
+      );
       setSessions((sessionsRes.data as Session[]) ?? []);
       setLoading(false);
     })();

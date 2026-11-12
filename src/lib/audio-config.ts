@@ -16,8 +16,10 @@ export const DIALOGUE_VOICES = PREVIEW_VOICES;
 
 export type ListeningAudioTarget = { kind: "question" | "passage"; id: string };
 
+/** A recording the browser can play: a full URL, a blob, or a file on this
+ *  site (the pre-recorded clips in public/audio/, e.g. "/audio/q-<id>.mp3"). */
 export function isPlayableAudio(url: string | null | undefined): url is string {
-  return !!url && /^(https?:\/\/|blob:)/i.test(url);
+  return !!url && /^(https?:\/\/|blob:|\/(?!\/))/i.test(url);
 }
 
 export function needsKokoroAudio(url: string | null | undefined): boolean {

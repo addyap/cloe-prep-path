@@ -1,20 +1,15 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const { data, error } = await supabase.auth.getUser();
-    let user = !error && data.user ? data.user : null;
-
-    if (!user) {
-      const { data: anon, error: anonError } = await supabase.auth.signInAnonymously();
-      if (anonError || !anon.user) throw redirect({ to: "/auth" });
-      user = anon.user;
-    }
+    // Each browser is one learner; there's no sign-in (see src/lib/local-db.ts).
+    const { data } = await db.auth.getUser();
+    const user = data.user!;
 
     if (location.pathname !== "/onboarding") {
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from("profiles")
         .select("target_cefr_level")
         .eq("id", user.id)

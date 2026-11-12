@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { BookOpen, Timer, Check, X, ArrowRight, Loader2, Trophy, TimerOff } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -81,21 +81,17 @@ function ReadingPractice() {
   useEffect(() => {
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u } = await db.auth.getUser();
         const [profileRes, passRes, qRes] = await Promise.all([
           u.user
-            ? supabase
+            ? db
                 .from("profiles")
                 .select("current_estimated_level")
                 .eq("id", u.user.id)
                 .maybeSingle()
             : Promise.resolve({ data: null } as const),
-          supabase.from("passages").select("*").eq("skill", "reading"),
-          supabase
-            .from("questions")
-            .select("*")
-            .eq("skill", "reading")
-            .not("passage_id", "is", null),
+          db.from("passages").select("*").eq("skill", "reading"),
+          db.from("questions").select("*").eq("skill", "reading").not("passage_id", "is", null),
         ]);
         if (passRes.error) throw passRes.error;
         if (qRes.error) throw qRes.error;
@@ -132,7 +128,7 @@ function ReadingPractice() {
         setPool(passages);
 
         if (u.user) {
-          const { data: missed } = await supabase
+          const { data: missed } = await db
             .from("attempts")
             .select("question_id")
             .eq("user_id", u.user.id)
@@ -223,9 +219,9 @@ function ReadingPractice() {
       correct: answers[q.id] === q.correct_answer,
     }));
     setResults((r) => [...r, { passage: current, answers: graded, seconds }]);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("attempts").insert(
+      await db.from("attempts").insert(
         graded.map((g) => ({
           user_id: u.user!.id,
           question_id: g.question.id,
@@ -326,12 +322,19 @@ function ReadingPractice() {
           <div className="mt-6 space-y-4 text-sm md:text-base text-foreground/90">
             <p className="font-semibold">After this session you will be able to:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Read and understand professional emails, reports, and business documents in English.</li>
-              <li>Locate key information, infer meaning from context, and distinguish fact from opinion.</li>
+              <li>
+                Read and understand professional emails, reports, and business documents in English.
+              </li>
+              <li>
+                Locate key information, infer meaning from context, and distinguish fact from
+                opinion.
+              </li>
             </ul>
             <p className="font-semibold mt-4">How it works:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>You will read {SESSION_PASSAGES} passages, each with several linked questions.</li>
+              <li>
+                You will read {SESSION_PASSAGES} passages, each with several linked questions.
+              </li>
               <li>Use the optional timer to simulate exam conditions.</li>
               <li>Answer all questions for a passage, then submit to see detailed feedback.</li>
               <li>Difficulty adapts based on your answers.</li>
@@ -605,18 +608,37 @@ function Summary({ results, estimatedLevel }: { results: PassageResult[]; estima
             </div>
             <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
               {accuracy < 50 && (
-                <li>Below 50% — try shorter, simpler passages to build comprehension before stepping up.</li>
+                <li>
+                  Below 50% — try shorter, simpler passages to build comprehension before stepping
+                  up.
+                </li>
               )}
               {accuracy >= 50 && accuracy < 80 && weakestTag && (
-                <li>Focus on <span className="font-semibold capitalize">{weakestTag.tag.replace("_", " ")}</span> passages — it was your weakest topic this session.</li>
+                <li>
+                  Focus on{" "}
+                  <span className="font-semibold capitalize">
+                    {weakestTag.tag.replace("_", " ")}
+                  </span>{" "}
+                  passages — it was your weakest topic this session.
+                </li>
               )}
               {accuracy >= 80 && (
-                <li>Great reading session. Try a <Link to="/practice/grammar-vocab" className="underline font-semibold">grammar drill</Link> to sharpen accuracy in your writing too.</li>
+                <li>
+                  Great reading session. Try a{" "}
+                  <Link to="/practice/grammar-vocab" className="underline font-semibold">
+                    grammar drill
+                  </Link>{" "}
+                  to sharpen accuracy in your writing too.
+                </li>
               )}
               {wpm !== null && wpm < 150 && (
-                <li>Your reading speed ({wpm} WPM) is below the exam pace — timed practice will help.</li>
+                <li>
+                  Your reading speed ({wpm} WPM) is below the exam pace — timed practice will help.
+                </li>
               )}
-              <li>Re-read passages you found difficult — noticing what you missed builds retention.</li>
+              <li>
+                Re-read passages you found difficult — noticing what you missed builds retention.
+              </li>
             </ul>
           </div>
 

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Check, X, Loader2, Trophy, Flame, Timer, PenLine, Zap, ArrowRight } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -93,18 +93,18 @@ function GrammarVocabPractice() {
     setError(null);
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u } = await db.auth.getUser();
         const [profileRes, qRes] = await Promise.all([
           u.user
-            ? supabase
+            ? db
                 .from("profiles")
                 .select("current_estimated_level")
                 .eq("id", u.user.id)
                 .maybeSingle()
             : Promise.resolve({ data: null } as const),
           topic === "mixed"
-            ? supabase.from("questions").select("*").eq("skill", "grammar_vocab")
-            : supabase
+            ? db.from("questions").select("*").eq("skill", "grammar_vocab")
+            : db
                 .from("questions")
                 .select("*")
                 .eq("skill", "grammar_vocab")
@@ -141,7 +141,7 @@ function GrammarVocabPractice() {
         setPool(list);
 
         if (u.user) {
-          const { data: missed } = await supabase
+          const { data: missed } = await db
             .from("attempts")
             .select("question_id")
             .eq("user_id", u.user.id)
@@ -242,9 +242,9 @@ function GrammarVocabPractice() {
     if (newRight > bestStreak) setBestStreak(newRight);
     setStreakRight(newRight);
     setStreakWrong(newWrong);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("attempts").insert({
+      await db.from("attempts").insert({
         user_id: u.user.id,
         question_id: current.id,
         skill: "grammar_vocab",
@@ -691,15 +691,33 @@ function Summary({
             </div>
             <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
               {accuracy < 50 && (
-                <li>Below 50% — review the explanations above, then try a focused drill on fewer sub-topics.</li>
+                <li>
+                  Below 50% — review the explanations above, then try a focused drill on fewer
+                  sub-topics.
+                </li>
               )}
               {accuracy >= 50 && accuracy < 80 && tagStats[0] && tagStats[0].acc < 0.6 && (
-                <li>Drill <span className="font-semibold capitalize">{tagStats[0].tag.replace(/_/g, " ")}</span> on its own to bring up your weakest area.</li>
+                <li>
+                  Drill{" "}
+                  <span className="font-semibold capitalize">
+                    {tagStats[0].tag.replace(/_/g, " ")}
+                  </span>{" "}
+                  on its own to bring up your weakest area.
+                </li>
               )}
               {accuracy >= 80 && (
-                <li>Solid accuracy. Try a <Link to="/practice/writing" className="underline font-semibold">writing exercise</Link> to put your grammar into practice.</li>
+                <li>
+                  Solid accuracy. Try a{" "}
+                  <Link to="/practice/writing" className="underline font-semibold">
+                    writing exercise
+                  </Link>{" "}
+                  to put your grammar into practice.
+                </li>
               )}
-              <li>Questions you got wrong will appear more often in future sessions — spacing builds long-term memory.</li>
+              <li>
+                Questions you got wrong will appear more often in future sessions — spacing builds
+                long-term memory.
+              </li>
             </ul>
           </div>
 

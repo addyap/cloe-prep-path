@@ -1,15 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
 import { createOpenAiProvider } from "@/lib/ai-gateway.server";
-import {
-  ENFORCE_ENTITLEMENTS,
-  hasFeature,
-  resolvePlan,
-  type SubscriptionRow,
-} from "@/lib/entitlements";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 const PHASES = ["interview", "role_play", "discussion"] as const;
@@ -130,17 +122,6 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const authHeader = request.headers.get("authorization") ?? "";
-          if (!authHeader.startsWith("Bearer ")) {
-            return new Response(JSON.stringify({ error: "Unauthorized" }), {
-              status: 401,
-              headers: { "Content-Type": "application/json" },
-            });
-          }
-          const token = authHeader.slice(7);
-
-          const SUPABASE_URL = process.env.SUPABASE_URL!;
-          const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
           const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
           if (!OPENAI_API_KEY) {
             return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
@@ -149,41 +130,11 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
             });
           }
 
-          const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-            global: { headers: { Authorization: `Bearer ${token}` } },
-            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-          });
-          const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
-          if (claimsErr || !claimsData?.claims?.sub) {
-            return new Response(JSON.stringify({ error: "Unauthorized" }), {
-              status: 401,
-              headers: { "Content-Type": "application/json" },
-            });
-          }
-          const userId = claimsData.claims.sub as string;
-
-          if (ENFORCE_ENTITLEMENTS) {
-            const { data: subRow } = await supabase
-              .from("subscriptions")
-              .select("plan, status, current_period_end")
-              .eq("user_id", userId)
-              .maybeSingle();
-            const plan = resolvePlan((subRow ?? null) as SubscriptionRow | null);
-            if (!hasFeature(plan, "ai_speaking_feedback")) {
-              return new Response(JSON.stringify({ error: "UPGRADE_REQUIRED" }), {
-                status: 402,
-                headers: { "Content-Type": "application/json" },
-              });
-            }
-          }
-
           const form = await request.formData();
           const audio = form.get("audio");
-          const question_id = String(form.get("question_id") ?? "");
           const prompt_text = String(form.get("prompt_text") ?? "");
           const target_level = String(form.get("target_level") ?? "B1") as (typeof LEVELS)[number];
           const phase = String(form.get("phase") ?? "interview") as (typeof PHASES)[number];
-          const save = String(form.get("save") ?? "true") !== "false";
 
           if (!(audio instanceof Blob) || audio.size < 512) {
             return new Response(JSON.stringify({ error: "Recording too short or empty." }), {
@@ -222,26 +173,8 @@ export const Route = createFileRoute("/api/speaking/evaluate")({
               100,
           );
 
-          let attempt_id: string | null = null;
-          if (save && question_id) {
-            const { data, error } = await supabase
-              .from("attempts")
-              .insert({
-                user_id: userId,
-                question_id,
-                skill: "speaking",
-                cefr_level: feedback.estimated_level,
-                user_answer: transcript,
-                is_correct: null,
-                score: overall / 100,
-                feedback: { ...feedback, phase } as never,
-              })
-              .select("id")
-              .single();
-            if (!error) attempt_id = data.id;
-          }
-
-          return Response.json({ attempt_id, transcript, feedback, overall });
+          // The learner's browser saves the attempt (src/lib/attempts.ts).
+          return Response.json({ transcript, feedback, overall });
         } catch (e: unknown) {
           const err = e as { message?: string; statusCode?: number };
           const status = err.statusCode === 429 ? 429 : err.statusCode === 402 ? 402 : 500;

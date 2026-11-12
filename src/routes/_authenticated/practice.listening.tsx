@@ -12,7 +12,7 @@ import {
   Loader2,
   Trophy,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -113,22 +113,18 @@ function ListeningPractice() {
   useEffect(() => {
     (async () => {
       try {
-        const { data: u } = await supabase.auth.getUser();
+        const { data: u } = await db.auth.getUser();
         const [profileRes, singlesRes, passagesRes, passageQsRes] = await Promise.all([
           u.user
-            ? supabase
+            ? db
                 .from("profiles")
                 .select("current_estimated_level")
                 .eq("id", u.user.id)
                 .maybeSingle()
             : Promise.resolve({ data: null } as const),
-          supabase.from("questions").select("*").eq("skill", "listening").is("passage_id", null),
-          supabase.from("passages").select("*").eq("skill", "listening"),
-          supabase
-            .from("questions")
-            .select("*")
-            .eq("skill", "listening")
-            .not("passage_id", "is", null),
+          db.from("questions").select("*").eq("skill", "listening").is("passage_id", null),
+          db.from("passages").select("*").eq("skill", "listening"),
+          db.from("questions").select("*").eq("skill", "listening").not("passage_id", "is", null),
         ]);
         if (singlesRes.error) throw singlesRes.error;
         if (passagesRes.error) throw passagesRes.error;
@@ -182,7 +178,7 @@ function ListeningPractice() {
         setPool([...singleUnits, ...passageUnits]);
 
         if (u.user) {
-          const { data: missed } = await supabase
+          const { data: missed } = await db
             .from("attempts")
             .select("question_id")
             .eq("user_id", u.user.id)
@@ -296,9 +292,9 @@ function ListeningPractice() {
 
     setResults((r) => [...r, { unit: current, answers, correctCount, totalCount }]);
 
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await db.auth.getUser();
     if (u.user) {
-      await supabase.from("attempts").insert(
+      await db.from("attempts").insert(
         attemptRows.map((a) => ({
           user_id: u.user!.id,
           question_id: a.question_id,

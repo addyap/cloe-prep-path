@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AccessibilityRouteImport } from './routes/accessibility'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LegalNoticeRouteImport } from './routes/legal-notice'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
@@ -26,7 +25,6 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPracticeRouteImport } from './routes/_authenticated/practice'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
-import { Route as AuthenticatedAdminGenerateRouteImport } from './routes/_authenticated/admin.generate'
 import { Route as AuthenticatedPracticeIndexRouteImport } from './routes/_authenticated/practice.index'
 import { Route as AuthenticatedPracticeGrammarVocabRouteImport } from './routes/_authenticated/practice.grammar-vocab'
 import { Route as AuthenticatedPracticeListeningRouteImport } from './routes/_authenticated/practice.listening'
@@ -35,7 +33,6 @@ import { Route as AuthenticatedPracticeSpeakingRouteImport } from './routes/_aut
 import { Route as AuthenticatedPracticeWordBankRouteImport } from './routes/_authenticated/practice.word-bank'
 import { Route as AuthenticatedPracticeWritingRouteImport } from './routes/_authenticated/practice.writing'
 import { Route as ApiSpeakingEvaluateRouteImport } from './routes/api/speaking/evaluate'
-import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,11 +46,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AccessibilityRoute = AccessibilityRouteImport.update({
   id: '/accessibility',
   path: '/accessibility',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -121,12 +113,6 @@ const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminGenerateRoute =
-  AuthenticatedAdminGenerateRouteImport.update({
-    id: '/admin/generate',
-    path: '/admin/generate',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedPracticeIndexRoute =
   AuthenticatedPracticeIndexRouteImport.update({
     id: '/',
@@ -174,16 +160,10 @@ const ApiSpeakingEvaluateRoute = ApiSpeakingEvaluateRouteImport.update({
   path: '/api/speaking/evaluate',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
-  id: '/api/stripe/webhook',
-  path: '/api/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
-  '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -197,7 +177,6 @@ export interface FileRoutesByFullPath {
   '/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
-  '/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -205,13 +184,11 @@ export interface FileRoutesByFullPath {
   '/practice/word-bank': typeof AuthenticatedPracticeWordBankRoute
   '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
-  '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -224,7 +201,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
-  '/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -232,7 +208,6 @@ export interface FileRoutesByTo {
   '/practice/word-bank': typeof AuthenticatedPracticeWordBankRoute
   '/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/practice': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRoutesById {
@@ -240,7 +215,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accessibility': typeof AccessibilityRoute
-  '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/legal-notice': typeof LegalNoticeRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -254,7 +228,6 @@ export interface FileRoutesById {
   '/_authenticated/practice': typeof AuthenticatedPracticeRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
-  '/_authenticated/admin/generate': typeof AuthenticatedAdminGenerateRoute
   '/_authenticated/practice/grammar-vocab': typeof AuthenticatedPracticeGrammarVocabRoute
   '/_authenticated/practice/listening': typeof AuthenticatedPracticeListeningRoute
   '/_authenticated/practice/reading': typeof AuthenticatedPracticeReadingRoute
@@ -262,7 +235,6 @@ export interface FileRoutesById {
   '/_authenticated/practice/word-bank': typeof AuthenticatedPracticeWordBankRoute
   '/_authenticated/practice/writing': typeof AuthenticatedPracticeWritingRoute
   '/api/speaking/evaluate': typeof ApiSpeakingEvaluateRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_authenticated/practice/': typeof AuthenticatedPracticeIndexRoute
 }
 export interface FileRouteTypes {
@@ -270,7 +242,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accessibility'
-    | '/auth'
     | '/faq'
     | '/legal-notice'
     | '/mentions-legales'
@@ -284,7 +255,6 @@ export interface FileRouteTypes {
     | '/practice'
     | '/profile'
     | '/progress'
-    | '/admin/generate'
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
@@ -292,13 +262,11 @@ export interface FileRouteTypes {
     | '/practice/word-bank'
     | '/practice/writing'
     | '/api/speaking/evaluate'
-    | '/api/stripe/webhook'
     | '/practice/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/accessibility'
-    | '/auth'
     | '/faq'
     | '/legal-notice'
     | '/mentions-legales'
@@ -311,7 +279,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/progress'
-    | '/admin/generate'
     | '/practice/grammar-vocab'
     | '/practice/listening'
     | '/practice/reading'
@@ -319,14 +286,12 @@ export interface FileRouteTypes {
     | '/practice/word-bank'
     | '/practice/writing'
     | '/api/speaking/evaluate'
-    | '/api/stripe/webhook'
     | '/practice'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/accessibility'
-    | '/auth'
     | '/faq'
     | '/legal-notice'
     | '/mentions-legales'
@@ -340,7 +305,6 @@ export interface FileRouteTypes {
     | '/_authenticated/practice'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
-    | '/_authenticated/admin/generate'
     | '/_authenticated/practice/grammar-vocab'
     | '/_authenticated/practice/listening'
     | '/_authenticated/practice/reading'
@@ -348,7 +312,6 @@ export interface FileRouteTypes {
     | '/_authenticated/practice/word-bank'
     | '/_authenticated/practice/writing'
     | '/api/speaking/evaluate'
-    | '/api/stripe/webhook'
     | '/_authenticated/practice/'
   fileRoutesById: FileRoutesById
 }
@@ -356,7 +319,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccessibilityRoute: typeof AccessibilityRoute
-  AuthRoute: typeof AuthRoute
   FaqRoute: typeof FaqRoute
   LegalNoticeRoute: typeof LegalNoticeRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -365,7 +327,6 @@ export interface RootRouteChildren {
   RefundPolicyRoute: typeof RefundPolicyRoute
   TermsRoute: typeof TermsRoute
   ApiSpeakingEvaluateRoute: typeof ApiSpeakingEvaluateRoute
-  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,13 +350,6 @@ declare module '@tanstack/react-router' {
       path: '/accessibility'
       fullPath: '/accessibility'
       preLoaderRoute: typeof AccessibilityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -489,13 +443,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgressRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/generate': {
-      id: '/_authenticated/admin/generate'
-      path: '/admin/generate'
-      fullPath: '/admin/generate'
-      preLoaderRoute: typeof AuthenticatedAdminGenerateRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/practice/': {
       id: '/_authenticated/practice/'
       path: '/'
@@ -552,13 +499,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSpeakingEvaluateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/stripe/webhook': {
-      id: '/api/stripe/webhook'
-      path: '/api/stripe/webhook'
-      fullPath: '/api/stripe/webhook'
-      preLoaderRoute: typeof ApiStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -595,7 +535,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPracticeRoute: typeof AuthenticatedPracticeRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
-  AuthenticatedAdminGenerateRoute: typeof AuthenticatedAdminGenerateRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -605,7 +544,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPracticeRoute: AuthenticatedPracticeRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
-  AuthenticatedAdminGenerateRoute: AuthenticatedAdminGenerateRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -615,7 +553,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccessibilityRoute: AccessibilityRoute,
-  AuthRoute: AuthRoute,
   FaqRoute: FaqRoute,
   LegalNoticeRoute: LegalNoticeRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
@@ -624,7 +561,6 @@ const rootRouteChildren: RootRouteChildren = {
   RefundPolicyRoute: RefundPolicyRoute,
   TermsRoute: TermsRoute,
   ApiSpeakingEvaluateRoute: ApiSpeakingEvaluateRoute,
-  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -12,7 +12,8 @@ import {
   Play,
   Pause,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/local-db";
+import { saveSpeakingAttempt } from "@/lib/attempts";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { PracticeErrorState, PracticeRouteError } from "@/components/practice-error";
@@ -86,17 +87,17 @@ function SpeakingPractice() {
     (async () => {
       try {
         const [{ data: qs, error: qError }, { data: userRes }] = await Promise.all([
-          supabase
+          db
             .from("questions")
             .select("id, cefr_level, context_tag, prompt_text")
             .eq("skill", "speaking")
             .eq("type", "prompt"),
-          supabase.auth.getUser(),
+          db.auth.getUser(),
         ]);
         if (qError) throw qError;
         setPrompts((qs ?? []) as Prompt[]);
         if (userRes?.user) {
-          const { data: prof } = await supabase
+          const { data: prof } = await db
             .from("profiles")
             .select("current_estimated_level")
             .eq("id", userRes.user.id)
@@ -422,19 +423,14 @@ function PhaseRecorder({
     setSubmitting(true);
     setError(null);
     try {
-      const { data: sess } = await supabase.auth.getSession();
-      const token = sess.session?.access_token;
-      if (!token) throw new Error("Not signed in.");
       const form = new FormData();
       form.append("audio", blob, `recording.${blob.type.includes("mp4") ? "mp4" : "webm"}`);
       form.append("question_id", prompt.id);
       form.append("prompt_text", prompt.prompt_text);
       form.append("target_level", targetLevel);
       form.append("phase", phase);
-      form.append("save", save ? "true" : "false");
       const res = await fetch("/api/speaking/evaluate", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: form,
       });
       if (!res.ok) {
@@ -442,6 +438,7 @@ function PhaseRecorder({
         throw new Error(j.error ?? `Evaluation failed (${res.status})`);
       }
       const data = (await res.json()) as EvalResult;
+      if (save) await saveSpeakingAttempt(prompt.id, data, phase);
       setResult(data);
       onSubmitted(data);
     } catch (e: unknown) {

@@ -12,11 +12,9 @@ preset. The `prebuild` script copies the installed ONNX runtime into
 in the static deployment. The worker loads only when speech generation is
 needed. Model weights and voices download from Hugging Face on first use.
 
-Keep the existing Supabase server variables and the `listening-audio` public
-bucket. Admin uploads use `SUPABASE_SERVICE_ROLE_KEY` on the server, as before.
-Learner speech and voice previews don't use that key. Keep `OPENAI_API_KEY` for
-the existing question generation, transcription, and feedback features.
-No additional environment variables or database migrations are required.
+The site has no database (see CLAUDE.md). Keep `OPENAI_API_KEY` for writing
+feedback and speaking transcription and feedback. No other environment
+variables are required.
 
 The security policy permits WebAssembly compilation and model downloads from
 Hugging Face. Executable runtime modules are served from the application's own
@@ -48,32 +46,20 @@ the printed question after a quoted script. Long scripts are split into short
 segments to avoid Kokoro's tokenizer limit. Output is 24 kHz, 16-bit PCM WAV,
 joined under one RIFF header with short pauses between segments.
 
-## Upgrade the shared audio bank
+## Record the shared audio bank
 
-You need a CLOE admin account and the existing Supabase storage setup.
+Every listening question and passage is pre-recorded with Kokoro on a
+maintainer's computer and shipped as static files in `public/audio/`, so
+learners normally never load the model. Browser generation is only a fallback
+for a clip that has no recording.
 
-1. Open **Admin → Generate → Voice preview** and play a sample.
-2. Enable **Re-voice everything** to replace older clips, including uploaded
-   recordings, with Kokoro. Leave it unchecked to fill missing audio only.
-3. Select **Re-voice item audio (next 2)** until its remaining count reaches zero.
-4. Select **Re-voice passage audio (next 2)** until its count reaches zero.
-5. Resolve any reported errors, then verify an item and dialogue as a learner.
+1. One-off setup: `brew install uv ffmpeg espeak-ng`, then `npm run audio:setup`.
+2. After editing listening content in `src/data/*.json`, run `npm run audio`.
+   It records new or changed clips and writes each item's `audio_url`
+   (`/audio/q-<id>.mp3?v=<fingerprint>` or `/audio/passage-<id>.mp3?v=…`).
+3. Commit the new MP3s and the updated JSON.
 
-Keep the admin page open during each batch. The admin browser performs speech
-generation, then uploads directly to Supabase with a short-lived token scoped
-to one canonical object path. Audio bytes do not pass through Vercel's request
-body. The server checks the admin role, canonical script hash, file metadata,
-size, and WAV structure before updating the lesson's audio URL. Signed tokens
-are created only for admins; the service-role key stays on the server.
-
-An object path includes a hash of the script, model, voices, and recipe version.
-Uploads are immutable, and old objects remain available for rollback. A retry
-reuses an uploaded object after a failed row update. The server rejects a save
-if its script changed after the batch was loaded.
-
-Re-voicing skips clips tagged with `#kokoro-browser-v1`. Bump `AUDIO_VERSION`
-in `src/lib/audio-config.ts` when changing the voicing recipe. If you edit a
-script, clear its `audio_url` to regenerate that individual clip.
+`npm run audio -- --force` re-records everything.
 
 ## Verify a change
 
@@ -101,14 +87,11 @@ Verify these browser behaviors:
 4. Navigate away while generation or playback is in progress; confirm it does
    not start or continue in the next question.
 5. Test a failed generation or playback start; confirm a retry remains possible.
-6. Generate an admin batch and verify its stored clips play for another learner
-   without initializing the model.
+6. Play a recorded clip and confirm it plays without loading the model.
 
-Unit tests cover script parsing, WAV assembly, playback limits, cancellation,
-upload scoping, immutable storage, and failure recovery. A live browser check
-is also needed to verify WebAssembly, model downloads, and media playback.
-Authenticated production bank updates still require access to an admin session
-and the production Supabase environment.
+Unit tests cover script parsing, WAV assembly, playback limits, cancellation
+and failure recovery. A live browser check is also needed to verify
+WebAssembly, model downloads, and media playback.
 
 ## Dependencies and limits
 
